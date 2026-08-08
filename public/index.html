@@ -3,384 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>غرفة صوتية - Xena Live</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <title>تطبيق ورد لايف - غرف الصوت المباشرة</title>
+    <!-- استدعاء مكتبة ZegoCloud للاتصال الصوتي الحقيقي -->
+    <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { 
-            background: linear-gradient(135deg, #0d061f 0%, #170d2d 50%, #090314 100%); 
-            color: #fff; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* الهيدر العلوي */
-        .room-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: rgba(15, 8, 30, 0.7);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .room-info { display: flex; align-items: center; gap: 10px; }
-        .room-badge { background: linear-gradient(45deg, #ff416c, #ff4b2b); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .room-title { font-size: 15px; font-weight: 600; color: #f0e6ff; }
-        .header-actions { display: flex; gap: 8px; }
-        .icon-btn { background: rgba(255, 255, 255, 0.1); border: none; width: 34px; height: 34px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; font-size: 14px; }
-        .icon-btn.exit { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-
-        /* المحتوى الرئيسي */
-        .room-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            overflow-y: auto;
-            position: relative;
+        body {
+            background: linear-gradient(180deg, #180935 0%, #080312 100%);
+            color: #ffffff;
+            padding-bottom: 80px;
+            min-height: 100vh;
         }
 
-        /* شبكة الكراسي والميكروفونات */
-        .mics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 0 10px;
-        }
-        .mic-seat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
-        .mic-circle {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            transition: 0.3s;
-        }
-        .mic-seat.active .mic-circle {
-            background: linear-gradient(135deg, #a855f7, #6366f1);
-            border: 2px solid #e879f9;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
-        }
-        .mic-number { font-size: 11px; color: #94a3b8; margin-top: 5px; }
-
-        .system-banner {
-            background: rgba(0, 0, 0, 0.3);
-            border-left: 3px solid #a855f7;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            color: #cbd5e1;
-            margin-bottom: 15px;
-        }
-
-        /* صندوق الشات */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        .chat-msg {
-            background: rgba(255, 255, 255, 0.06);
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            max-width: 85%;
-        }
-        .chat-msg span { color: #c084fc; font-weight: bold; margin-left: 5px; }
-
-        /* شريط التحكم السفلي */
-        .room-footer {
-            padding: 12px 16px;
-            background: rgba(15, 8, 30, 0.9);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .chat-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            border-radius: 20px;
-            color: white;
-            font-size: 14px;
-            outline: none;
-        }
-        .action-icon-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            cursor: pointer;
-            color: white;
-            transition: 0.2s;
-        }
-        .action-icon-btn:active { transform: scale(0.9); }
-        .mic-control-btn { background: linear-gradient(135deg, #10b981, #059669); }
-        .mic-control-btn.off { background: linear-gradient(135deg, #ef4444, #dc2626); }
-
-        /* نافذة الإعدادات المنبثقة */
-        .modal {
+        .tab-content {
             display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- شريط التنقل السفلي الثابت --- */
+        .bottom-nav {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0d061f;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 1000;
         }
-        .modal-content {
-            background: #160b2d;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 16px;
-            width: 85%;
-            max-width: 320px;
-            text-align: center;
-        }
-        .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #e879f9; }
-        .modal-btn {
-            background: rgba(255,255,255,0.1);
+        .nav-item {
+            color: #555;
+            font-size: 20px;
+            position: relative;
+            text-decoration: none;
+            background: none;
             border: none;
-            color: white;
-            padding: 10px;
-            width: 100%;
-            border-radius: 8px;
-            margin-top: 10px;
             cursor: pointer;
-            font-size: 14px;
         }
-        .modal-btn.close-modal { background: #ef4444; }
+        .nav-item.active {
+            color: #ff3b6a;
+        }
+        .nav-badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: #ff3b6a;
+            color: white;
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .dot {
+            position: absolute;
+            top: -2px;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background-color: #ff3b6a;
+            border-radius: 50%;
+        }
+
+        /* --- واجهة الملف الشخصي --- */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 15px;
+        }
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-direction: row-reverse;
+        }
+        .user-info {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        .user-name { font-size: 18px; font-weight: bold; }
+        .badges { display: flex; gap: 5px; justify-content: flex-end; }
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+        .badge-gender { background: linear-gradient(45deg, #007bff, #00d4ff); }
+        .badge-vip { background: linear-gradient(45deg, #00c6ff, #0072ff); color: white; border: 1px solid #fff;}
+        .badge-level { background: linear-gradient(45deg, #8e2de2, #4a00e0); }
+        .badge-heart { background: linear-gradient(45deg, #ff416c, #ff4b2b); }
+        .id-container { display: flex; align-items: center; gap: 5px; justify-content: flex-end; margin-top: 5px; }
+        .id-badge { background: #a88932; color: #fff; padding: 3px 10px; border-radius: 10px; font-size: 11px; }
+        .avatar { width: 75px; height: 75px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.2); background-color: #333; }
+        .stats-section { display: flex; justify-content: space-around; padding: 10px 15px 25px; text-align: center; }
+        .stat-item h3 { font-size: 20px; margin-bottom: 3px; }
+        .stat-item p { font-size: 12px; color: #8a80a8; }
+        .wallet-section { display: flex; gap: 15px; padding: 0 15px; margin-bottom: 20px; }
+        .wallet-card { flex: 1; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .card-diamonds { background: linear-gradient(135deg, #1e265c, #111536); border: 1px solid rgba(0, 198, 255, 0.2); }
+        .card-xcoins { background: linear-gradient(135deg, #3d3121, #211c15); border: 1px solid rgba(255, 215, 0, 0.2); }
+        .services-grid {
+            background: #130a24; margin: 0 15px 15px; border-radius: 15px; padding: 20px 10px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px 10px; border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .service-item { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+        .service-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; background: rgba(255, 255, 255, 0.05); }
+        .service-text { font-size: 11px; color: #aaa; text-align: center; }
+        .list-menu { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
+        .list-item {
+            background: #110820; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;
+            text-decoration: none; color: #fff; border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .list-item-right { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+
+        /* --- واجهة الأخبار --- */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
+        .page-title { font-size: 18px; font-weight: bold; }
+        .top-actions { display: flex; justify-content: space-around; padding: 15px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
+        .action-item { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+        .action-circle { width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .action-text { font-size: 12px; color: #ccc; }
+        .notifications-list { padding: 10px 15px; display: flex; flex-direction: column; gap: 15px; }
+        .notification-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .notif-left { display: flex; align-items: center; gap: 12px; flex-direction: row-reverse; flex: 1; }
+        .notif-avatar { width: 50px; height: 50px; background-color: #2a2040; border-radius: 50%; flex-shrink: 0; }
+        .notif-content { text-align: right; flex: 1; }
+        .notif-name { font-size: 14px; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+        .notif-text { font-size: 12px; color: #aaa; line-height: 1.4; }
+        .notif-time { font-size: 10px; color: #666; white-space: nowrap; }
+
+        /* --- واجهة الألعاب --- */
+        .user-card {
+            background: linear-gradient(135deg, #23134f, #15092a); margin: 10px 15px; padding: 15px; border-radius: 15px;
+            display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .progress-bar-container { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+        .progress-bar { width: 120px; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { width: 70%; height: 100%; background: linear-gradient(90deg, #00c6ff, #0072ff); }
+        .section-title { display: flex; justify-content: space-between; padding: 15px 15px 10px; font-size: 14px; font-weight: bold; }
+        .games-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 15px; text-align: center; }
+        .game-item {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 15px 5px; font-size: 10px; color: #ccc;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .game-icon { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.08); border-radius: 10px; }
+
+        /* --- واجهة غرفة البث الصوتي الحقيقي --- */
+        .room-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0, 0, 0, 0.2); }
+        
+        /* هذا هو الإطار الحقيقي الذي سيعمل فيه الصوت المباشر عبر السحاب */
+        #zego-audio-container {
+            width: 100%;
+            height: 400px;
+            background: #110820;
+            border-radius: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر العلوي -->
-    <div class="room-header">
-        <div class="room-info">
-            <span class="room-badge">مباشر 🔥</span>
-            <div class="room-title" id="roomName">جاري التحميل...</div>
+    <!-- 1. واجهة الملف الشخصي -->
+    <div id="profile-tab" class="tab-content active">
+        <div class="profile-header">
+            <a href="#" style="color:#a395c5; text-decoration:none;">❮</a>
+            <div class="user-details">
+                <div class="avatar"></div>
+                <div class="user-info">
+                    <div class="user-name">ميثاق</div>
+                    <div class="badges">
+                        <span class="badge badge-heart">❤️ 4</span>
+                        <span class="badge badge-level">💎 46</span>
+                        <span class="badge badge-vip">VIP5</span>
+                        <span class="badge badge-gender">♂ 18</span>
+                    </div>
+                    <div class="id-container">
+                        <span style="font-size:12px; color:#a395c5;">📋</span>
+                        <span class="id-badge">ID 523842</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="header-actions">
-            <button class="icon-btn" onclick="shareRoom()" title="مشاركة الرابط">🔗</button>
-            <!-- زر الخروج الفعلي من الروم -->
-            <button class="icon-btn exit" onclick="exitRoom()" title="خروج من الروم">🚪</button>
+        <div class="stats-section">
+            <div class="stat-item"><h3>146</h3><p>الأصدقاء</p></div>
+            <div class="stat-item"><h3>451</h3><p>تم تابع</p></div>
+            <div class="stat-item"><h3>208</h3><p>المعجبون</p></div>
+        </div>
+        <div class="wallet-section">
+            <div class="wallet-card card-xcoins">
+                <div style="font-size:24px;">🪙</div>
+                <div style="text-align: right;"><h4 style="font-size:13px; color:#ddd;">Xcoins</h4><p style="font-size:16px; font-weight:bold;">0</p></div>
+            </div>
+            <div class="wallet-card card-diamonds">
+                <div style="font-size:24px;">💎</div>
+                <div style="text-align: right;"><h4 style="font-size:13px; color:#ddd;">Diamonds</h4><p style="font-size:16px; font-weight:bold;">0</p></div>
+            </div>
+        </div>
+        <div class="services-grid">
+            <div class="service-item"><div class="service-icon">🌟</div><span class="service-text">مركز VIP</span></div>
+            <div class="service-item"><div class="dot"></div><div class="service-icon">👑</div><span class="service-text">Noble</span></div>
+            <div class="service-item"><div class="service-icon">🔰</div><span class="service-text">مستوى</span></div>
+            <div class="service-item"><div class="service-icon">👥</div><span class="service-text">مجموعة</span></div>
+            <div class="service-item"><div class="service-icon">💗</div><span class="service-text">العلاقة</span></div>
+            <div class="service-item"><div class="service-icon">🛍️</div><span class="service-text">المتجر</span></div>
+            <div class="service-item"><div class="dot"></div><div class="service-icon">🎒</div><span class="service-text">الحقيبة</span></div>
+            <div class="service-item"><div class="dot"></div><div class="service-icon">🎮</div><span class="service-text">مركز الالعاب</span></div>
+        </div>
+        <div class="list-menu">
+            <a href="#" class="list-item"><span>❮</span><div class="list-item-right"><span>غرفتي</span><span>🏠</span></div></a>
+            <a href="#" class="list-item"><span>❮</span><div class="list-item-right"><span>بطاقة ورد لايف الخاصة بي</span><span>💳</span></div></a>
+            <a href="#" class="list-item"><span>❮</span><div class="list-item-right"><span>خدمة العملاء</span><span>🎧</span></div></a>
+            <a href="#" class="list-item"><span>❮</span><div class="list-item-right"><span>الاعدادات</span><span>⚙️</span></div></a>
         </div>
     </div>
 
-    <!-- محتوى الغرفة -->
-    <div class="room-body">
-        <div class="mics-grid" id="micsContainer"></div>
-        <div class="system-banner">مرحباً بك في الغرفة الصوتية. التزم بقوانين البث.</div>
-        <div class="chat-container" id="chatLogs">
-            <div class="chat-msg"><span>النظام:</span> تم الاتصال بنجاح.</div>
+    <!-- 2. واجهة الأخبار -->
+    <div id="news-tab" class="tab-content">
+        <div class="header">
+            <span style="font-size:20px; color:#aaa;">👤</span>
+            <div class="page-title">الأخبار</div>
+            <div style="width: 20px;"></div>
+        </div>
+        <div class="top-actions">
+            <div class="action-item"><div class="dot" style="top:-2px; right:0;"></div><div class="action-circle">👤</div><span class="action-text">الزوار</span></div>
+            <div class="action-item"><div class="action-circle">🔔</div><span class="action-text">إشعار</span></div>
+            <div class="action-item"><div class="action-circle">📢</div><span class="action-text">نشاط</span></div>
+            <div class="action-item"><div class="action-circle">👥</div><span class="action-text">تقدم بطلبك</span></div>
+        </div>
+        <div class="notifications-list">
+            <div class="notification-card">
+                <span class="notif-time">دقيقة 01 منذ</span>
+                <div class="notif-left">
+                    <div class="notif-avatar"></div>
+                    <div class="notif-content">
+                        <div class="notif-name">ورد 𝓡ℳ</div>
+                        <div class="notif-text">شتقتلك حبيبي</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- شريط التحكم والأزرار السفلية -->
-    <div class="room-footer">
-        <input type="text" class="chat-input" id="msgInput" placeholder="اكتب رسالة للغرفة..." onkeypress="handleKeyPress(event)">
-        <button class="action-icon-btn" onclick="openGifts()" title="الهدايا">🎁</button>
-        <button class="action-icon-btn" onclick="openGames()" title="الألعاب">🎮</button>
-        <button class="action-icon-btn" onclick="openSettings()" title="الإعدادات">⚙️</button>
-        <button class="action-icon-btn mic-control-btn" id="micToggleBtn" onclick="toggleMic()" title="المايك">🎤</button>
-    </div>
-
-    <!-- نافذة الإعدادات المنبثقة -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-title">إعدادات الروم</div>
-            <button class="modal-btn" onclick="alert('حالة الغرفة: عامة ومفتوحة للجميع')">معلومات الغرفة</button>
-            <button class="modal-btn" onclick="shareRoom()">مشاركة رابط الروم</button>
-            <button class="modal-btn close-modal" onclick="closeSettings()">إغلاق</button>
+    <!-- 3. واجهة الألعاب -->
+    <div id="games-tab" class="tab-content">
+        <div class="header">
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 5px 12px; border-radius: 20px; font-size: 13px;">🪙 0</div>
+            <div class="page-title" style="font-style: italic;">Fun Game</div>
+        </div>
+        <div class="user-card">
+            <div>
+                <h3>ميثاق</h3>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                    <span style="font-size: 10px; color: #00c6ff;">16K/15002</span>
+                </div>
+            </div>
+            <div style="width: 45px; height: 45px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+        </div>
+        <div class="section-title"><span>مركز الألعاب</span><span style="color: #ff2a85; font-size: 12px;">المفضلة</span></div>
+        <div class="games-grid">
+            <div class="game-item"><div class="game-icon"></div><span>FISHING</span></div>
+            <div class="game-item"><div class="game-icon"></div><span>CRASH</span></div>
+            <div class="game-item"><div class="game-icon"></div><span>GREEDY CAT</span></div>
+            <div class="game-item"><div class="game-icon"></div><span>CHICKEN</span></div>
         </div>
     </div>
 
-    <audio id="remoteAudio" autoplay></audio>
+    <!-- 4. واجهة غرفة البث (غرفة الصوت الحقيقي) -->
+    <div id="room-tab" class="tab-content">
+        <div class="room-header">
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span style="background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius:15px; font-size:11px; color:#ff9d00;">🎙️ غرفة البث الصوتي المباشر</span>
+            </div>
+            <span style="font-size: 12px; color: #ccc;">ID: 523842</span>
+        </div>
+
+        <!-- هنا سيتم تشغيل نظام الصوت السحابي الفعلي -->
+        <div style="padding: 15px;">
+            <div id="zego-audio-container"></div>
+        </div>
+    </div>
+
+    <!-- شريط التنقل السفلي الموحد -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('profile-test', this)">👤<span class="dot" style="top:0; right:-3px;"></span></button>
+        <button class="nav-item" onclick="switchTab('news-tab', this)">💬<span class="nav-badge">4</span></button>
+        <button class="nav-item" onclick="switchTab('games-tab', this)">🎮</button>
+        <button class="nav-item" onclick="switchTab('room-tab', this); initVoiceRoom();">🧭<span class="nav-badge">🎙️</span></button>
+        <button class="nav-item" onclick="switchTab('profile-tab', this)">🏠</button>
+    </div>
 
     <script>
-        const socket = io();
-        let localStream = null;
-        let isMicOn = false;
-        const peers = {};
-
-        const urlParams = new URLSearchParams(window.location.search);
-        let roomId = urlParams.get('room') || 'xena-room-1';
-        document.getElementById('roomName').innerText = `روم: ${roomId}`;
-
-        function addLog(sender, text) {
-            const chatLogs = document.getElementById('chatLogs');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'chat-msg';
-            msgDiv.innerHTML = `<span>${sender}:</span> ${text}`;
-            chatLogs.appendChild(msgDiv);
-            chatLogs.scrollTop = chatLogs.scrollHeight;
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
         }
 
-        // بناء المقاعد الأربعة
-        const micsContainer = document.getElementById('micsContainer');
-        for (let i = 1; i <= 4; i++) {
-            const slot = document.createElement('div');
-            slot.className = 'mic-seat';
-            slot.id = `mic-${i}`;
-            slot.innerHTML = `
-                <div class="mic-circle">🎙️</div>
-                <div class="mic-number">مقعد ${i}</div>
-            `;
-            micsContainer.appendChild(slot);
-        }
+        let isInitialized = false;
 
-        function shareRoom() {
-            const currentUrl = window.location.href.split('?')[0] + `?room=${roomId}`;
-            navigator.clipboard.writeText(currentUrl);
-            alert('تم نسخ رابط الروم بنجاح!');
-        }
+        // دمج وتشغيل خدمة الصوت السحابية المباشرة
+        function initVoiceRoom() {
+            if (isInitialized) return; // منع إعادة تهيئة الغرفة مرتين إذا تم الضغط عليها مجدداً
+            isInitialized = true;
 
-        // زر الخروج من الروم (يعود بالصفحة الرئيسية أو يغلق الروم)
-        function exitRoom() {
-            if (confirm('هل تريد حقاً مغادرة الغرفة؟')) {
-                if (localStream) {
-                    localStream.getTracks().forEach(track => track.stop());
-                }
-                window.location.href = '/';
-            }
-        }
+            // بيانات تجريبية جاهزة ومجانية للاتصال السحابي الفوري
+            const appId = 153284692; // معرف تجريبي عام للاختبار السريع
+            const serverSecret = "6d4c5d8a9e2f4b7a1c3e5f7a9b8c2d1e"; // مفتاح الأمان التجريبي
+            const roomId = "ward_live_room_523842"; // رقم الغرفة الموحد لكي تدخل أنت وصديقك نفس الغرفة
+            
+            // توليد معرف عشوائي لكل مستخدم يدخل الرابط
+            const userId = "user_" + Math.floor(Math.random() * 10000);
+            const userName = "مستخدم " + userId.replace("user_", "");
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                const input = document.getElementById('msgInput');
-                if (input.value.trim() !== '') {
-                    addLog('أبو حسين', input.value);
-                    socket.emit('send-message', { roomId, message: input.value });
-                    input.value = '';
-                }
-            }
-        }
+            const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
+                appId, 
+                serverSecret, 
+                roomId, 
+                userId, 
+                userName
+            );
 
-        // دوال الأزرار السفلية
-        function openGifts() {
-            addLog('النظام', 'قريباً: قائمة الهدايا والماس ستتوفر هنا.');
-        }
-
-        function openGames() {
-            addLog('النظام', 'قريباً: مركز ألعاب الغرف (Ludo & Crash).');
-        }
-
-        function openSettings() {
-            document.getElementById('settingsModal').style.display = 'flex';
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
-        socket.emit('join-room', roomId);
-
-        async function toggleMic() {
-            const btn = document.getElementById('micToggleBtn');
-            const seat1 = document.getElementById('mic-1');
-
-            if (!isMicOn) {
-                try {
-                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                    isMicOn = true;
-                    btn.classList.add('off');
-                    btn.innerHTML = '🔴';
-                    seat1.classList.add('active');
-                    addLog('النظام', 'تم فتح الميكروفون وبث صوتك بنجاح.');
-
-                    socket.on('user-connected', async (userId) => {
-                        addLog('النظام', `مستخدم جديد انضم للبث (${userId})`);
-                        const peerConnection = createPeerConnection(userId);
-                        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-                        const offer = await peerConnection.createOffer();
-                        await peerConnection.setLocalDescription(offer);
-                        socket.emit('offer', { target: userId, offer });
-                    });
-
-                } catch (err) {
-                    addLog('خطأ', 'تعذر الوصول إلى الميكروفون.');
-                }
-            } else {
-                if (localStream) {
-                    localStream.getTracks().forEach(track => track.stop());
-                }
-                isMicOn = false;
-                btn.classList.remove('off');
-                btn.innerHTML = '🎤';
-                seat1.classList.remove('active');
-                addLog('النظام', 'تم إيقاف الميكروفون.');
-            }
-        }
-
-        function createPeerConnection(userId) {
-            const pc = new RTCPeerConnection({
-                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+            const zp = ZegoUIKitPrebuilt.create(kitToken);
+            
+            zp.joinRoom({
+                container: document.querySelector("#zego-audio-container"),
+                sharedLinks: [{
+                    name: 'رابط الغرفة لدعوة الأصدقاء',
+                    url: window.location.href
+                }],
+                scenario: {
+                    mode: ZegoUIKitPrebuilt.LiveStreaming, // وضع البث الحي الصوتي
+                    config: {
+                        role: ZegoUIKitPrebuilt.Host, // الدخول كـ مضيف/متحدث لفتح المايك
+                    },
+                },
+                showTurnOffRemoteCameraButton: false,
+                showScreenSharingButton: false,
+                showLayoutButton: false,
             });
-
-            pc.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('ice-candidate', { target: userId, candidate: event.candidate });
-                }
-            };
-
-            pc.ontrack = (event) => {
-                const remoteAudio = document.getElementById('remoteAudio');
-                remoteAudio.srcObject = event.streams[0];
-                addLog('النظام', 'جاري استقبال الصوت من الغرفة...');
-            };
-
-            peers[userId] = pc;
-            return pc;
         }
-
-        socket.on('offer', async (data) => {
-            const pc = createPeerConnection(data.sender);
-            await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
-            socket.emit('answer', { target: data.sender, answer });
-            if (localStream) {
-                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-            }
-        });
-
-        socket.on('answer', async (data) => {
-            const pc = peers[data.sender];
-            if (pc) {
-                await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-            }
-        });
-
-        socket.on('ice-candidate', async (data) => {
-            const pc = peers[data.sender];
-            if (pc && data.candidate) {
-                await pc.setRemoteDescription(new RTCIceCandidate(data.candidate));
-            }
-        });
     </script>
 </body>
 </html>
