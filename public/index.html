@@ -3,53 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>غرفة صوتية حية - أبو حسين</title>
+    <title>غرفة صوتية - Xena Live</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
-        body { background-color: #0d1117; color: #fff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        .header { padding: 15px; background: #161b22; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
-        .room-title { font-size: 18px; font-weight: bold; color: #58a6ff; }
-        .share-btn { background: #238636; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        
-        .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
-        
-        /* شبكة الـ 5 ميكروفونات */
-        .mics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 15px; width: 100%; max-width: 500px; margin-bottom: 20px; }
-        .mic-slot { background: #21262d; border: 2px dashed #30363d; border-radius: 12px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; transition: 0.3s; }
-        .mic-slot.active { border-color: #238636; background: #1f382b; }
-        .mic-avatar { width: 50px; height: 50px; background: #30363d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 5px; }
-        .mic-slot.active .mic-avatar { background: #238636; }
-        .mic-name { font-size: 12px; color: #8b949e; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #0d061f 0%, #170d2d 50%, #090314 100%); 
+            color: #fff; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
 
-        .logs { background: #161b22; border: 1px solid #30363d; border-radius: 8px; width: 100%; max-width: 500px; flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; color: #8b949e; margin-bottom: 15px; }
+        /* الهيدر العلوي */
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(15, 8, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .room-info { display: flex; align-items: center; gap: 10px; }
+        .room-badge { background: linear-gradient(45deg, #ff416c, #ff4b2b); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .room-title { font-size: 15px; font-weight: 600; color: #f0e6ff; }
+        .header-actions { display: flex; gap: 8px; }
+        .icon-btn { background: rgba(255, 255, 255, 0.1); border: none; width: 34px; height: 34px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .icon-btn:active { transform: scale(0.9); }
+
+        /* المحتوى الرئيسي للغرفة */
+        .room-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* شبكة الكراسي/الميكروفونات */
+        .mics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+        .mic-seat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .mic-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            position: relative;
+            transition: 0.3s;
+        }
+        .mic-seat.active .mic-circle {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border: 2px solid #e879f9;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
+        .mic-number {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        /* رسالة النظام والترحيب */
+        .system-banner {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid #a855f7;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* شات الغرفة */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+        .chat-msg {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            max-width: 85%;
+            align-self: flex-start;
+            animation: fadeIn 0.3s ease;
+        }
+        .chat-msg span { color: #c084fc; font-weight: bold; margin-left: 5px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* شريط التحكم السفلي */
+        .room-footer {
+            padding: 12px 16px;
+            background: rgba(15, 8, 30, 0.9);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        .chat-input::placeholder { color: #64748b; }
         
-        .controls { padding: 15px; background: #161b22; display: flex; justify-content: center; gap: 15px; border-top: 1px solid #30363d; }
-        .btn { background: #f85149; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 16px; cursor: pointer; font-weight: bold; }
-        .btn.active { background: #238636; }
+        .action-icon-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .action-icon-btn:active { transform: scale(0.9); }
+        .mic-control-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .mic-control-btn.off {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="room-title" id="roomName">غرفة صوتية عامة</div>
-        <button class="share-btn" onclick="shareRoom()">مشاركة الرابط 🔗</button>
+    <!-- الهيدر العلوي -->
+    <div class="room-header">
+        <div class="room-info">
+            <span class="room-badge">مباشر 🔥</span>
+            <div class="room-title" id="roomName">غرفة رقم: جاري التحميل...</div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="shareRoom()" title="مشاركة الرابط">🔗</button>
+            <button class="icon-btn" onclick="window.location.href='/'" title="إغلاق">✕</button>
+        </div>
     </div>
 
-    <div class="main-content">
-        <!-- 5 ميكروفونات -->
+    <!-- محتوى الغرفة -->
+    <div class="room-body">
+        
+        <!-- شبكة الميكروفونات (4 مقاعد رئيسية) -->
         <div class="mics-grid" id="micsContainer">
-            <!-- سيتم إنشاؤها برمجياً -->
+            <!-- يتم تعبئتها ديناميكياً -->
         </div>
 
-        <div class="logs" id="logs">
-            <div>النظام: تم تهيئة الغرفة بنجاح.</div>
+        <!-- لافتة الترحيب / الإشعارات -->
+        <div class="system-banner">
+            مرحباً بك في الغرفة الصوتية. سيتم حظر أي محتوى إباحي أو عنيف أو مخالف للقانون.
+        </div>
+
+        <!-- صندوق المحادثة والتفاعلات -->
+        <div class="chat-container" id="chatLogs">
+            <div class="chat-msg"><span>النظام:</span> تم الاتصال بسنترال الغرفة بنجاح.</div>
         </div>
     </div>
 
-    <div class="controls">
-        <button class="btn" id="micToggleBtn" onclick="toggleMic()">فتح الميكروفون 🎤</button>
+    <!-- شريط التحكم السفلي -->
+    <div class="room-footer">
+        <input type="text" class="chat-input" id="msgInput" placeholder="اكتب رسالة..." onkeypress="handleKeyPress(event)">
+        <button class="action-icon-btn" title="هدايا">🎁</button>
+        <button class="action-icon-btn" title="ألعاب">🎮</button>
+        <button class="action-icon-btn mic-control-btn" id="micToggleBtn" onclick="toggleMic()" title="التحكم بالميكروفون">🎤</button>
     </div>
 
     <audio id="remoteAudio" autoplay></audio>
@@ -60,26 +213,28 @@
         let isMicOn = false;
         const peers = {};
 
-        // استخراج معرف الغرفة من الرابط أو إنشاء غرفة افتراضية
         const urlParams = new URLSearchParams(window.location.search);
-        let roomId = urlParams.get('room') || 'default-room';
-        document.getElementById('roomName').innerText = `غرفة رقم: ${roomId}`;
+        let roomId = urlParams.get('room') || 'xena-room-1';
+        document.getElementById('roomName').innerText = `روم رقم: ${roomId}`;
 
-        function addLog(text) {
-            const logs = document.getElementById('logs');
-            logs.innerHTML += `<div>${text}</div>`;
-            logs.scrollTop = logs.scrollHeight;
+        function addLog(sender, text) {
+            const chatLogs = document.getElementById('chatLogs');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg';
+            msgDiv.innerHTML = `<span>${sender}:</span> ${text}`;
+            chatLogs.appendChild(msgDiv);
+            chatLogs.scrollTop = chatLogs.scrollHeight;
         }
 
-        // بناء 5 ميكروفونات
+        // بناء 4 مقاعد ميكروفونات احترافية
         const micsContainer = document.getElementById('micsContainer');
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 4; i++) {
             const slot = document.createElement('div');
-            slot.className = 'mic-slot';
+            slot.className = 'mic-seat';
             slot.id = `mic-${i}`;
             slot.innerHTML = `
-                <div class="mic-avatar">🎙️</div>
-                <div class="mic-name">ميك ${i}</div>
+                <div class="mic-circle">🎙️</div>
+                <div class="mic-number">مقعد ${i}</div>
             `;
             micsContainer.appendChild(slot);
         }
@@ -88,30 +243,40 @@
             const currentUrl = window.location.href.split('?')[0] + `?room=${roomId}`;
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(currentUrl);
-                alert('تم نسخ رابط الغرفة بنجاح! شاركه مع أصدقائك.');
+                alert('تم نسخ رابط الغرفة بنجاح!');
             } else {
                 prompt('انسخ الرابط:', currentUrl);
             }
         }
 
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('msgInput');
+                if (input.value.trim() !== '') {
+                    addLog('أبو حسين', input.value);
+                    input.value = '';
+                }
+            }
+        }
+
         socket.emit('join-room', roomId);
-        addLog('النظام: تم دخول الغرفة.');
+        addLog('النظام', 'تم الانضمام للبث بنجاح.');
 
         async function toggleMic() {
             const btn = document.getElementById('micToggleBtn');
-            const slot1 = document.getElementById('mic-1');
+            const seat1 = document.getElementById('mic-1');
 
             if (!isMicOn) {
                 try {
                     localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                     isMicOn = true;
-                    btn.innerText = 'إيقاف الميكروفون 🔴';
-                    btn.classList.add('active');
-                    slot1.classList.add('active');
-                    addLog('النظام: الميكروفون يعمل الآن، جاري البث...');
+                    btn.classList.add('off');
+                    btn.innerHTML = '🔴';
+                    seat1.classList.add('active');
+                    addLog('النظام', 'تم فتح الميكروفون وبث صوتك بنجاح.');
 
                     socket.on('user-connected', async (userId) => {
-                        addLog(`النظام: انضم مستخدم جديد (${userId})`);
+                        addLog('النظام', `مستخدم جديد انضم للبث (${userId})`);
                         const peerConnection = createPeerConnection(userId);
                         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
                         const offer = await peerConnection.createOffer();
@@ -120,7 +285,7 @@
                     });
 
                 } catch (err) {
-                    addLog('خطأ: تعذر الوصول إلى الميكروفون.');
+                    addLog('خطأ', 'تعذر الوصول إلى الميكروفون.');
                     console.error(err);
                 }
             } else {
@@ -128,10 +293,10 @@
                     localStream.getTracks().forEach(track => track.stop());
                 }
                 isMicOn = false;
-                btn.innerText = 'فتح الميكروفون 🎤';
-                btn.classList.remove('active');
-                slot1.classList.remove('active');
-                addLog('النظام: تم إيقاف الميكروفون.');
+                btn.classList.remove('off');
+                btn.innerHTML = '🎤';
+                seat1.classList.remove('active');
+                addLog('النظام', 'تم إيقاف الميكروفون.');
             }
         }
 
@@ -149,7 +314,7 @@
             pc.ontrack = (event) => {
                 const remoteAudio = document.getElementById('remoteAudio');
                 remoteAudio.srcObject = event.streams[0];
-                addLog('النظام: تم استقبال صوت من المشاركين الآخرين بنجاح.');
+                addLog('النظام', 'جاري استقبال الصوت من الغرفة...');
             };
 
             peers[userId] = pc;
@@ -163,7 +328,7 @@
             await pc.setLocalDescription(answer);
             socket.emit('answer', { target: data.sender, answer });
             if (localStream) {
-                localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+                localStream.getTracks().exec(track => pc.addTrack(track, localStream));
             }
         });
 
