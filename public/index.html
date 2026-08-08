@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xena Live - غرف البث الصوتي</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #050b14, #120d26); color: #fff; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .phone-frame { width: 100%; max-width: 414px; height: 100%; max-height: 896px; background: #090d16; overflow: hidden; display: flex; flex-direction: column; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+        @media (min-width: 480px) { .phone-frame { height: 88vh; border-radius: 40px; border: 8px solid #1e293b; } }
+        .view { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; width: 100%; }
+        .hidden { display: none !important; }
+        .lobby-header { padding: 15px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; font-weight: bold; font-size: 15px; }
+        .rooms-list { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .room-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #334155; border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .room-tag { background: rgba(168, 85, 247, 0.2); color: #c084fc; padding: 4px 10px; border-radius: 20px; font-size: 11px; }
+        .room-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.6); }
+        .room-body { flex: 1; padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 15px; overflow-y: auto; }
+        .safety-notice { background: rgba(147, 51, 234, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 10px; border-radius: 10px; font-size: 11px; color: #e2e8f0; width: 100%; text-align: center; }
+        .main-seat { width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #ec4899); display: flex; align-items: center; justify-content: center; border: 2px solid #facc15; font-size: 28px; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+        .chat-container { flex: 1; width: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+        .chat-msg { background: rgba(0, 0, 0, 0.25); padding: 8px 12px; border-radius: 8px; max-width: 90%; }
+        .room-footer { padding: 15px; display: flex; justify-content: center; background: #090d16; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        .action-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: #1e293b; color: #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; transition: 0.2s; }
+        .main-bottom-nav { height: 65px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div id="tab-party" class="view">
+            <div class="lobby-header">
+                <span>غرف الحفلات النشطة</span>
+                <span style="font-size: 11px; color: #38bdf8;" id="connection-status">🟢 جارِ الاتصال...</span>
+            </div>
+            <div class="rooms-list">
+                <div class="room-card" onclick="enterRoom('غرفة سوالف وسهر', 'room_suwalif')">
+                    <div>
+                        <h4>🎙️ غرفة سوالف وسهر</h4>
+                        <p style="font-size: 11px; color: #94a3b8; margin-top: 3px;">انقر للانضمام وبدء التحدث الصوتي</p>
+                    </div>
+                    <span class="room-tag">دخول</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="room-view" class="view hidden" style="position: absolute; top: 0; left: 0; background: #090d16; z-index: 100; width: 100%; height: 100%;">
+            <div class="room-header">
+                <div style="font-weight: bold;" id="room-name-display">اسم الغرفة</div>
+                <div style="color: #ef4444; font-weight: bold; cursor: pointer; padding: 5px;" onclick="leaveRoom()">✕ خروج</div>
+            </div>
+            <div class="room-body">
+                <div class="safety-notice">اضغط على زر الميكروفون بالأسفل لبدء بث صوتك للآخرين في الغرفة.</div>
+                <div class="main-seat">👑</div>
+                <div class="chat-container" id="chat-messages">
+                    <div class="chat-msg"><b>النظام:</b> تم دخول الغرفة بنجاح.</div>
+                </div>
+            </div>
+            <div class="room-footer">
+                <button class="action-btn" id="mic-btn" onclick="toggleMic()">🎤</button>
+            </div>
+        </div>
+
+        <div class="main-bottom-nav" id="main-bottom-nav">
+            <button class="nav-item"><span>🎉</span><span>الحفلة</span></button>
+        </div>
+    </div>
+
+    <audio id="remote-audio" autoplay></audio>
+
+    <script>
+        const socket = io(); 
+        let currentRoomId = null;
+        let localStream = null;
+        let peerConnection = null;
+        let isMicActive = false;
+        let targetSocketId = null;
+
+        const rtcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        };
+
+        socket.on('connect', () => {
+            document.getElementById('connection-status').innerText = '🟢 متصل بالسيرفر';
+        });
+
+        function enterRoom(roomName, roomId) {
+            currentRoomId = roomId;
+            document.getElementById('main-bottom-nav').classList.add('hidden');
+            document.getElementById('room-view').classList.remove('hidden');
+            document.getElementById('room-name-display').innerText = roomName;
+            socket.emit('join-room', roomId);
+            addSysMsg("تم الاتصال بالسنترال الصوتي.");
+        }
+
+        function leaveRoom() {
+            if (localStream) localStream.getTracks().forEach(track => track.stop());
+            if (peerConnection) { peerConnection.close(); peerConnection = null; }
+            isMicActive = false;
+            document.getElementById('mic-btn').style.background = '#1e293b';
+            document.getElementById('room-view').classList.add('hidden');
+            document.getElementById('main-bottom-nav').classList.remove('hidden');
+        }
+
+        async function toggleMic() {
+            const micBtn = document.getElementById('mic-btn');
+            if (!isMicActive) {
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    isMicActive = true;
+                    micBtn.style.background = '#10b981';
+                    addSysMsg("الميكروفون يعمل الآن، جاري البث...");
+                    setupPeerConnection();
+                } catch (err) {
+                    alert("تعذر الوصول إلى الميكروفون.");
+                    console.error(err);
+                }
+            } else {
+                if (localStream) localStream.getTracks().forEach(track => track.stop());
+                isMicActive = false;
+                micBtn.style.background = '#1e293b';
+                addSysMsg("تم إيقاف الميكروفون.");
+            }
+        }
+
+        function setupPeerConnection() {
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            if (localStream) {
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            }
+            peerConnection.ontrack = (event) => {
+                const remoteAudio = document.getElementById('remote-audio');
+                remoteAudio.srcObject = event.streams[0];
+                addSysMsg("🔊 تم استقبال صوت مستخدم آخر!");
+            };
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate && targetSocketId) {
+                    socket.emit('ice-candidate', { candidate: event.candidate, target: targetSocketId });
+                }
+            };
+        }
+
+        socket.on('user-connected', async (id) => {
+            targetSocketId = id;
+            addSysMsg("انضم مستخدم جديد، جاري ربط قناة الصوت...");
+            if (!peerConnection) setupPeerConnection();
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            socket.emit('offer', { offer: offer, target: id });
+        });
+
+        socket.on('offer', async (data) => {
+            targetSocketId = data.sender;
+            if (!peerConnection) setupPeerConnection();
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            socket.emit('answer', { answer: answer, target: data.sender });
+        });
+
+        socket.on('answer', async (data) => {
+            if (peerConnection) await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        });
+
+        socket.on('ice-candidate', async (data) => {
+            if (peerConnection) await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        });
+
+        function addSysMsg(text) {
+            const box = document.getElementById('chat-messages');
+            box.innerHTML += `<div class="chat-msg"><b>النظام:</b> ${text}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
