@@ -9,8 +9,6 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// حالة المقاعد في الغرفة (8 مقاعد كمثال)
-// كل مقعد له: id, user (اسم المستخدم أو null)، isLocked (هل مقفل أم متاح)
 let seats = {
     host: { user: "الملك (المذيع)", socketId: null },
     1: { user: null, socketId: null, isLocked: false },
@@ -18,29 +16,25 @@ let seats = {
     3: { user: null, socketId: null, isLocked: false },
     4: { user: null, socketId: null, isLocked: false },
     5: { user: null, socketId: null, isLocked: false },
-    6: { user: null, socketId: null, isLocked: true }   // مثال مقعد مقفل
+    6: { user: null, socketId: null, isLocked: true }
 };
 
 let onlineUsers = 0;
-let roomHostSocketId = null; // أول شخص يدخل يعتبر صاحب الغرفة
+let roomHostSocketId = null;
 
 io.on('connection', (socket) => {
     onlineUsers++;
-    
-    // إذا كان أول شخص يدخل يعتبر هو المالك (Host)
     if (!roomHostSocketId) {
         roomHostSocketId = socket.id;
         seats.host.socketId = socket.id;
     }
 
-    // إرسال حالة المقاعد الحالية للمستخدم الجديد
     socket.emit('init_seats', { seats, hostId: roomHostSocketId });
     io.emit('update_users_count', onlineUsers);
 
-    // طلب الصعود على مايك
+    // صعود المايك
     socket.on('take_seat', (seatId) => {
         if (seats[seatId] && !seats[seatId].isLocked && !seats[seatId].user) {
-            // إزالة المستخدم من أي مقعد قديم إن وجد
             Object.keys(seats).forEach(s => {
                 if (seats[s].socketId === socket.id && s !== 'host') {
                     seats[s].user = null;
@@ -51,10 +45,12 @@ io.on('connection', (socket) => {
             seats[seatId].user = socket.username || "مستخدم";
             seats[seatId].socketId = socket.id;
             io.emit('update_seats', seats);
+            // إعلام باقي المتواجدين ببدء اتصال الصوت
+            socket.broadcast.emit('user_joined_mic', { socketId: socket.id, seatId });
         }
     });
 
-    // النزول من المايك (حرية النزول متى شاء)
+    // النزول من المايك
     socket.on('leave_seat', () => {
         Object.keys(seats).forEach(s => {
             if (seats[s].socketId === socket.id && s !== 'host') {
@@ -63,20 +59,37 @@ io.on('connection', (socket) => {
             }
         });
         io.emit('update_seats', seats);
+        io.broadcast.emit('user_left_mic', { socketId: socket.id });
     });
 
-    // تحكم صاحب الغرفة: قفل أو فتح مقعد / أو إنزال شخص
+    // إدارة المقاعد من قِبل المالك
     socket.on('admin_control_seat', (data) => {
-        // التحقق أن المرسل هو صاحب الغرفة
         if (socket.id === roomHostSocketId && seats[data.seatId]) {
             if (data.action === 'toggle_lock') {
                 seats[data.seatId].isLocked = !seats[data.seatId].isLocked;
             } else if (data.action === 'kick') {
+                const targetSocketId = seats[data.seatId].socketId;
                 seats[data.seatId].user = null;
                 seats[data.seatId].socketId = null;
+                if (targetSocketId) {
+                    io.to(targetSocketId).emit('kicked_from_mic');
+                }
             }
             io.emit('update_seats', seats);
         }
+    });
+
+    // WebRTC Signaling (تبادل إشارات الصوت بين المتصفحات)
+    socket.on('offer', (data) => {
+        io.to(data.target).emit('offer', { offer: data.offer, sender: socket.id });
+    });
+
+    socket.on('answer', (data) => {
+        io.to(data.target).emit('answer', { answer: data.answer, sender: socket.id });
+    });
+
+    socket.on('ice-candidate', (data) => {
+        io.to(data.target).emit('ice-candidate', { candidate: data.candidate, sender: socket.id });
     });
 
     socket.on('join_room', (data) => {
@@ -94,13 +107,8 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         onlineUsers = Math.max(0, onlineUsers - 1);
-        // إذا غادر صاحب الغرفة، نعين شخص آخر إن وجد
-        if (socket.id === roomHostSocketId) {
-            roomHostSocketId = null;
-            seats.host.user = "المذيع (غادر)";
-            seats.host.socketId = null;
-        }
-        // إخلاء مقاعده إن كان على مايك
+        if (socket.id === roomHostSocketId) roomHostSocketId = null;
+        
         Object.keys(seats).forEach(s => {
             if (seats[s].socketId === socket.id) {
                 seats[s].user = null;
@@ -109,6 +117,7 @@ io.on('connection', (socket) => {
         });
         io.emit('update_seats', seats);
         io.emit('update_users_count', onlineUsers);
+        io.broadcast.emit('user_left_mic', { socketId: socket.id });
     });
 });
 
