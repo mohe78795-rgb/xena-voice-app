@@ -1,0 +1,1227 @@
+/* Define CSS variables - Updated to match modern UI library color scheme */
+:root {
+  --bg-primary: #1e293b;
+  --bg-secondary: #0f172a;
+  --accent-color: #06b6d4;
+  --accent-secondary: #3b82f6;
+  --accent-tertiary: #6366f1;
+  --border-color: rgba(148, 163, 184, 0.2);
+  --text-light: #ffffff;
+  --text-dark: #cbd5e1;
+  --audio-bar: 0%;
+}
+
+
+
+
+
+
+/* Override scrollbar to match site theme */
+::-webkit-scrollbar-thumb {
+  background: rgba(122, 162, 247, 0.5) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 162, 247, 0.7) !important;
+}
+
+/* Override checkbox accent color */
+input[type="checkbox"] {
+  accent-color: #7aa2f7 !important;
+}
+
+/* Override modal backdrop and content */
+.modal {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.modal-content.modern-card {
+  background: linear-gradient(135deg, #24283b 0%, #1e1e2e 100%) !important;
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a) !important;
+  background-color: #0f172a;
+  color: #ffffff;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(6, 182, 212, 0.1);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+h1 {
+  background: linear-gradient(to right, #22d3ee, #3b82f6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  height: calc(100vh - 140px); /* Calculate height based on viewport minus header and padding */
+  overflow: hidden;
+}
+
+/* Video Section */
+.video-section {
+  background: transparent; /* modern-card handles background */
+  border-radius: 1rem;
+  padding: 20px;
+  overflow: auto; /* Allow scrolling if content is too tall */
+  height: 100%;
+}
+
+.video-container {
+  margin: 20px 0;
+}
+
+.video-box {
+  margin-top: 20px;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+#remoteVideo {
+  display: none; /* Hide by default */
+}
+
+#remoteVideo.visible {
+  display: block; /* Show when second user joins */
+}
+
+#additionalVideos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.video-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 2px solid rgba(6, 182, 212, 0.2);
+  box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.1), 0 0 0 1px rgba(6, 182, 212, 0.1);
+  transition: all 0.3s ease;
+}
+
+.video-player:hover {
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.2), 0 0 0 1px rgba(6, 182, 212, 0.2);
+}
+
+.video-player video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Video controls buttons now use modern-btn classes - styles removed to avoid conflicts */
+.video-controls button {
+  height: auto;
+  min-width: 100px;
+}
+
+/* Video Labels */
+.video-label {
+  position: absolute;
+  top: 10px;
+  left: 35px;
+  background-color: rgba(26, 27, 38, 0.8);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10;
+}
+
+/* Chat Section */
+.chat-section {
+  background: transparent; /* modern-card handles background */
+  border-radius: 1rem;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Prevent content from overflowing */
+}
+
+.channel-controls {
+  margin-bottom: 20px;
+}
+
+.chat-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  padding-bottom: 10px;
+}
+
+.tab-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.tab-btn.active {
+  color: #06b6d4;
+  border-bottom: 2px solid #06b6d4;
+}
+
+.message-notification {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e74c3c;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  display: none;
+}
+
+/* Chat Container */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Prevent content from overflowing */
+}
+
+/* Chat Panels */
+.chat-panels {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent content from overflowing */
+}
+
+.chat-panel {
+  flex: 1;
+  display: none;
+  overflow: hidden; /* Prevent content from overflowing */
+}
+
+.chat-panel.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chat Input */
+.chat-input {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: transparent;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.chat-input input {
+  flex: 1;
+  /* Styles handled by modern-ui-library.css */
+}
+
+/* Scrollbar styling */
+.chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+  background: #1e1e2e;
+  border-radius: 4px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: #565f89;
+  border-radius: 4px;
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+  background: #7aa2f7;
+}
+
+.message-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.message-bar input {
+  flex: 1;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  background: transparent; /* modern-card handles background */
+  margin: 15% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 1.5rem;
+}
+
+/* Common Styles */
+.input-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #cdd6f4;
+}
+
+/* Input and select styles now handled by modern-ui-library.css with overrides above */
+input:not([type="text"]):not([type="number"]):not([type="password"]):not([type="email"]), 
+select:not(.modern-ui-library-select) {
+  background-color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #ffffff;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* Base button styles - modern-btn classes handle most styling now */
+button:not(.modern-btn) {
+  background-color: rgba(30, 41, 59, 0.6);
+  color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:not(.modern-btn):hover {
+  background-color: rgba(30, 41, 59, 0.8);
+}
+
+button:not(.modern-btn):disabled {
+  background-color: #1a1b26;
+  color: #6c7086;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.status-text {
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+/* Message Styles */
+.chat-message {
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 0.5rem;
+  background: rgba(30, 41, 59, 0.4);
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.3;
+  word-wrap: break-word;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Sent message styles */
+.chat-message[data-sender="self"],
+.message-to {
+  background: rgba(30, 41, 59, 0.6);
+  margin-left: 20%;
+  border-left: 3px solid rgba(6, 182, 212, 0.5);
+}
+
+/* Received message styles */
+.chat-message[data-sender="other"],
+.message-from {
+  background: rgba(30, 41, 59, 0.4);
+  margin-right: 20%;
+  border-left: 3px solid rgba(16, 185, 129, 0.5);
+}
+
+/* System message styles */
+.message-system {
+  background: rgba(15, 23, 42, 0.6);
+  margin: 4px auto;
+  text-align: center;
+  font-style: italic;
+  color: #cbd5e1;
+  border-left: none;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+  max-width: 80%;
+}
+
+/* Message sender/recipient indicator styling */
+.chat-message .to {
+  color: #22d3ee;
+  font-weight: 600;
+}
+
+.chat-message .from {
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* Peer Chat Specific */
+.peer-inputs {
+  margin-bottom: 20px;
+}
+
+/* Presence Indicator */
+.login-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.presence-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #bdc3c7;
+}
+
+.presence-indicator.online {
+  background-color: #9ece6a;
+}
+
+.presence-indicator.offline {
+  background-color: #f7768e;
+}
+
+/* Participants List */
+.participants-list {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: transparent; /* modern-panel handles background */
+  border-radius: 1rem;
+}
+
+.participants-list h3 {
+  margin-bottom: 12px;
+  color: #ffffff;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.participants-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 8px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background-color: #1e293b;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  margin-bottom: 8px;
+}
+
+.participant-item:hover {
+  background-color: #2c3047;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.participant-item.selected {
+  background-color: #2c3047;
+  border-color: #06b6d4;
+}
+
+.participant-item .presence-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #9ece6a;
+}
+
+/* For the video tile overlay */
+.video-player .screen-share-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(137, 180, 250, 0.9);
+  color: #0f172a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* For the participants list */
+.participant-item .screen-share-indicator {
+  position: static;
+  background: none;
+  color: #06b6d4;
+  font-size: 16px;
+  font-weight: normal;
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+}
+.participant-item .screen-share-indicator i {
+  color: #06b6d4;
+  font-size: 16px;
+  animation: pulse 2s infinite;
+}
+
+.participant-item span:last-child {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Select Input Styles - now handled by modern-ui-library.css */
+.select-input {
+  /* Styles handled by modern-ui-library.css */
+}
+
+/* Device Modal Specific Styles */
+#deviceModal .modal-content {
+  max-width: 400px;
+  padding: 25px;
+}
+
+#deviceModal .input-group {
+  margin-bottom: 20px;
+}
+
+#deviceModal label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Device modal inputs now handled by modern-ui-library.css */
+#deviceModal select,
+#deviceModal input {
+  width: 100%;
+  /* Other styles handled by modern-ui-library.css */
+}
+
+/* Login/Device Settings Input Styles - now handled by modern-ui-library.css */
+.select-input,
+input[type="text"] {
+  max-width: 300px;
+  /* Other styles handled by modern-ui-library.css */
+}
+
+.additional-videos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.additional-videos .video-player {
+  width: 100%;
+  height: 240px;
+  min-width: 0;
+}
+
+/* Remove the previous grid column rules as they're not needed */
+@media (min-width: 769px) {
+  .additional-videos {
+    grid-auto-flow: row;
+    grid-auto-rows: 240px;
+  }
+}
+
+.participants-window {
+  background-color: #1e293b;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.participant {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  cursor: pointer;
+}
+
+.participant:hover {
+  background-color: #2c3047;
+}
+
+/* Style the participants list to be above the chat */
+#participantsList {
+  background-color: #0f172a;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: block !important;
+}
+
+/* Update the local video styling to ensure the label is visible */
+#localVideo {
+  position: relative;
+}
+
+/* Peer Chat Header */
+.peer-chat-header {
+  background-color: #1e293b;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #06b6d4;
+  text-align: center;
+  border-radius: 4px 4px 0 0;
+}
+
+/* Chat Box */
+.chat-box {
+  flex: 1;
+  height: 0; /* Allow flex to control the height */
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 0.75rem;
+  margin-bottom: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Speaking indicator styling */
+.video-player.speaking {
+  box-shadow: 0 0 0 2px #4CAF50;
+  border: 4px solid #4CAF50;
+  position: relative;
+  z-index: 5;
+  animation: subtle-pulse 2s infinite;
+}
+
+@keyframes subtle-pulse {
+  0% {
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.7);
+  }
+}
+
+/* Mute indicators */
+.mute-indicator {
+  position: absolute;
+  top: 10px;
+  background-color: rgba(231, 76, 60, 0.8);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  text-align: center;
+}
+
+/* Center the icons within the circle - simplified approach */
+.mute-indicator i {
+  margin: 0;
+  padding: 0;
+  /* Fixed size for consistency */
+  font-size: 14px;
+  /* Remove any inherited styles that might affect positioning */
+  line-height: 32px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Position the mic mute indicator to the left of the network indicator */
+.mic-mute-indicator {
+  right: 90px; /* Space for network indicator + gap */
+  top: 10px;
+}
+
+/* Position the camera mute indicator to the left of the mic mute indicator */
+.camera-mute-indicator {
+  right: 130px; /* Further left of mic mute indicator */
+  top: 10px;
+}
+
+/* Video muted indication - only apply when explicitly muted */
+.video-muted {
+  background-color: #1a1b26 !important;
+}
+
+/* Talking while muted notification */
+#talking-while-muted {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(231, 76, 60, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 20;
+  animation: pulse 1s infinite alternate;
+  white-space: nowrap;
+  display: none;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.video-muted-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 16px;
+  background-color: rgba(231, 76, 60, 0.8);
+  padding: 8px 16px;
+  border-radius: 4px;
+  z-index: 30; /* Increase z-index to ensure it's always visible */
+  text-align: center;
+  font-weight: 500;
+  pointer-events: none; /* Prevent it from blocking interactions */
+}
+
+/* Video Stats Overlay Styles */
+.stats-toggle-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  background-color: rgba(26, 27, 38, 0.9);
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stats-toggle-container:hover {
+  transform: scale(1.05);
+  background-color: rgba(26, 27, 38, 1);
+}
+
+.stats-toggle-container i {
+  color: var(--accent-color);
+  font-size: 16px;
+}
+
+.stats-toggle-container::after {
+  content: "Stats";
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+#statsToggleInput {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.stats-overlay {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  background-color: rgba(26, 27, 38, 0.8);
+  color: #ffffff;
+  font-size: 10px;
+  font-family: monospace;
+  line-height: 1.2;
+  z-index: 10;
+  display: none;
+  padding: 8px;
+}
+
+.stats-overlay.visible {
+  display: flex;
+}
+
+.stats-column {
+  flex: 1;
+  padding: 0 5px;
+  min-width: 0;
+  max-width: 50%;
+}
+
+/* Make headers display inline */
+.stats-header {
+  font-weight: bold;
+  display: inline;
+  margin-right: 5px;
+  color: white;
+}
+
+.stats-header.network {
+  color: #06b6d4; /* Blue */
+}
+
+.stats-header.performance {
+  color: #f7768e; /* Red */
+}
+
+.stats-header.video {
+  color: #9ece6a; /* Green */
+}
+
+.stats-header.audio {
+  color: #bb9af7; /* Purple */
+}
+
+.stats-column > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* Network quality indicator - dot style instead of split circle */
+.network-quality-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  z-index: 30;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Simple quality indicator */
+.simple-quality {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+/* Network quality indicators with dual display */
+.dual-quality-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px; /* Move all the way to the right */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 30;
+  background-color: rgba(26, 27, 38, 0.7);
+  padding: 3px 6px;
+  border-radius: 12px;
+}
+
+.uplink-indicator,
+.downlink-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Quality colors */
+/* Unknown quality */
+.quality-0 {
+  background-color: #999;
+}
+
+/* Excellent quality */
+.quality-1 {
+  background-color: #3ae678;
+}
+
+/* Good quality, less than optimal bitrate */
+.quality-2 {
+  background-color: #98da55;
+}
+
+/* Slightly impaired communication */
+.quality-3 {
+  background-color: #f5d442;
+}
+
+/* Not smooth communication */
+.quality-4 {
+  background-color: #f9a12c;
+}
+
+/* Poor quality, barely communicate */
+.quality-5 {
+  background-color: #ff5d38;
+}
+
+/* Disconnected, can't communicate */
+.quality-6 {
+  background-color: #ff0000;
+}
+
+.client-stats-overlay {
+  position: fixed;
+  top: 130px; /* Move below the header */
+  right: 20px;
+  width: 300px;
+  background-color: rgba(26, 27, 38, 0.95);
+  color: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: monospace;
+  line-height: 1.4;
+  z-index: 100;
+  display: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--accent-color);
+}
+
+.client-stats-overlay.visible {
+  display: block;
+}
+
+.client-stats-heading {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--accent-color);
+  text-align: center;
+  font-size: 14px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Network quality indicators */
+.network-quality {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* PiP Container */
+#pipContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  height: 180px;
+  background-color: #0f172a;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#pipContainer:hover {
+  transform: scale(1.02);
+}
+
+#pipContainer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Remove the custom PiP button styles */
+#pipBtn {
+  /* Remove custom styles to inherit from the common button styles */
+}
+
+/* Screen Share Styles */
+.screen-share {
+  border: 2px solid #89b4fa;
+}
+
+.screen-share-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(137, 180, 250, 0.9);
+  color: #0f172a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.screen-share-icon {
+  color: #06b6d4;
+  margin-left: 4px;
+  font-size: 14px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.participants-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.participants-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+/* RTC Controls */
+.rtc-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.copy-link-btn {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 8px 12px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-link-btn:hover {
+  background-color: #3d3d3d;
+}
+
+.copy-link-btn.copied {
+  background-color: #4CAF50;
+}
+
+.copy-link-btn i {
+  font-size: 16px;
+}
+
+/* Add some spacing between the buttons */
+.copy-link-btn + button {
+  margin-left: 8px;
+}
+
+/* Audio Level Indicator */
+.audio-level-wave {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.audio-level-wave::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(137, 180, 250, 0.8) 0%,
+    rgba(137, 180, 250, 0.9) 50%,
+    rgba(137, 180, 250, 0.8) 100%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.1s ease-out;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(137, 180, 250, 0.5);
+}
+
+/* Level indicators - now using more precise fill levels */
+.audio-level-wave.level-1::before {
+  display: none;
+}
+
+.audio-level-wave.level-2::before {
+  display: block;
+  transform: translateX(-87.5%);
+}
+
+.audio-level-wave.level-3::before {
+  display: block;
+  transform: translateX(-75%);
+}
+
+.audio-level-wave.level-4::before {
+  display: block;
+  transform: translateX(-62.5%);
+}
+
+.audio-level-wave.level-5::before {
+  display: block;
+  transform: translateX(-50%);
+}
+
+.audio-level-wave.level-6::before {
+  display: block;
+  transform: translateX(-37.5%);
+}
+
+.audio-level-wave.level-7::before {
+  display: block;
+  transform: translateX(-25%);
+}
+
+.audio-level-wave.level-8::before {
+  display: block;
+  transform: translateX(-12.5%);
+}
+
+/* Ensure the button text remains visible */
+.audio-level-wave button {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Smooth Audio Level Bar (new, non-destructive) */
+.audio-level-wave.smooth-bar::before {
+  width: var(--audio-bar, 0%);
+  transition: width 0.1s linear;
+  background: linear-gradient(90deg, #7aa2f7 0%, #89b4fa 100%);
+  opacity: 0.85;
+  box-shadow: 0 0 10px #7aa2f7aa;
+}
+
+.github-link {
+  position: absolute;
+  top: 36px;
+  left: 32px;
+  color: #fff; /* Changed to white for dark background */
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.github-link:hover {
+  transform: scale(1.1);
+  color: #4094f7;
+}
+
+.github-icon {
+  fill: currentColor;
+}
