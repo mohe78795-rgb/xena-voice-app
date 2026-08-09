@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "npx serve dist -l $PORT"
+    "start": "npx serve . -l $PORT"
   },
   "devDependencies": {
     "vite": "^5.1.4"
