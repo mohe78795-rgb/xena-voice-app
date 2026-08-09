@@ -1,46 +1,43 @@
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
 const path = require('path');
+const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
+const io = new Server(server);
 
+// ربط مجلد public بشكل صحيح ليعمل على Render
 app.use(express.static(path.join(__dirname, 'public')));
 
+let onlineUsers = 0;
+
 io.on('connection', (socket) => {
-    console.log('مستخدم متصل:', socket.id);
+    console.log('مستخدم جديد متصل:', socket.id);
 
-    socket.on('join-room', (roomId) => {
-        socket.join(roomId);
-        console.log(`المستخدم ${socket.id} انضم إلى الغرفة: ${roomId}`);
-        socket.to(roomId).emit('user-connected', socket.id);
+    socket.on('join_room', (data) => {
+        onlineUsers++;
+        io.emit('update_users_count', onlineUsers);
+        io.emit('receive_message', { sender: 'النظام', message: `${data.username} انضم إلى الغرفة.`, type: 'system' });
     });
 
-    socket.on('offer', (data) => {
-        socket.to(data.target).emit('offer', { offer: data.offer, sender: socket.id });
+    socket.on('send_message', (data) => {
+        // إعادة إرسال الرسالة لكل المتواجدين في الروم
+        io.emit('receive_message', data);
     });
 
-    socket.on('answer', (data) => {
-        socket.to(data.target).emit('answer', { answer: data.answer, sender: socket.id });
-    });
-
-    socket.on('ice-candidate', (data) => {
-        socket.to(data.target).emit('ice-candidate', { candidate: data.candidate, sender: socket.id });
+    socket.on('change_settings', (data) => {
+        io.emit('update_room_settings', data);
     });
 
     socket.on('disconnect', () => {
-        console.log('انقطع اتصال المستخدم:', socket.id);
+        onlineUsers = Math.max(0, onlineUsers - 1); // تم التصحيح هنا لاستخدام Math.max
+        io.emit('update_users_count', onlineUsers);
+        console.log('مستخدم غادر الغرفة');
     });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`السيرفر يعمل بنجاح على المنفذ ${PORT}`);
+    console.log(`السيرفر يعمل الآن على البورت: ${PORT}`);
 });
