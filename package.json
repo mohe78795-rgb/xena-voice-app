@@ -1,14 +1,13 @@
 {
   "name": "xena-voice-app",
   "version": "1.0.0",
-  "description": "Voice chat web application",
-  "main": "server.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npx vite build",
     "start": "npx serve dist -l $PORT"
   },
   "dependencies": {
-    "serve": "^14.2.1"
+    "serve": "^14.2.1",
+    "vite": "^5.0.0"
   }
 }
