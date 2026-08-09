@@ -2,6 +2,12 @@
   "name": "xena-voice-app",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "dependencies": { "express": "^4.19.2", "socket.io": "^4.7.5" }
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "mongoose": "^9.9.1",
+    "socket.io": "^4.7.5"
+  }
 }
