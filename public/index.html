@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معجم لتربية وتسويق الدواجن - النظام الشامل بملء الشاشة</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- استدعاء خط Cairo الأنيق لضمان تطابق تصميم اللوحة والمراسلات -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- استدعاء مكتبة الأيقونات Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- مكتبة الرسم البياني Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; }
@@ -29,7 +26,6 @@
             box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
         }
 
-        /* تنسيق واجهة البصمة لتملأ الشاشة بالكامل بدون أي فراغات */
         .bio-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
         .bio-active { display: flex; }
 
@@ -58,7 +54,6 @@
         .success-img { width: 180px; height: 180px; object-fit: contain; animation: bounceIn 0.6s ease; }
         @keyframes bounceIn { 0% { transform: scale(0); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* تنسيقات لوحة التحكم الخاصة بقسم مدير المخازن والمدير العام المدمجة في الرئيسية */
         .manager-home-container { width: 100%; display: flex; flex-direction: column; gap: 15px; }
         .chart-container-box { background-color: #131c31; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; height: 280px; flex-shrink: 0; position: relative; }
         .grid-buttons-box { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -70,7 +65,6 @@
         .action-dashboard-btn:hover { background-color: #facc15; color: #0b111e; }
         .full-width-btn { grid-column: span 2; }
 
-        /* النوافذ المنبثقة الخاصة بلوحة التحكم والمراسلات */
         .sub-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.92); display: none; justify-content: center; align-items: center; z-index: 100; padding: 0;
@@ -94,7 +88,6 @@
         .sub-modal-buttons { display: flex; gap: 10px; margin-top: auto; padding-top: 12px; }
         .sub-modal-buttons button { flex: 1; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
 
-        /* تنسيقات قسم مراسلات الجهات لتبويب "رسائل" */
         .messaging-wrapper { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; padding: 10px 0; }
         .menu-msg-btn {
             width: 100%; background-color: #161f32; border: 2px solid #facc15; color: #facc15;
@@ -140,7 +133,6 @@
         }
         .send-msg-btn { background-color: #facc15; color: #0b111e; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; }
 
-        /* تنسيقات واجهة الحساب والإعدادات الجديدة المدمجة */
         .account-page-container {
             width: 100%; min-height: 100%; background-color: #0f172a; display: flex; flex-direction: column; position: relative; overflow-y: auto;
         }
@@ -234,13 +226,13 @@
                 <p class="text-slate-400 text-xs">ليس لديك حساب وموظف جديد أو عميل في المنظومة؟</p>
                 <button onclick="document.getElementById('registerModal').classList.remove('hidden')"
                     class="w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 hover:text-yellow-300 font-bold py-3.5 rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-2 shadow-lg">
-                    <i class="fa-solid fa-user-plus text-sm"></i> إنشاء حساب جديد (الاسم، رقم الهاتف، كلمة السر)
+                    <i class="fa-solid fa-user-plus text-sm"></i> إنشاء حساب جديد (قاعدة البيانات السحابية)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- نافذة طلب تسجيل حساب جديد (محدثة لتملأ الشاشة بالكامل وبـ الحقول المطلوبة: الاسم، رقم الهاتف، كلمة السر) -->
+    <!-- نافذة طلب تسجيل حساب جديد -->
     <div id="registerModal" class="hidden fixed inset-0 bg-[#0d111a] flex flex-col items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="w-full h-full max-w-full max-h-screen bg-[#0f172a] rounded-none p-6 md:p-12 shadow-2xl flex flex-col justify-center relative">
             <button onclick="document.getElementById('registerModal').classList.add('hidden')" class="absolute top-6 left-6 text-slate-400 hover:text-white text-xl bg-slate-800/60 w-10 h-10 rounded-full flex items-center justify-center">
@@ -294,7 +286,7 @@
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-slate-950 font-bold py-3.5 rounded-xl text-sm mt-4 flex items-center justify-center gap-2 shadow-lg">
-                        <i class="fa-solid fa-check-circle"></i> تسجيل الحساب والانتقال الفوري
+                        <i class="fa-solid fa-check-circle"></i> تسجيل الحساب في قاعدة البيانات
                     </button>
                 </form>
             </div>
@@ -304,7 +296,6 @@
     <!-- لوحة التحكم بملء الشاشة -->
     <div id="dashboardScreen" class="hidden w-full min-h-screen bg-[#0d111a] p-3 md:p-6 flex flex-col justify-between">
         <div class="w-full flex-1 flex flex-col">
-            <!-- الهيدر العلوي -->
             <div class="w-full border-b border-slate-800/80 pb-3 mb-4 bg-[#161f32]/60 px-4 py-3 rounded-2xl shadow-sm flex justify-between items-center">
                 <div>
                     <h2 class="text-sm md:text-base font-bold text-white tracking-wide">معجم لتربية وتسويق الدواجن</h2>
@@ -314,11 +305,9 @@
                     <img src="https://i.postimg.cc/DWtX86v7/logo.png" alt="شعار" class="w-full h-full object-contain">
                 </div>
             </div>
-            <!-- محتوى التبويبات -->
             <div id="tabContentContainer" class="w-full flex-1 space-y-4 custom-scrollbar"></div>
         </div>
 
-        <!-- شريط التنقل السفلي -->
         <div class="w-full mt-4 pt-2 border-t border-slate-800 grid grid-cols-6 gap-1 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg">
             <button onclick="switchTab('home')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-yellow-400" data-nav="home"><i class="fa-solid fa-house text-base"></i><span class="text-[10px] mt-1">رئيسية</span></button>
             <button onclick="switchTab('tasks')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="tasks"><i class="fa-solid fa-file-invoice-dollar text-base"></i><span class="text-[10px] mt-1">فاتوره</span></button>
@@ -359,7 +348,7 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة زبون جديد الخاصة بلوحة التحكم المدمجة -->
+    <!-- نوافذ فرعية أخرى -->
     <div id="subCustomerModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>إضافة زبون جديد لقاعدة البيانات</h2>
@@ -386,7 +375,6 @@
         </div>
     </div>
 
-    <!-- نافذة وارد دجاج اليوم -->
     <div id="subIncomingModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>تقرير وارد دجاج اليوم</h2>
@@ -416,7 +404,6 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل البيع -->
     <div id="subSalesDetailsModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>سجل تفاصيل المبيعات</h2>
@@ -443,7 +430,6 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الزبائن -->
     <div id="subCustomersDetailsModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>قائمة وتفاصيل الزبائن المسجلين</h2>
@@ -466,7 +452,6 @@
         </div>
     </div>
 
-    <!-- نافذة جرد المخازن -->
     <div id="subInventoryModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>تقرير جرد المخازن الحالي</h2>
@@ -498,7 +483,6 @@
         </div>
     </div>
 
-    <!-- قائمة اختيار الزبائن (للمراسلات) -->
     <div id="customerSubMenu" class="sub-menu-section">
         <div class="sub-header">
             <button class="chat-back-btn" onclick="closeCustomerMenu()">⬅ القائمة الرئيسية</button>
@@ -507,7 +491,6 @@
         <div id="customerListContainer" class="customer-list"></div>
     </div>
 
-    <!-- واجهة المحادثة التفاعلية -->
     <div id="chatSection" class="chat-section">
         <div class="chat-header">
             <button class="chat-back-btn" onclick="closeChat()">⬅ رجوع</button>
@@ -525,12 +508,6 @@
     </div>
 
     <script>
-        if (!localStorage.getItem('users')) {
-            localStorage.setItem('users', JSON.stringify([
-                { id: 1, name: 'خالد مدير المخازن', username: 'warehouse', phone: '771111111', password: '123', role: 'warehouse', status: 'approved' },
-                { id: 2, name: 'مدير النظام العام', username: 'admin', phone: '772222222', password: '123', role: 'admin', status: 'approved' }
-            ]));
-        }
         if (!localStorage.getItem('invoicingCustomers')) {
             localStorage.setItem('invoicingCustomers', JSON.stringify(['دعمك', 'حسين العبيدي', 'نبيل السالمي', 'عبدالله الدمج', 'عبدالله عبدرحمن', 'عبدرحمن المطوع', 'أبو خليل']));
         }
@@ -551,34 +528,61 @@
             if (savedUser) { loadDashboard(JSON.parse(savedUser)); }
         });
 
-        function handleLogin(e) {
+        // دالة تسجيل الدخول عبر السيرفر وقاعدة البيانات
+        async function handleLogin(e) {
             e.preventDefault();
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim();
-            let users = JSON.parse(localStorage.getItem('users'));
-            // يسمح بالدخول عبر اسم المستخدم أو رقم الهاتف
-            let user = users.find(x => (x.username === u || x.phone === u) && x.password === p);
-            if (user) {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                loadDashboard(user);
-            } else { alert('خطأ في بيانات الدخول (اسم المستخدم أو الهاتف أو كلمة المرور غير صحيحة).'); }
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    loadDashboard(data.user);
+                } else {
+                    alert(data.message || 'خطأ في اسم المستخدم أو الهاتف أو كلمة المرور.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ أثناء الاتصال بالسيرفر.');
+            }
         }
 
-        function handleRegister(e) {
+        // دالة تسجيل حساب جديد وحفظه في قاعدة البيانات السحابية (MongoDB)
+        async function handleRegister(e) {
             e.preventDefault();
             const name = document.getElementById('regName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value.trim();
             const role = document.getElementById('regRole').value;
 
-            let users = JSON.parse(localStorage.getItem('users'));
-            let newUser = { id: Date.now(), name, username: phone, phone, password, role, status: 'approved' };
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
-            document.getElementById('registerModal').classList.add('hidden');
-            document.getElementById('registerForm').reset();
-            loadDashboard(newUser);
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, password, role })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ تم إنشاء الحساب وحفظ البيانات في قاعدة البيانات (MongoDB Atlas) بنجاح!');
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    document.getElementById('registerModal').classList.add('hidden');
+                    document.getElementById('registerForm').reset();
+                    loadDashboard(data.user);
+                } else {
+                    alert('❌ خطأ: ' + (data.message || 'فشل حفظ الحساب'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ في الاتصال بالخادم وقاعدة البيانات.');
+            }
         }
 
         function loadDashboard(user) {
@@ -625,7 +629,6 @@
             }
         }
 
-        // واجهة زر الرئيسية الخاصة بقسم مدير المخازن والمدير العام
         function getManagerHomeUI() {
             return `
                 <div class="manager-home-container pb-6">
@@ -645,7 +648,6 @@
             `;
         }
 
-        // واجهة زر رسائل (قائمة مراسلات الجهات المدمجة)
         function getMessagingUI() {
             return `
                 <div class="messaging-wrapper">
@@ -660,7 +662,6 @@
             `;
         }
 
-        // واجهة زر الحساب والإعدادات العامة المدمجة
         function getAccountUI(user) {
             return `
                 <div class="account-page-container pb-6">
@@ -681,8 +682,7 @@
                     <div class="user-info">
                         <div class="user-name">${user.name || 'مستخدم النظام'}</div>
                         <div class="user-role">${roleNames[user.role] || user.role}</div>
-                        <div class="user-detail">رقم الهاتف: <span>${user.phone || '735429057'}</span></div>
-                        <div class="user-detail">رقم الحساب: <span>15988</span></div>
+                        <div class="user-detail">رقم الهاتف: <span>${user.phone || user.username || '---'}</span></div>
                         <div class="user-detail">العنوان: <span>الجمهورية اليمنية - محافظة البيضاء</span></div>
                     </div>
 
@@ -704,7 +704,6 @@
                     </div>
                 </div>
 
-                <!-- صفحة الإعدادات العامة الفرعية المنبثقة -->
                 <div id="settingsPageModal" class="settings-page">
                     <div class="settings-top-bar">
                         <span style="cursor:pointer; color: #facc15; font-size: 18px;" onclick="closeSettingsModal()">➔</span>
@@ -721,65 +720,13 @@
                                 <span class="setting-icon">👆</span>
                             </div>
                         </div>
-                        <div class="setting-item">
-                            <span>تفعيل الرمز السري</span>
-                            <div class="setting-item-left">
-                                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-                                <span class="setting-icon">🔒</span>
-                            </div>
-                        </div>
-                        <div class="setting-item" style="cursor: pointer;" onclick="alert('تم تفعيل تغيير الرمز')">
-                            <span>تغيير الرمز السري</span>
-                            <span class="setting-icon">📱</span>
-                        </div>
-                    </div>
-
-                    <div class="section-title">تأكيد الأجهزة</div>
-                    <div class="settings-card">
-                        <div class="setting-item" style="cursor: pointer;">
-                            <span>ترخيص هذا الجهاز</span>
-                            <span class="setting-icon">📱</span>
-                        </div>
-                        <div class="setting-item" style="cursor: pointer;">
-                            <span>ترخيص جهاز جديد</span>
-                            <span class="setting-icon">➕📱</span>
-                        </div>
-                        <div class="setting-item" style="cursor: pointer;">
-                            <span>ترخيص جهاز الويب (التقاط الباركود)</span>
-                            <span class="setting-icon">🔲</span>
-                        </div>
                     </div>
 
                     <div class="section-title">اعدادات اخرى</div>
                     <div class="settings-card">
-                        <div class="setting-item">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <input type="text" class="setting-input" value="5000">
-                                <span>اشعاري عندما يكون رصيدي</span>
-                            </div>
-                            <div class="setting-item-left">
-                                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-                                <span class="setting-icon">🔔</span>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <span class="update-badge">تحديث التطبيق</span>
-                            <div class="setting-item-left">
-                                <span style="font-size: 12px; color: #94a3b8;">اصدار التطبيق: 932</span>
-                                <span class="setting-icon">🤖</span>
-                            </div>
-                        </div>
-                        <div class="setting-item" style="cursor: pointer;">
-                            <span>تغيير العنوان (محافظة البيضاء)</span>
-                            <span class="setting-icon">☁️</span>
-                        </div>
                         <div class="setting-item highlight-item" style="cursor: pointer;" onclick="logout()">
                             <span style="font-weight: 700;">تسجيل خروج</span>
                             <span class="setting-icon">➡️</span>
-                        </div>
-                        <div class="setting-item danger-item" style="cursor: pointer;" onclick="closeSettingsModal()">
-                            <span>خروج من جميع الاجهزة</span>
-                            <span class="setting-icon">🔌</span>
                         </div>
                     </div>
                 </div>
@@ -796,7 +743,6 @@
             if(modal) modal.style.display = 'none';
         }
 
-        // تفاعلات قائمة مراسلات الزبائن والمحادثة
         function handleCustomerClick() {
             const container = document.getElementById('customerListContainer');
             container.innerHTML = "";
@@ -973,12 +919,11 @@
             alert("تم تسجيل الزبون بنجاح في قاعدة البيانات!");
         }
 
-        // واجهة الفاتورة الأصلية
         function getInvoiceUI(user) {
             return `
                 <div class="w-full max-w-2xl mx-auto space-y-4 pb-6">
                     <div class="relative w-full">
-                        <input type="text" id="globalInvSearch" onkeyup="filterCustomersDropdown()" placeholder="ابحث عن زبون (دعمك، حسين، نبيل، دمج، عبدالله...)"
+                        <input type="text" id="globalInvSearch" onkeyup="filterCustomersDropdown()" placeholder="ابحث عن زبون..."
                             class="w-full bg-[#161f32] border border-[#d4af37]/40 rounded-2xl pr-4 pl-12 py-3 text-xs text-white focus:outline-none focus:border-[#d4af37] shadow-lg">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-yellow-400"><i class="fa-solid fa-magnifying-glass"></i></span>
                         <div id="customerDropResults" class="hidden absolute top-full left-0 right-0 bg-[#161f32] border border-[#d4af37]/40 rounded-2xl mt-1 max-h-40 overflow-y-auto z-30 shadow-2xl custom-scrollbar"></div>
@@ -992,53 +937,9 @@
                                 <input type="number" id="p_big" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
                             </div>
                         </div>
-
-                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
-                            <div class="flex items-center gap-2 text-yellow-400 font-bold text-xs w-1/3 pr-2"><i class="fa-solid fa-feather text-sm"></i> <span>دجاج مخورج</span></div>
-                            <div class="flex gap-2 w-2/3">
-                                <input type="number" id="q_makhourj" placeholder="العدد" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                                <input type="number" id="p_makhourj" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                            </div>
-                        </div>
-
-                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
-                            <div class="flex items-center gap-2 text-yellow-400 font-bold text-xs w-1/3 pr-2"><i class="fa-solid fa-kiwi-bird text-sm"></i> <span>دجاج متوسط</span></div>
-                            <div class="flex gap-2 w-2/3">
-                                <input type="number" id="q_mid" placeholder="العدد" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                                <input type="number" id="p_mid" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                            </div>
-                        </div>
-
-                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
-                            <div class="flex items-center gap-2 text-yellow-400 font-bold text-xs w-1/3 pr-2"><i class="fa-solid fa-utensils text-sm"></i> <span>دجاج مطاعم</span></div>
-                            <div class="flex gap-2 w-2/3">
-                                <input type="number" id="q_rest" placeholder="العدد" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                                <input type="number" id="p_rest" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                            </div>
-                        </div>
-
-                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
-                            <div class="flex items-center gap-2 text-yellow-400 font-bold text-xs w-1/3 pr-2"><i class="fa-solid fa-egg text-sm"></i> <span>دجاج صغير</span></div>
-                            <div class="flex gap-2 w-2/3">
-                                <input type="number" id="q_small" placeholder="العدد" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                                <input type="number" id="p_small" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                            </div>
-                        </div>
-
-                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
-                            <div class="flex items-center gap-2 text-yellow-400 font-bold text-xs w-1/3 pr-2"><i class="fa-solid fa-otter text-sm"></i> <span>دجاج جفش</span></div>
-                            <div class="flex gap-2 w-2/3">
-                                <input type="number" id="q_jafsh" placeholder="العدد" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                                <input type="number" id="p_jafsh" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
-                            </div>
-                        </div>
                     </div>
 
                     <div class="space-y-2 pt-2">
-                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-3 text-xs text-slate-300 flex justify-between items-center">
-                            <span class="text-yellow-400 font-bold">التاريخ:</span>
-                            <span class="font-mono text-white">2026-08-13</span>
-                        </div>
                         <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-3 text-xs text-slate-300 flex justify-between items-center">
                             <span class="text-yellow-400 font-bold">اسم المشتري:</span>
                             <span id="selectedBuyerDisplay" class="font-bold text-white">${selectedCustomer}</span>
@@ -1053,14 +954,6 @@
                         <div class="flex justify-center">
                             <button onclick="triggerBiometric('save')" class="gold-frame-btn text-yellow-400 font-bold py-3 px-10 rounded-2xl text-sm transition tracking-widest flex items-center gap-2">
                                 <i class="fa-solid fa-file-circle-check"></i> حفظ فاتورة
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 pt-1">
-                            <button onclick="triggerBiometric('print')" class="gold-frame-btn text-yellow-400 font-bold py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-print"></i> طباعة فاتورة
-                            </button>
-                            <button onclick="exportLuxuryInvoice()" class="gold-frame-btn text-yellow-400 font-bold py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-share-nodes"></i> تصدير فاتورة
                             </button>
                         </div>
                     </div>
@@ -1136,8 +1029,6 @@
                     scanAttempts = 0;
                     if(pendingActionType === 'save') {
                         executeActualSave();
-                    } else if(pendingActionType === 'print') {
-                        alert('🖨️ جاري إرسال الفاتورة المعتمدة بالبصمة إلى الطابعة الحرارية...');
                     }
                 }, 1500);
             }, 1200);
@@ -1147,22 +1038,14 @@
             let data = {
                 id: Date.now().toString().slice(-5),
                 buyer: selectedCustomer,
-                date: '2026-08-13'
+                date: new Date().toISOString().split('T')[0]
             };
             let saved = JSON.parse(localStorage.getItem('savedInvoices')) || [];
             saved.push(data);
             localStorage.setItem('savedInvoices', JSON.stringify(saved));
             alert(`✅ تم حفظ الفاتورة رسمياً واعتمادها ببصمة المشتري للزبون: (${selectedCustomer})`);
         }
-
-        function exportLuxuryInvoice() {
-            let saved = JSON.parse(localStorage.getItem('savedInvoices')) || [];
-            let last = saved.length > 0 ? saved[saved.length - 1] : { buyer: selectedCustomer, date: '2026-08-13' };
-            let text = `فاتورة مبيعات دواجن معتمدة ببصمة الإصبع%0aالمشتري: ${last.buyer}%0aالتاريخ: ${last.date}`;
-            window.open(`https://wa.me/?text=${text}`, '_blank');
-        }
     </script>
 </body>
 </html>
-
 

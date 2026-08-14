@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 
-// 1. نموذج المستخدمين وتسجيل الدخول
+// 1. نموذج المستخدمين وتسجيل الدخول (مع إضافة الاسم ورقم الهاتف والوظيفة)
 const userSchema = new mongoose.Schema({
+    name: { type: String, required: true },
     username: { type: String, required: true, unique: true },
+    phone: { type: String, required: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'employee' },
+    role: { type: String, required: true, default: 'warehouse' },
+    status: { type: String, default: 'approved' },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -33,7 +36,7 @@ const inventorySchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// تصدير النماذج لتعمل تلقائياً وفتحة الكولكشنات في قاعدة بيانات magm
+// تصدير النماذج لتعمل تلقائياً وفتح الكولكشنات في قاعدة بيانات magm
 module.exports = {
     User: mongoose.model('User', userSchema, 'users'),
     Invoice: mongoose.model('Invoice', invoiceSchema, 'invoices'),

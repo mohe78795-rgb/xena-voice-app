@@ -30,15 +30,47 @@ app.get('/api/status', (req, res) => {
     res.json({ success: true, message: '🚀 السيرفر يعمل وقاعدة البيانات مرتبطة بنجاح!' });
 });
 
-// 2. مسار تسجيل الدخول
+// 2. مسار تسجيل الدخول (عبر قاعدة البيانات)
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = await User.findOne({ username, password });
+        // البحث بواسطة اسم المستخدم أو رقم الهاتف
+        const user = await User.findOne({ 
+            $or: [{ username: username }, { phone: username }],
+            password: password 
+        });
+        
         if (!user) {
-            return res.status(401).json({ success: false, message: 'خطأ في اسم المستخدم أو كلمة المرور' });
+            return res.status(401).json({ success: false, message: 'خطأ في اسم المستخدم أو رقم الهاتف أو كلمة المرور' });
         }
         res.json({ success: true, user });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// مسار تسجيل مستخدم جديد وحفظه في قاعدة البيانات السحابية
+app.post('/api/register', async (req, res) => {
+    try {
+        const { name, phone, password, role } = req.body;
+        
+        // التحقق من عدم تكرار رقم الهاتف
+        const existingUser = await User.findOne({ phone });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: 'رقم الهاتف مسجل مسبقاً!' });
+        }
+
+        const newUser = new User({
+            name,
+            username: phone, // جعل اسم المستخدم هو رقم الهاتف لتسهيل تسجيل الدخول
+            phone,
+            password,
+            role,
+            status: 'approved'
+        });
+
+        await newUser.save(); // الحفظ الفعلي في MongoDB Atlas
+        res.json({ success: true, message: 'تم حفظ المستخدم في قاعدة البيانات بنجاح', user: newUser });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -48,7 +80,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/customers', async (req, res) => {
     try {
         const newCustomer = new Customer(req.body);
-        await newCustomer.save(); // سيتم إنشاء الكولكشن تلقائياً في magm
+        await newCustomer.save(); 
         res.json({ success: true, message: 'تم حفظ الزبون وفتح الكولكشن بنجاح', data: newCustomer });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -91,4 +123,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`📡 الخادم يعمل بكفاءة على المنفذ: ${PORT}`);
 });
-
