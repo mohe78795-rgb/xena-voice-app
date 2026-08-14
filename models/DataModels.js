@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// 1. نموذج المستخدمين
+// 1. نموذج المستخدمين وتسجيل الدخول
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     username: { type: String, required: true, unique: true },
@@ -36,13 +36,12 @@ const inventorySchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// 5. [كولكشن جديد] نموذج قسم مسؤول مزارع (وارد المزارع والتحديث الفردي للحقول)
+// 5. نموذج كولكشن مسؤول المزارع الجديد (market_shipments)
 const marketShipmentSchema = new mongoose.Schema({
     farmName: { type: String, default: 'مزرعة كيدان' },
     shipmentDetails: { type: String, default: 'حمول دينة الفيضي' },
     marketerName: { type: String, default: 'صالح بصير' },
     shipmentDate: { type: String, default: '14-08-2026' },
-    // تفاصيل الجدول لكل نوع دجاج
     rows: {
         type: Map,
         of: {
@@ -62,7 +61,6 @@ const marketShipmentSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// تصدير النماذج وتفعيل الكولكشنات في قاعدة بيانات magm
 module.exports = {
     User: mongoose.model('User', userSchema, 'users'),
     Invoice: mongoose.model('Invoice', invoiceSchema, 'invoices'),
