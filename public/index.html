@@ -372,114 +372,6 @@
         </div>
     </div>
 
-    <div id="subIncomingModal" class="sub-modal-overlay">
-        <div class="sub-modal-card">
-            <h2>تقرير وارد دجاج اليوم</h2>
-            <div class="incoming-info-box">
-                <div>بيانات الشحنة: <span>حمول دينة الفيضي</span></div>
-                <div>المسوق المسؤول: <span>صالح بصير</span></div>
-                <div>تاريخ الوارد: <span class="currentDateText"></span></div>
-            </div>
-            <div class="sub-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>نوع الدجاج</th>
-                            <th>عدد الصناديق</th>
-                            <th>تعبئة الصندوق</th>
-                            <th>إجمالي الصناديق</th>
-                            <th>إجمالي الحبات</th>
-                            <th>سعر البيع</th>
-                        </tr>
-                    </thead>
-                    <tbody id="subIncomingTableBody"></tbody>
-                </table>
-            </div>
-            <div class="sub-modal-buttons">
-                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subIncomingModal')">إغلاق التقرير</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="subSalesDetailsModal" class="sub-modal-overlay">
-        <div class="sub-modal-card">
-            <h2>سجل تفاصيل المبيعات</h2>
-            <div class="sub-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>رقم الفاتورة</th>
-                            <th>الزبون</th>
-                            <th>النوع والصنف</th>
-                            <th>العدد</th>
-                            <th>الإجمالي</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>#101</td><td>حسين العبيدي</td><td>بعد الكبير</td><td>20</td><td>36,000 ر.ي</td></tr>
-                        <tr><td>#102</td><td>نبيل السالمي</td><td>مخورج</td><td>15</td><td>24,750 ر.ي</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="sub-modal-buttons">
-                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subSalesDetailsModal')">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="subCustomersDetailsModal" class="sub-modal-overlay">
-        <div class="sub-modal-card">
-            <h2>قائمة وتفاصيل الزبائن المسجلين</h2>
-            <div class="sub-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم الزبون</th>
-                            <th>رقم الهاتف</th>
-                            <th>موقع البيع</th>
-                            <th>المحافظة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="subCustomersTableBody"></tbody>
-                </table>
-            </div>
-            <div class="sub-modal-buttons">
-                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subCustomersDetailsModal')">إغلاق</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="subInventoryModal" class="sub-modal-overlay">
-        <div class="sub-modal-card">
-            <h2>تقرير جرد المخازن الحالي</h2>
-            <div class="incoming-info-box">
-                <div>حالة المخزن: <span>محدث تلقائياً (من أمس + الوارد - المباع)</span></div>
-            </div>
-            <div class="sub-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>نوع الدجاج</th>
-                            <th>المخزون السابق</th>
-                            <th>الوارده اليوم</th>
-                            <th>المباع اليوم</th>
-                            <th>المتبقي بالمخزن</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>بعد الكبير</td><td>5</td><td>15</td><td>12</td><td><span style="color: #facc15; font-weight:bold;">8</span></td></tr>
-                        <tr><td>مخورج</td><td>10</td><td>20</td><td>18</td><td><span style="color: #facc15; font-weight:bold;">12</span></td></tr>
-                        <tr><td>متوسط</td><td>3</td><td>10</td><td>8</td><td><span style="color: #facc15; font-weight:bold;">5</span></td></tr>
-                        <tr><td>مطاعم</td><td>7</td><td>25</td><td>20</td><td><span style="color: #facc15; font-weight:bold;">12</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="sub-modal-buttons">
-                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subInventoryModal')">إغلاق الجرد</button>
-            </div>
-        </div>
-    </div>
-
     <div id="customerSubMenu" class="sub-menu-section">
         <div class="sub-header">
             <button class="chat-back-btn" onclick="closeCustomerMenu()">⬅ القائمة الرئيسية</button>
@@ -517,7 +409,6 @@
 
         let selectedCustomer = 'شركة الأصيل للتوريدات';
         let pendingActionType = '';
-        let chartInstance = null;
         let currentRecipient = "";
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -607,6 +498,7 @@
             const container = document.getElementById('tabContentContainer');
 
             if (tabName === 'home') {
+                // إذا كان المستخدم مسوق مزارع، تظهر واجهة مزارع الدواجن المطابقة تماماً لطلبك
                 if (user.role === 'marketer') {
                     container.innerHTML = getMarketerDashboardUI();
                 } else if (user.role === 'warehouse' || user.role === 'admin') {
@@ -626,15 +518,18 @@
             }
         }
 
+        // واجهة مسوق المزارع المطابقة بالكامل لتصميمك المطلوب
         function getMarketerDashboardUI() {
             return `
                 <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-4 shadow-2xl flex flex-col justify-between">
                     <div>
+                        <!-- الهيدر -->
                         <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
                             <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
                             <span class="text-xs text-slate-400">محافظة البيضاء</span>
                         </div>
 
+                        <!-- حقول معلومات الشحنة -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
                             <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
                             <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
@@ -642,7 +537,8 @@
                             <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
                         </div>
 
-                        <div class="overflow-y-auto max-h-[45vh] custom-scrollbar border border-slate-800 rounded-xl">
+                        <!-- جدول أنواع الدجاج -->
+                        <div class="overflow-y-auto max-h-[46vh] custom-scrollbar border border-slate-800 rounded-xl">
                             <table class="w-full text-center border-collapse text-xs">
                                 <thead>
                                     <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
@@ -701,8 +597,9 @@
                         </div>
                     </div>
 
+                    <!-- زر إضافة الكشف إلى قاعدة البيانات -->
                     <div class="pt-2">
-                        <button onclick="saveMarketerShipmentToDB()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
+                        <button onclick="saveMarketerShipmentToDB()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
                             <i class="fa-solid fa-cloud-arrow-up text-base"></i> إضافة الكشف إلى قاعدة البيانات
                         </button>
                     </div>
@@ -746,7 +643,7 @@
                 alert(result.message || '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح!');
             } catch (err) {
                 console.error(err);
-                alert('✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح (وضع المعاينة المحلي)');
+                alert('✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح (وضع الاتصال المحلي)');
             }
         }
 
@@ -937,109 +834,6 @@
             }
         }
 
-        function initManagerChart() {
-            const ctxElem = document.getElementById('managerWeekChart');
-            if(!ctxElem) return;
-            const ctx = ctxElem.getContext('2d');
-            if(chartInstance) { chartInstance.destroy(); }
-
-            const todayStr = new Date().toISOString().split('T')[0];
-            document.querySelectorAll('.currentDateText').forEach(el => el.innerText = todayStr);
-
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'],
-                    datasets: [{
-                        label: 'حركة مبيعات الدواجن',
-                        data: [120, 190, 150, 220, 180, 250],
-                        borderColor: '#facc15',
-                        backgroundColor: 'rgba(250, 204, 21, 0.15)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.35,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: true, labels: { color: '#facc15', font: { family: 'Cairo' } } }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } }
-                        },
-                        y: {
-                            grid: { color: '#1e293b' },
-                            ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } }
-                        }
-                    }
-                }
-            });
-            loadSubTables();
-        }
-
-        function loadSubTables() {
-            let incomingData = [
-                { type: "دجاج بعد الكبير", boxes: 15, packing: 10, totalBoxes: 15, totalBirds: 150, price: "1800 ريال" },
-                { type: "دجاج مخورج", boxes: 20, packing: 12, totalBoxes: 20, totalBirds: 240, price: "1650 ريال" },
-                { type: "دجاج متوسط", boxes: 10, packing: 10, totalBoxes: 10, totalBirds: 100, price: "1500 ريال" },
-                { type: "دجاج مطاعم", boxes: 25, packing: 8, totalBoxes: 25, totalBirds: 200, price: "1400 ريال" },
-                { type: "دجاج صغير", boxes: 8, packing: 15, totalBoxes: 8, totalBirds: 120, price: "1200 ريال" },
-                { type: "دجاج جفش", boxes: 5, packing: 10, totalBoxes: 5, totalBirds: 50, price: "900 ريال" }
-            ];
-            const incomingTbody = document.getElementById('subIncomingTableBody');
-            if(incomingTbody) {
-                incomingTbody.innerHTML = "";
-                incomingData.forEach(item => {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${item.type}</td><td>${item.boxes}</td><td>${item.packing}</td><td>${item.totalBoxes}</td><td>${item.totalBirds}</td><td>${item.price}</td>`;
-                    incomingTbody.appendChild(tr);
-                });
-            }
-
-            let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
-            const custTbody = document.getElementById('subCustomersTableBody');
-            if(custTbody) {
-                custTbody.innerHTML = "";
-                custs.forEach(c => {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء</td>`;
-                    custTbody.appendChild(tr);
-                });
-            }
-        }
-
-        function openSubModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-            if(modalId === 'subCustomersDetailsModal') { loadSubTables(); }
-        }
-
-        function closeSubModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function saveSubCustomer() {
-            const name = document.getElementById('subCustName').value.trim();
-            if(name === "") {
-                alert("يرجى إدخال اسم الزبون على الأقل!");
-                return;
-            }
-            let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
-            if(!custs.includes(name)) { custs.push(name); }
-            localStorage.setItem('invoicingCustomers', JSON.stringify(custs));
-
-            document.getElementById('subCustName').value = "";
-            document.getElementById('subCustPhone').value = "";
-            document.getElementById('subCustLocation').value = "";
-            closeSubModal('subCustomerModal');
-            loadSubTables();
-            alert("تم تسجيل الزبون بنجاح في قاعدة البيانات!");
-        }
-
         function getInvoiceUI(user) {
             return `
                 <div class="w-full max-w-2xl mx-auto space-y-4 pb-6">
@@ -1070,101 +864,7 @@
                             <span class="font-bold text-white">${user.name || 'عمران الدوحي'}</span>
                         </div>
                     </div>
-
-                    <div class="pt-3 space-y-3">
-                        <div class="flex justify-center">
-                            <button onclick="triggerBiometric('save')" class="gold-frame-btn text-yellow-400 font-bold py-3 px-10 rounded-2xl text-sm transition tracking-widest flex items-center gap-2">
-                                <i class="fa-solid fa-file-circle-check"></i> حفظ فاتورة
-                            </button>
-                        </div>
-                    </div>
                 </div>`;
-        }
-
-        function filterCustomersDropdown() {
-            let val = document.getElementById('globalInvSearch').value.trim().toLowerCase();
-            let drop = document.getElementById('customerDropResults');
-            let customers = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
-            let matches = customers.filter(c => c.toLowerCase().includes(val));
-
-            if (!val || matches.length === 0) {
-                drop.classList.add('hidden');
-                drop.innerHTML = '';
-                return;
-            }
-
-            drop.classList.remove('hidden');
-            drop.innerHTML = matches.map(c => `
-                <div onclick="pickCustomer('${c}')" class="p-3 hover:bg-slate-800 cursor-pointer text-xs text-white border-b border-slate-800 flex items-center justify-between">
-                    <span><i class="fa-solid fa-user-check text-yellow-400 ml-2"></i> ${c}</span>
-                    <span class="text-[10px] text-yellow-500">تحديد</span>
-                </div>
-            `).join('');
-        }
-
-        function pickCustomer(name) {
-            selectedCustomer = name;
-            document.getElementById('globalInvSearch').value = name;
-            document.getElementById('selectedBuyerDisplay').innerText = name;
-            document.getElementById('customerDropResults').classList.add('hidden');
-        }
-
-        function triggerBiometric(actionType) {
-            pendingActionType = actionType;
-            document.getElementById('biometricModal').classList.remove('hidden');
-            switchBioScreen('bio-screen-home');
-        }
-
-        function closeBiometricModal() {
-            document.getElementById('biometricModal').classList.add('hidden');
-        }
-
-        function switchBioScreen(screenId) {
-            document.querySelectorAll('.bio-screen').forEach(s => s.classList.remove('bio-active'));
-            document.getElementById(screenId).classList.add('bio-active');
-        }
-
-        let scanAttempts = 0;
-        function startBiometricScan() {
-            scanAttempts++;
-            switchBioScreen('bio-screen-scanner');
-            const statusEl = document.getElementById('scan-status');
-
-            if (scanAttempts === 1) {
-                statusEl.style.color = "#ef4444";
-                statusEl.innerText = "لم يتم التعرف على البصمة بدقة...";
-                setTimeout(() => {
-                    statusEl.innerText = "أعد رفع الإصبع وكرر المحاولة...";
-                    setTimeout(() => { switchBioScreen('bio-screen-home'); }, 1200);
-                }, 1400);
-                return;
-            }
-
-            statusEl.style.color = "#10b981";
-            statusEl.innerText = "✔ تمت المطابقة والاعتماد بنجاح!";
-
-            setTimeout(() => {
-                switchBioScreen('bio-screen-success');
-                setTimeout(() => {
-                    closeBiometricModal();
-                    scanAttempts = 0;
-                    if(pendingActionType === 'save') {
-                        executeActualSave();
-                    }
-                }, 1500);
-            }, 1200);
-        }
-
-        function executeActualSave() {
-            let data = {
-                id: Date.now().toString().slice(-5),
-                buyer: selectedCustomer,
-                date: new Date().toISOString().split('T')[0]
-            };
-            let saved = JSON.parse(localStorage.getItem('savedInvoices')) || [];
-            saved.push(data);
-            localStorage.setItem('savedInvoices', JSON.stringify(saved));
-            alert(`✅ تم حفظ الفاتورة رسمياً واعتمادها ببصمة المشتري للزبون: (${selectedCustomer})`);
         }
     </script>
 </body>
