@@ -559,7 +559,6 @@
                     <div class="grid-buttons-box">
                         <button class="action-dashboard-btn" onclick="openSubModal('subCustomerModal')"><i class="fa-solid fa-user-plus"></i> إضافة زبون جديد</button>
                         <button class="action-dashboard-btn" onclick="switchTab('tasks')"><i class="fa-solid fa-file-invoice-dollar"></i> اصدار فاتورة نقد</button>
-                        <button class="action-dashboard-btn" onclick="switchTab('marketShipment')"><i class="fa-solid fa-truck-ramp-box"></i> وارد دجاج اليوم (مسوق مزارع)</button>
                         <button class="action-dashboard-btn" onclick="alert('📦 تم عرض بيانات المخزن من أمس بنجاح')"><i class="fa-solid fa-boxes-stacked"></i> المخزن من أمس</button>
                         <button class="action-dashboard-btn" onclick="alert('تفاصيل البيع')"><i class="fa-solid fa-chart-line"></i> تفاصيل البيع</button>
                         <button class="action-dashboard-btn" onclick="alert('تفاصيل الزبائن')"><i class="fa-solid fa-users"></i> تفاصيل الزبائن</button>
@@ -569,7 +568,7 @@
             `;
         }
 
-        // --- كود جلب وعرض واجهة "مسوق مزارع" المرتبطة بقاعدة البيانات مع زرين سفليين (الرئيسية والحساب) ---
+        // --- جلب وعرض واجهة "مسوق مزارع" مع الزرين السفليين (الرئيسية والحساب) وبدون زر الخروج ---
         async function fetchMarketShipmentData() {
             const container = document.getElementById('tabContentContainer');
             container.innerHTML = `<div class="text-center text-yellow-400 py-10">جاري جلب بيانات شحنات المزارع...</div>`;
@@ -667,7 +666,7 @@
                             </span>
                         </div>
                         
-                        <!-- الزران السفليان المطلبان: الرئيسية والحساب -->
+                        <!-- الزران السفليان: الرئيسية والحساب -->
                         <div class="grid grid-cols-2 gap-3 pt-1">
                             <button onclick="switchTab('home')" class="bg-[#161f32] border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0b111e] font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
                                 <i class="fa-solid fa-house"></i> الرئيسية
