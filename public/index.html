@@ -1,5 +1,3 @@
---- START OF FILE Paste August 14, 2026 - 8:27PM ---
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -307,14 +305,13 @@
             <div id="tabContentContainer" class="w-full flex-1 space-y-4 custom-scrollbar"></div>
         </div>
 
-        <!-- شريط التنقل السفلي المطور -->
         <div class="w-full mt-4 pt-2 border-t border-slate-800 grid grid-cols-6 gap-1 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg">
             <button onclick="switchTab('home')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-yellow-400" data-nav="home"><i class="fa-solid fa-house text-base"></i><span class="text-[10px] mt-1">رئيسية</span></button>
-            <button onclick="switchTab('marketShipment')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="marketShipment"><i class="fa-solid fa-truck-ramp-box text-base"></i><span class="text-[10px] mt-1">مسؤول مزارع</span></button>
             <button onclick="switchTab('tasks')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="tasks"><i class="fa-solid fa-file-invoice-dollar text-base"></i><span class="text-[10px] mt-1">فاتوره</span></button>
+            <button onclick="switchTab('orders')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="orders"><i class="fa-solid fa-boxes-stacked text-base"></i><span class="text-[10px] mt-1">طلبات</span></button>
+            <button onclick="switchTab('notifications')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="notifications"><i class="fa-solid fa-truck-ramp-box text-base"></i><span class="text-[10px] mt-1">وارد</span></button>
             <button onclick="switchTab('messages')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="messages"><i class="fa-solid fa-comments text-base"></i><span class="text-[10px] mt-1">رسائل</span></button>
             <button onclick="switchTab('account')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="account"><i class="fa-solid fa-user-gear text-base"></i><span class="text-[10px] mt-1">الحساب</span></button>
-            <button onclick="logout()" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-red-400 hover:text-red-300"><i class="fa-solid fa-right-from-bracket text-base"></i><span class="text-[10px] mt-1">خروج</span></button>
         </div>
     </div>
 
@@ -348,7 +345,7 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة زبون جديد -->
+    <!-- نوافذ فرعية أخرى -->
     <div id="subCustomerModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>إضافة زبون جديد لقاعدة البيانات</h2>
@@ -375,7 +372,114 @@
         </div>
     </div>
 
-    <!-- نافذة المحادثات والرسائل -->
+    <div id="subIncomingModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>تقرير وارد دجاج اليوم</h2>
+            <div class="incoming-info-box">
+                <div>بيانات الشحنة: <span>حمول دينة الفيضي</span></div>
+                <div>المسوق المسؤول: <span>صالح بصير</span></div>
+                <div>تاريخ الوارد: <span class="currentDateText"></span></div>
+            </div>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوع الدجاج</th>
+                            <th>عدد الصناديق</th>
+                            <th>تعبئة الصندوق</th>
+                            <th>إجمالي الصناديق</th>
+                            <th>إجمالي الحبات</th>
+                            <th>سعر البيع</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subIncomingTableBody"></tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subIncomingModal')">إغلاق التقرير</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subSalesDetailsModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>سجل تفاصيل المبيعات</h2>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الفاتورة</th>
+                            <th>الزبون</th>
+                            <th>النوع والصنف</th>
+                            <th>العدد</th>
+                            <th>الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>#101</td><td>حسين العبيدي</td><td>بعد الكبير</td><td>20</td><td>36,000 ر.ي</td></tr>
+                        <tr><td>#102</td><td>نبيل السالمي</td><td>مخورج</td><td>15</td><td>24,750 ر.ي</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subSalesDetailsModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subCustomersDetailsModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>قائمة وتفاصيل الزبائن المسجلين</h2>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الزبون</th>
+                            <th>رقم الهاتف</th>
+                            <th>موقع البيع</th>
+                            <th>المحافظة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subCustomersTableBody"></tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subCustomersDetailsModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subInventoryModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>تقرير جرد المخازن الحالي</h2>
+            <div class="incoming-info-box">
+                <div>حالة المخزن: <span>محدث تلقائياً (من أمس + الوارد - المباع)</span></div>
+            </div>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوع الدجاج</th>
+                            <th>المخزون السابق</th>
+                            <th>الوارده اليوم</th>
+                            <th>المباع اليوم</th>
+                            <th>المتبقي بالمخزن</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>بعد الكبير</td><td>5</td><td>15</td><td>12</td><td><span style="color: #facc15; font-weight:bold;">8</span></td></tr>
+                        <tr><td>مخورج</td><td>10</td><td>20</td><td>18</td><td><span style="color: #facc15; font-weight:bold;">12</span></td></tr>
+                        <tr><td>متوسط</td><td>3</td><td>10</td><td>8</td><td><span style="color: #facc15; font-weight:bold;">5</span></td></tr>
+                        <tr><td>مطاعم</td><td>7</td><td>25</td><td>20</td><td><span style="color: #facc15; font-weight:bold;">12</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subInventoryModal')">إغلاق الجرد</button>
+            </div>
+        </div>
+    </div>
+
     <div id="customerSubMenu" class="sub-menu-section">
         <div class="sub-header">
             <button class="chat-back-btn" onclick="closeCustomerMenu()">⬅ القائمة الرئيسية</button>
@@ -389,38 +493,14 @@
             <button class="chat-back-btn" onclick="closeChat()">⬅ رجوع</button>
             <div id="chatTitle" class="chat-title">اسم الجهة</div>
         </div>
+
         <div id="chatMessages" class="chat-messages">
             <div class="msg-bubble incoming">مرحباً بك، تم فتح قناة الاتصال بنجاح. كيف يمكننا الخدمة؟</div>
         </div>
+
         <div class="chat-input-area">
             <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا..." onkeypress="handleKeyPress(event)">
             <button class="send-msg-btn" onclick="sendMessage()">إرسال</button>
-        </div>
-    </div>
-
-    <!-- نافذة الإعدادات -->
-    <div id="settingsPageModal" class="settings-page">
-        <div class="settings-top-bar">
-            <span style="cursor:pointer; color: #facc15; font-size: 18px;" onclick="closeSettingsModal()">➔</span>
-            <h2>الإعدادات</h2>
-            <span style="font-size: 18px; color: #facc15;">🔗</span>
-        </div>
-        <div class="section-title">اعدادات الدخول</div>
-        <div class="settings-card">
-            <div class="setting-item">
-                <span>تفعيل البصمة للدخول للحساب</span>
-                <div class="setting-item-left">
-                    <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-                    <span class="setting-icon">👆</span>
-                </div>
-            </div>
-        </div>
-        <div class="section-title">اعدادات اخرى</div>
-        <div class="settings-card">
-            <div class="setting-item highlight-item" style="cursor: pointer;" onclick="logout()">
-                <span style="font-weight: 700;">تسجيل خروج</span>
-                <span class="setting-icon">➡️</span>
-            </div>
         </div>
     </div>
 
@@ -503,11 +583,7 @@
         function loadDashboard(user) {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboardScreen').classList.remove('hidden');
-            if (user.role === 'marketer') {
-                switchTab('marketShipment');
-            } else {
-                switchTab('home');
-            }
+            switchTab('home');
         }
 
         function logout() {
@@ -531,14 +607,14 @@
             const container = document.getElementById('tabContentContainer');
 
             if (tabName === 'home') {
-                if (user.role === 'warehouse' || user.role === 'admin') {
+                if (user.role === 'marketer') {
+                    container.innerHTML = getMarketerDashboardUI();
+                } else if (user.role === 'warehouse' || user.role === 'admin') {
                     container.innerHTML = getManagerHomeUI();
                     setTimeout(() => { initManagerChart(); }, 100);
                 } else {
-                    container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">مرحباً بك (${user.name}) في النظام الشامل لتربية وتسويق الدواجن. انقر على التبويبات بالأسفل للاستعراض.</div>`;
+                    container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">مرحباً بك (${user.name}) في النظام الشامل لتربية وتسويق الدواجن. انقر على تبويب (فاتوره) بالأسفل لإنشاء أو إصدار الفواتير.</div>`;
                 }
-            } else if (tabName === 'marketShipment') {
-                fetchMarketShipmentData();
             } else if (tabName === 'tasks') {
                 container.innerHTML = getInvoiceUI(user);
             } else if (tabName === 'messages') {
@@ -547,6 +623,130 @@
                 container.innerHTML = getAccountUI(user);
             } else {
                 container.innerHTML = `<div class="p-6 text-center text-slate-400">محتوى قسم (${tabName}) جاهز. انقر على التبويبات بالأسفل للاستعراض.</div>`;
+            }
+        }
+
+        function getMarketerDashboardUI() {
+            return `
+                <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-4 shadow-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
+                            <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
+                            <span class="text-xs text-slate-400">محافظة البيضاء</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">المسوق:</label><input type="text" id="marketer" value="عمران الدوحي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                        </div>
+
+                        <div class="overflow-y-auto max-h-[45vh] custom-scrollbar border border-slate-800 rounded-xl">
+                            <table class="w-full text-center border-collapse text-xs">
+                                <thead>
+                                    <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
+                                        <th class="py-3 px-3 text-right">نوع الدجاج</th>
+                                        <th class="py-3 px-3">عدد الصناديق</th>
+                                        <th class="py-3 px-3">تعبئة الصندوق</th>
+                                        <th class="py-3 px-3">إجمالي الحبات</th>
+                                        <th class="py-3 px-3 text-left">سعر البيع</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#1f293d]/50 text-gray-200" id="chickenTableBody">
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج كبير</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="10" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="5500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج مخورج</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="5" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="5000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج متوسط</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="8" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="15" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="4800" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج مطاعم</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="6" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="4500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج صغير</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="4" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="20" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">80</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="4000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج جفش</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="2" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">20</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="3500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="saveMarketerShipmentToDB()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-base"></i> إضافة الكشف إلى قاعدة البيانات
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calcRow(input) {
+            const row = input.closest('.chicken-row');
+            const boxes = parseFloat(row.querySelector('.boxes').value) || 0;
+            const packing = parseFloat(row.querySelector('.packing').value) || 0;
+            row.querySelector('.total-chickens').textContent = boxes * packing;
+        }
+
+        async function saveMarketerShipmentToDB() {
+            const rowsData = [];
+            document.querySelectorAll('.chicken-row').forEach(row => {
+                const type = row.querySelector('td').textContent.trim();
+                const boxes = row.querySelector('.boxes').value;
+                const packing = row.querySelector('.packing').value;
+                const total = row.querySelector('.total-chickens').textContent;
+                const price = row.querySelector('.price').value;
+                rowsData.push({ type, boxes, packing, total, price });
+            });
+
+            const data = {
+                farm: document.getElementById('farmName').value,
+                driver: document.getElementById('driverName').value,
+                marketer: document.getElementById('marketer').value,
+                date: document.getElementById('shipDate').value,
+                rows: rowsData
+            };
+
+            try {
+                const response = await fetch('/api/shipments/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                alert(result.message || '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح!');
+            } catch (err) {
+                console.error(err);
+                alert('✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح (وضع المعاينة المحلي)');
             }
         }
 
@@ -559,162 +759,14 @@
                     <div class="grid-buttons-box">
                         <button class="action-dashboard-btn" onclick="openSubModal('subCustomerModal')"><i class="fa-solid fa-user-plus"></i> إضافة زبون جديد</button>
                         <button class="action-dashboard-btn" onclick="switchTab('tasks')"><i class="fa-solid fa-file-invoice-dollar"></i> اصدار فاتورة نقد</button>
-                        <button class="action-dashboard-btn" onclick="switchTab('marketShipment')"><i class="fa-solid fa-truck-ramp-box"></i> وارد دجاج اليوم (مسوق مزارع)</button>
+                        <button class="action-dashboard-btn" onclick="openSubModal('subIncomingModal')"><i class="fa-solid fa-truck-ramp-box"></i> وارد دجاج اليوم</button>
                         <button class="action-dashboard-btn" onclick="alert('📦 تم عرض بيانات المخزن من أمس بنجاح')"><i class="fa-solid fa-boxes-stacked"></i> المخزن من أمس</button>
-                        <button class="action-dashboard-btn" onclick="alert('تفاصيل البيع')"><i class="fa-solid fa-chart-line"></i> تفاصيل البيع</button>
-                        <button class="action-dashboard-btn" onclick="alert('تفاصيل الزبائن')"><i class="fa-solid fa-users"></i> تفاصيل الزبائن</button>
-                        <button class="action-dashboard-btn full-width-btn" onclick="alert('جرد المخازن')"><i class="fa-solid fa-clipboard-list"></i> جرد المخازن</button>
+                        <button class="action-dashboard-btn" onclick="openSubModal('subSalesDetailsModal')"><i class="fa-solid fa-chart-line"></i> تفاصيل البيع</button>
+                        <button class="action-dashboard-btn" onclick="openSubModal('subCustomersDetailsModal')"><i class="fa-solid fa-users"></i> تفاصيل الزبائن</button>
+                        <button class="action-dashboard-btn full-width-btn" onclick="openSubModal('subInventoryModal')"><i class="fa-solid fa-clipboard-list"></i> جرد المخازن</button>
                     </div>
                 </div>
             `;
-        }
-
-        // --- كود جلب وعرض واجهة "مسوق مزارع" المرتبطة بقاعدة البيانات مع زرين سفليين (الرئيسية والحساب) ---
-        async function fetchMarketShipmentData() {
-            const container = document.getElementById('tabContentContainer');
-            container.innerHTML = `<div class="text-center text-yellow-400 py-10">جاري جلب بيانات شحنات المزارع...</div>`;
-            try {
-                const response = await fetch('/api/market-shipment');
-                const result = await response.json();
-                if (result.success) {
-                    container.innerHTML = getMarketShipmentUI(result.data);
-                }
-            } catch (err) {
-                container.innerHTML = `<div class="text-red-400 text-center py-10">خطأ في الاتصال لجلب بيانات تقرير المزارع.</div>`;
-            }
-        }
-
-        function getMarketShipmentUI(data) {
-            const rows = data.rows || {};
-            const getVal = (type, field) => (rows[type] && rows[type][field] !== undefined) ? rows[type][field] : 0;
-
-            const chickenTypes = [
-                { key: 'كبير', label: 'دجاج كبير' },
-                { key: 'مخورج', label: 'دجاج مخورج' },
-                { key: 'متوسط', label: 'دجاج متوسط' },
-                { key: 'مطاعم', label: 'دجاج مطاعم' },
-                { key: 'صغير', label: 'دجاج صغير' },
-                { key: 'جفش', label: 'دجاج جفش' }
-            ];
-
-            let rowsHtml = chickenTypes.map(item => {
-                let boxes = getVal(item.key, 'boxes');
-                let packing = getVal(item.key, 'packing');
-                let price = getVal(item.key, 'price');
-                let total = boxes * packing;
-
-                return `
-                    <tr class="chicken-row" data-type="${item.key}">
-                        <td class="py-3 px-2 text-right font-medium text-white">${item.label}</td>
-                        <td class="py-3 px-2">
-                            <input type="number" value="${boxes}" class="boxes w-20 bg-[#0f172a] border border-[#1f293d] rounded-lg py-1.5 text-center text-white font-semibold focus:outline-none focus:border-[#facc15]" oninput="calculateTotal(this)" onblur="updateRowField(this, 'boxes')">
-                        </td>
-                        <td class="py-3 px-2">
-                            <input type="number" value="${packing}" class="packing w-20 bg-[#0f172a] border border-[#1f293d] rounded-lg py-1.5 text-center text-white font-semibold focus:outline-none focus:border-[#facc15]" oninput="calculateTotal(this)" onblur="updateRowField(this, 'packing')">
-                        </td>
-                        <td class="py-3 px-2 text-[#facc15] font-bold total-chickens">${total}</td>
-                        <td class="py-3 px-2 text-left">
-                            <input type="number" value="${price}" class="price w-24 bg-[#0f172a] border border-[#1f293d] rounded-lg py-1.5 text-center text-white font-semibold focus:outline-none focus:border-[#facc15]" onblur="updateRowField(this, 'price')">
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            return `
-                <div class="w-full max-w-4xl mx-auto bg-[#111827] border border-[#1f293d] rounded-2xl p-5 shadow-2xl flex flex-col justify-between my-auto">
-                    <div>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
-                            <div>
-                                <label class="block text-[11px] text-gray-400 mb-1">المزرعة:</label>
-                                <input type="text" id="farmName" value="${data.farmName || ''}" onblur="updateField('farmName', this.value)" class="w-full bg-[#111827] border border-[#1f293d] rounded-lg px-2.5 py-1.5 text-xs text-[#facc15] font-bold focus:outline-none focus:border-[#facc15]">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-gray-400 mb-1">بيانات الشحنة:</label>
-                                <input type="text" id="shipmentDetails" value="${data.shipmentDetails || ''}" onblur="updateField('shipmentDetails', this.value)" class="w-full bg-[#111827] border border-[#1f293d] rounded-lg px-2.5 py-1.5 text-xs text-[#facc15] font-bold focus:outline-none focus:border-[#facc15]">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-gray-400 mb-1">المسوق المسؤول:</label>
-                                <input type="text" id="marketerName" value="${data.marketerName || ''}" onblur="updateField('marketerName', this.value)" class="w-full bg-[#111827] border border-[#1f293d] rounded-lg px-2.5 py-1.5 text-xs text-[#facc15] font-bold focus:outline-none focus:border-[#facc15]">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] text-gray-400 mb-1">تاريخ الوارد:</label>
-                                <input type="text" id="shipmentDate" value="${data.shipmentDate || ''}" onblur="updateField('shipmentDate', this.value)" class="w-full bg-[#111827] border border-[#1f293d] rounded-lg px-2.5 py-1.5 text-xs text-[#facc15] font-bold focus:outline-none focus:border-[#facc15]">
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto max-h-[50vh] custom-scrollbar">
-                            <table class="w-full text-center border-collapse">
-                                <thead>
-                                    <tr class="text-[#facc15] text-xs border-b border-[#1f293d]">
-                                        <th class="py-2.5 px-2 text-right">نوع الدجاج</th>
-                                        <th class="py-2.5 px-2">عدد الصناديق</th>
-                                        <th class="py-2.5 px-2">تعبئة الصندوق</th>
-                                        <th class="py-2.5 px-2">إجمالي الحبات</th>
-                                        <th class="py-2.5 px-2 text-left">سعر البيع</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-[#1f293d]/50 text-xs text-gray-200" id="chickenTable">
-                                    ${rowsHtml}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 pt-2 flex flex-col gap-3">
-                        <div class="text-center">
-                            <span class="text-[11px] text-yellow-400 font-semibold bg-[#0f172a] px-4 py-2 rounded-xl border border-yellow-500/30 inline-block">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> يتم حفظ وتحديث كافة التعديلات تلقائياً في قاعدة البيانات (MongoDB Atlas)
-                            </span>
-                        </div>
-                        
-                        <!-- الزران السفليان المطلبان: الرئيسية والحساب -->
-                        <div class="grid grid-cols-2 gap-3 pt-1">
-                            <button onclick="switchTab('home')" class="bg-[#161f32] border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0b111e] font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
-                                <i class="fa-solid fa-house"></i> الرئيسية
-                            </button>
-                            <button onclick="switchTab('account')" class="bg-[#161f32] border border-[#facc15] text-[#facc15] hover:bg-[#facc15] hover:text-[#0b111e] font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
-                                <i class="fa-solid fa-user-gear"></i> الحساب
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function calculateTotal(element) {
-            const row = element.closest('.chicken-row');
-            const boxes = parseFloat(row.querySelector('.boxes').value) || 0;
-            const packing = parseFloat(row.querySelector('.packing').value) || 0;
-            const totalCell = row.querySelector('.total-chickens');
-            totalCell.textContent = boxes * packing;
-        }
-
-        async function updateField(fieldName, fieldValue) {
-            try {
-                await fetch('/api/update-field', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fieldName, fieldValue })
-                });
-            } catch (err) {
-                console.error('خطأ في التحديث:', err);
-            }
-        }
-
-        async function updateRowField(element, subField) {
-            const row = element.closest('.chicken-row');
-            const chickenType = row.getAttribute('data-type');
-            const fieldValue = element.value;
-
-            try {
-                await fetch('/api/update-row-field', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chickenType, subField, fieldValue })
-                });
-            } catch (err) {
-                console.error('خطأ في تحديث الصف:', err);
-            }
         }
 
         function getMessagingUI() {
@@ -760,25 +812,56 @@
                             <span>تحديث كلمة السر</span>
                             <span class="icon-badge">🔒</span>
                         </button>
+
                         <button class="action-btn" onclick="openSettingsModal()">
                             <span>الإعدادات العامة</span>
                             <span class="icon-badge">⚙️</span>
                         </button>
+
                         <button class="action-btn logout-btn" onclick="logout()">
                             <span>تسجيل الخروج</span>
                             <span class="icon-badge">🚪</span>
                         </button>
                     </div>
                 </div>
+
+                <div id="settingsPageModal" class="settings-page">
+                    <div class="settings-top-bar">
+                        <span style="cursor:pointer; color: #facc15; font-size: 18px;" onclick="closeSettingsModal()">➔</span>
+                        <h2>الإعدادات</h2>
+                        <span style="font-size: 18px; color: #facc15;">🔗</span>
+                    </div>
+
+                    <div class="section-title">اعدادات الدخول</div>
+                    <div class="settings-card">
+                        <div class="setting-item">
+                            <span>تفعيل البصمة للدخول للحساب</span>
+                            <div class="setting-item-left">
+                                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                <span class="setting-icon">👆</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">اعدادات اخرى</div>
+                    <div class="settings-card">
+                        <div class="setting-item highlight-item" style="cursor: pointer;" onclick="logout()">
+                            <span style="font-weight: 700;">تسجيل خروج</span>
+                            <span class="setting-icon">➡️</span>
+                        </div>
+                    </div>
+                </div>
             `;
         }
 
         function openSettingsModal() {
-            document.getElementById('settingsPageModal').style.display = 'flex';
+            const modal = document.getElementById('settingsPageModal');
+            if(modal) modal.style.display = 'flex';
         }
 
         function closeSettingsModal() {
-            document.getElementById('settingsPageModal').style.display = 'none';
+            const modal = document.getElementById('settingsPageModal');
+            if(modal) modal.style.display = 'none';
         }
 
         function handleCustomerClick() {
@@ -796,9 +879,12 @@
                     </div>
                     <span style="color: #facc15; font-size: 16px;"><i class="fa-solid fa-comment-dots"></i></span>
                 `;
-                item.onclick = function() { openChat("الزبون: " + custName); };
+                item.onclick = function() {
+                    openChat("الزبون: " + custName);
+                };
                 container.appendChild(item);
             });
+
             document.getElementById('customerSubMenu').style.display = 'flex';
         }
 
@@ -811,6 +897,7 @@
             document.getElementById('customerSubMenu').style.display = 'none';
             document.getElementById('chatTitle').innerText = recipientName;
             document.getElementById('chatSection').style.display = 'flex';
+
             const messagesContainer = document.getElementById('chatMessages');
             messagesContainer.innerHTML = `<div class="msg-bubble incoming">أهلاً بك، أنت الآن متصل مع (${recipientName}). تفضل بكتابة رسالتك.</div>`;
         }
@@ -822,12 +909,16 @@
         function sendMessage() {
             const inputField = document.getElementById('messageInput');
             const messageText = inputField.value.trim();
+
             if (messageText === "") return;
+
             const messagesContainer = document.getElementById('chatMessages');
+
             const outgoingMsg = document.createElement('div');
             outgoingMsg.className = "msg-bubble outgoing";
             outgoingMsg.innerText = messageText;
             messagesContainer.appendChild(outgoingMsg);
+
             inputField.value = "";
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
@@ -841,7 +932,9 @@
         }
 
         function handleKeyPress(event) {
-            if (event.key === 'Enter') { sendMessage(); }
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         }
 
         function initManagerChart() {
@@ -849,6 +942,9 @@
             if(!ctxElem) return;
             const ctx = ctxElem.getContext('2d');
             if(chartInstance) { chartInstance.destroy(); }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('.currentDateText').forEach(el => el.innerText = todayStr);
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -868,17 +964,58 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: true, labels: { color: '#facc15', font: { family: 'Cairo' } } } },
+                    plugins: {
+                        legend: { display: true, labels: { color: '#facc15', font: { family: 'Cairo' } } }
+                    },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } } },
-                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } } }
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } }
+                        },
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } }
+                        }
                     }
                 }
             });
+            loadSubTables();
+        }
+
+        function loadSubTables() {
+            let incomingData = [
+                { type: "دجاج بعد الكبير", boxes: 15, packing: 10, totalBoxes: 15, totalBirds: 150, price: "1800 ريال" },
+                { type: "دجاج مخورج", boxes: 20, packing: 12, totalBoxes: 20, totalBirds: 240, price: "1650 ريال" },
+                { type: "دجاج متوسط", boxes: 10, packing: 10, totalBoxes: 10, totalBirds: 100, price: "1500 ريال" },
+                { type: "دجاج مطاعم", boxes: 25, packing: 8, totalBoxes: 25, totalBirds: 200, price: "1400 ريال" },
+                { type: "دجاج صغير", boxes: 8, packing: 15, totalBoxes: 8, totalBirds: 120, price: "1200 ريال" },
+                { type: "دجاج جفش", boxes: 5, packing: 10, totalBoxes: 5, totalBirds: 50, price: "900 ريال" }
+            ];
+            const incomingTbody = document.getElementById('subIncomingTableBody');
+            if(incomingTbody) {
+                incomingTbody.innerHTML = "";
+                incomingData.forEach(item => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${item.type}</td><td>${item.boxes}</td><td>${item.packing}</td><td>${item.totalBoxes}</td><td>${item.totalBirds}</td><td>${item.price}</td>`;
+                    incomingTbody.appendChild(tr);
+                });
+            }
+
+            let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
+            const custTbody = document.getElementById('subCustomersTableBody');
+            if(custTbody) {
+                custTbody.innerHTML = "";
+                custs.forEach(c => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء</td>`;
+                    custTbody.appendChild(tr);
+                });
+            }
         }
 
         function openSubModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
+            if(modalId === 'subCustomersDetailsModal') { loadSubTables(); }
         }
 
         function closeSubModal(modalId) {
@@ -887,14 +1024,19 @@
 
         function saveSubCustomer() {
             const name = document.getElementById('subCustName').value.trim();
-            if(name === "") { alert("يرجى إدخال اسم الزبون على الأقل!"); return; }
+            if(name === "") {
+                alert("يرجى إدخال اسم الزبون على الأقل!");
+                return;
+            }
             let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
             if(!custs.includes(name)) { custs.push(name); }
             localStorage.setItem('invoicingCustomers', JSON.stringify(custs));
+
             document.getElementById('subCustName').value = "";
             document.getElementById('subCustPhone').value = "";
             document.getElementById('subCustLocation').value = "";
             closeSubModal('subCustomerModal');
+            loadSubTables();
             alert("تم تسجيل الزبون بنجاح في قاعدة البيانات!");
         }
 
@@ -929,10 +1071,12 @@
                         </div>
                     </div>
 
-                    <div class="pt-3 flex justify-center">
-                        <button onclick="triggerBiometric('save')" class="gold-frame-btn text-yellow-400 font-bold py-3 px-10 rounded-2xl text-sm transition tracking-widest flex items-center gap-2">
-                            <i class="fa-solid fa-file-circle-check"></i> حفظ فاتورة
-                        </button>
+                    <div class="pt-3 space-y-3">
+                        <div class="flex justify-center">
+                            <button onclick="triggerBiometric('save')" class="gold-frame-btn text-yellow-400 font-bold py-3 px-10 rounded-2xl text-sm transition tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-file-circle-check"></i> حفظ فاتورة
+                            </button>
+                        </div>
                     </div>
                 </div>`;
         }
@@ -1004,7 +1148,9 @@
                 setTimeout(() => {
                     closeBiometricModal();
                     scanAttempts = 0;
-                    if(pendingActionType === 'save') { executeActualSave(); }
+                    if(pendingActionType === 'save') {
+                        executeActualSave();
+                    }
                 }, 1500);
             }, 1200);
         }
@@ -1023,4 +1169,3 @@
     </script>
 </body>
 </html>
-

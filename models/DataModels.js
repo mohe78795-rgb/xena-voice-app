@@ -36,29 +36,22 @@ const inventorySchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// 5. نموذج كولكشن مسؤول المزارع الجديد (market_shipments)
-const marketShipmentSchema = new mongoose.Schema({
-    farmName: { type: String, default: 'مزرعة كيدان' },
-    shipmentDetails: { type: String, default: 'حمول دينة الفيضي' },
-    marketerName: { type: String, default: 'صالح بصير' },
-    shipmentDate: { type: String, default: '14-08-2026' },
-    rows: {
-        type: Map,
-        of: {
+// 5. نموذج شحنات مسوق المزارع
+const shipmentSchema = new mongoose.Schema({
+    farm: { type: String, required: true },
+    driver: { type: String, required: true },
+    marketer: { type: String, required: true },
+    date: { type: String, required: true },
+    rows: [
+        {
+            type: String,
             boxes: Number,
             packing: Number,
+            total: Number,
             price: Number
-        },
-        default: {
-            "كبير": { boxes: 15, packing: 10, price: 1800 },
-            "مخورج": { boxes: 20, packing: 12, price: 1650 },
-            "متوسط": { boxes: 10, packing: 10, price: 1500 },
-            "مطاعم": { boxes: 25, packing: 8, price: 1400 },
-            "صغير": { boxes: 8, packing: 15, price: 1200 },
-            "جفش": { boxes: 5, packing: 10, price: 900 }
         }
-    },
-    updatedAt: { type: Date, default: Date.now }
+    ],
+    createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = {
@@ -66,5 +59,5 @@ module.exports = {
     Invoice: mongoose.model('Invoice', invoiceSchema, 'invoices'),
     Customer: mongoose.model('Customer', customerSchema, 'customers'),
     Inventory: mongoose.model('Inventory', inventorySchema, 'inventory'),
-    MarketShipment: mongoose.model('MarketShipment', marketShipmentSchema, 'market_shipments')
+    Shipment: mongoose.model('Shipment', shipmentSchema, 'shipments')
 };

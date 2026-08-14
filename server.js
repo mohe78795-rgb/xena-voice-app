@@ -1,16 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 
-// استيراد النماذج من مجلد models
-const { User, Invoice, Customer, Inventory, MarketShipment } = require('./models/DataModels');
+// استيراد النماذج من ملف DataModels
+const { User, Invoice, Customer, Inventory, Shipment } = require('./models/DataModels');
 
 const app = express();
 
+// إعدادات الـ Middleware
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
 
+// تقديم ملفات الواجهة الأمامية من مجلد public تلقائياً
+app.use(express.static(path.join(__dirname, 'public')));
+
+// رابط الاتصال بقاعدة البيانات السحابية (MongoDB Atlas - قاعدة بيانات magm)
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://mohe78795_db_user:737465252@cluster0.qr9q8iv.mongodb.net/magm?retryWrites=true&w=majority';
 
 mongoose.connect(MONGO_URI)
@@ -21,10 +26,12 @@ mongoose.connect(MONGO_URI)
 // مسارات النظام (API Endpoints)
 // ==========================================
 
+// 1. مسار اختبار حالة السيرفر
 app.get('/api/status', (req, res) => {
     res.json({ success: true, message: '🚀 السيرفر يعمل وقاعدة البيانات مرتبطة بنجاح!' });
 });
 
+// 2. مسار تسجيل الدخول (عبر قاعدة البيانات)
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -42,9 +49,11 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// مسار تسجيل مستخدم جديد وحفظه في قاعدة البيانات السحابية
 app.post('/api/register', async (req, res) => {
     try {
         const { name, phone, password, role } = req.body;
+        
         const existingUser = await User.findOne({ phone });
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'رقم الهاتف مسجل مسبقاً!' });
@@ -66,53 +75,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// --- مسارات كولكشن "مسؤول مزارع" الجديدة ---
-app.get('/api/market-shipment', async (req, res) => {
-    try {
-        let shipment = await MarketShipment.findOne();
-        if (!shipment) {
-            shipment = new MarketShipment();
-            await shipment.save();
-        }
-        res.json({ success: true, data: shipment });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-app.post('/api/update-field', async (req, res) => {
-    try {
-        const { fieldName, fieldValue } = req.body;
-        let shipment = await MarketShipment.findOne();
-        if (!shipment) shipment = new MarketShipment();
-        shipment[fieldName] = fieldValue;
-        shipment.updatedAt = Date.now();
-        await shipment.save();
-        res.json({ success: true, message: 'تم تحديث الحقل بنجاح' });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-app.post('/api/update-row-field', async (req, res) => {
-    try {
-        const { chickenType, subField, fieldValue } = req.body;
-        let shipment = await MarketShipment.findOne();
-        if (!shipment) shipment = new MarketShipment();
-        
-        let rowData = shipment.rows.get(chickenType) || { boxes: 0, packing: 0, price: 0 };
-        rowData[subField] = parseFloat(fieldValue) || 0;
-        shipment.rows.set(chickenType, rowData);
-        shipment.updatedAt = Date.now();
-        
-        await shipment.save();
-        res.json({ success: true, message: 'تم تحديث صف الجدول بنجاح' });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
-});
-
-// مسارات الزبائن والفواتير الاعتيادية
+// 3. مسارات الزبائن
 app.post('/api/customers', async (req, res) => {
     try {
         const newCustomer = new Customer(req.body);
@@ -132,6 +95,7 @@ app.get('/api/customers', async (req, res) => {
     }
 });
 
+// 4. مسارات الفواتير
 app.post('/api/invoices', async (req, res) => {
     try {
         const newInvoice = new Invoice(req.body);
@@ -151,6 +115,31 @@ app.get('/api/invoices', async (req, res) => {
     }
 });
 
+// 5. مسار حفظ شحنات مسوق المزارع
+app.post('/api/shipments/save', async (req, res) => {
+    try {
+        const { farm, driver, marketer, date, rows } = req.body;
+
+        if (!farm || !driver || !rows || rows.length === 0) {
+            return res.status(400).json({ success: false, message: '⚠️ تعذر الحفظ، بعض البيانات الأساسية ناقصة.' });
+        }
+
+        const newShipment = new Shipment({ farm, driver, marketer, date, rows });
+        await newShipment.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح وسُجلت باسم السائق: ' + driver 
+        });
+    } catch (error) {
+        console.error('خطأ أثناء حفظ الكشف:', error);
+        res.status(500).json({ success: false, message: '❌ حدث خطأ داخلي في الخادم أثناء حفظ الكشف.' });
+    }
+});
+
+// ==========================================
+// تشغيل السيرفر
+// ==========================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`📡 الخادم يعمل بكفاءة على المنفذ: ${PORT}`);
