@@ -1,19 +1,22 @@
 {
-  "name": "rtc-signaling",
-  "private": true,
-  "version": "0.0.1",
-  "type": "module",
-  "homepage": "https://agoraio-community.github.io/rtc-signaling",
+  "name": "xena-voice-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "echo \"Skipping build\"",
-    "preview": "vite preview",
-    "start": "npx serve . -l $PORT"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
-  "devDependencies": {
-    "vite": "^5.1.4"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohe78795-rgb/xena-voice-app.git"
   },
-  "dependencies": {
-    "agora-rtm-sdk": "2.2.0.1"
-  }
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mohe78795-rgb/xena-voice-app/issues"
+  },
+  "homepage": "https://github.com/mohe78795-rgb/xena-voice-app#readme"
 }
