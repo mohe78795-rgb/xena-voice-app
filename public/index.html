@@ -23,14 +23,53 @@
 </head>
 <body class="w-screen h-screen flex flex-col justify-between m-0 p-2 bg-[#0b111e]">
 
+    <!-- 0. شاشة تسجيل الدخول / إنشاء حساب -->
+    <div id="screen-auth" class="app-screen">
+        <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-6 shadow-2xl flex flex-col justify-center items-center max-w-md mx-auto my-auto">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-[#0f172a] rounded-full border-2 border-yellow-400 flex items-center justify-center mx-auto mb-3 shadow-lg">
+                    <i class="fa-solid fa-feather text-3xl text-yellow-400"></i>
+                </div>
+                <h1 class="text-xl font-bold text-yellow-400">معجم لتربية وتسويق الدواجن</h1>
+                <p class="text-xs text-slate-400 mt-1">بوابة إدارة المزارع والشحنات</p>
+            </div>
+
+            <div class="w-full space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">اسم المستخدم / البريد:</label>
+                    <input type="text" id="loginUser" placeholder="أدخل اسمك أو رقمك" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-yellow-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">كلمة المرور:</label>
+                    <input type="password" id="loginPass" placeholder="••••••••" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-yellow-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">الوظيفة / الصلاحية:</label>
+                    <input type="text" id="userRole" value="مسؤول مزارع" readonly class="w-full bg-[#0f172a]/50 border border-slate-800 rounded-xl px-3 py-2 text-xs text-yellow-400 font-bold cursor-not-allowed">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3 rounded-xl text-xs shadow-xl transition mt-2">
+                    تسجيل الدخول / إنشاء الحساب
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 1. شاشة الرئيسية (مسؤول المزارع) -->
-    <div id="screen-home" class="app-screen screen-active">
+    <div id="screen-home" class="app-screen">
         <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-4 shadow-2xl flex flex-col justify-between">
             <div>
-                <!-- الهيدر -->
-                <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
-                    <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
-                    <span class="text-xs text-slate-400">محافظة البيضاء</span>
+                <!-- الهيدر مع شعار وصورة المعجم -->
+                <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center bg-[#0f172a] p-3 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-[#162032] rounded-lg border border-yellow-400/50 flex items-center justify-center text-yellow-400 shadow">
+                            <i class="fa-solid fa-feather text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-yellow-400">معجم لتربية وتسويق الدواجن</h2>
+                            <span class="text-[10px] text-slate-400">تقارير شحنات المزارع - محافظة البيضاء</span>
+                        </div>
+                    </div>
+                    <span class="text-xs bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 px-2.5 py-1 rounded-lg font-bold">مسؤول مزارع</span>
                 </div>
 
                 <!-- حقول معلومات الشحنة -->
@@ -42,7 +81,7 @@
                 </div>
 
                 <!-- جدول أنواع الدجاج -->
-                <div class="overflow-y-auto max-h-[50vh] custom-scrollbar border border-slate-800 rounded-xl">
+                <div class="overflow-y-auto max-h-[45vh] custom-scrollbar border border-slate-800 rounded-xl">
                     <table class="w-full text-center border-collapse text-xs">
                         <thead>
                             <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
@@ -103,7 +142,7 @@
 
             <!-- زر إضافة الكشف إلى قاعدة البيانات -->
             <div class="pt-2">
-                <button onclick="saveToDatabase()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
+                <button onclick="saveToDatabase()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
                     <i class="fa-solid fa-cloud-arrow-up text-base"></i> إضافة الكشف إلى قاعدة البيانات
                 </button>
             </div>
@@ -124,24 +163,24 @@
                         <i class="fa-solid fa-user-shield text-2xl text-yellow-400"></i>
                     </div>
                     <div>
-                        <div class="text-base font-bold text-yellow-400">عمران الدوحي</div>
-                        <div class="text-xs text-slate-400">مسؤول النظام / مسوق مزارع</div>
-                        <div class="text-xs text-slate-300 mt-1">محافظة البيضاء</div>
+                        <div class="text-base font-bold text-yellow-400" id="profileNameDisplay">عمران الدوحي</div>
+                        <div class="text-xs text-yellow-500 font-semibold mt-0.5">مسؤول مزارع</div>
+                        <div class="text-xs text-slate-300 mt-0.5">محافظة البيضاء</div>
                     </div>
                 </div>
 
                 <div class="space-y-3 max-w-xl mx-auto w-full">
                     <button class="action-btn" onclick="alert('🔒 تم إرسال رمز التحقق لتحديث كلمة السر')"><span>تحديث كلمة السر</span><span>🔒</span></button>
                     <button class="action-btn" onclick="alert('⚙️ الإعدادات العامة مفعلة')"><span>الإعدادات العامة</span><span>⚙️</span></button>
-                    <button class="action-btn logout-btn" onclick="alert('تم تسجيل الخروج')"><span>تسجيل الخروج</span><span>🚪</span></button>
+                    <button class="action-btn logout-btn" onclick="handleLogout()"><span>تسجيل الخروج</span><span>🚪</span></button>
                 </div>
             </div>
-            <div class="text-center text-xs text-slate-500">نظام إدارة وتربية وتسويق الدواجن</div>
+            <div class="text-center text-xs text-slate-500">معجم لتربية وتسويق الدواجن</div>
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي المتنقل (مصلح ومربوط بالدوال بدقة) -->
-    <div class="w-full mt-2 pt-1 border-t border-slate-800 grid grid-cols-2 gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800 text-center shadow-lg shrink-0">
+    <!-- شريط التنقل السفلي (يظهر فقط بعد تسجيل الدخول) -->
+    <div id="bottomNav" class="w-full mt-2 pt-1 border-t border-slate-800 grid grid-cols-2 gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800 text-center shadow-lg shrink-0" style="display: none;">
         <button id="btn-home" onclick="switchScreen('home')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold">
             <i class="fa-solid fa-house text-sm"></i>
             <span class="text-[10px] mt-0.5">الرئيسية</span>
@@ -153,16 +192,60 @@
     </div>
 
     <script>
-        // دالة تبديل الشاشات المحدثة لتعمل بسلاسة كاملة
+        // التحقق من حالة الدخول عند فتح التطبيق
+        window.addEventListener('DOMContentLoaded', () => {
+            const isLogged = localStorage.getItem('isLoggedIn');
+            if (isLogged === 'true') {
+                const savedName = localStorage.getItem('userName') || 'عمران الدوحي';
+                document.getElementById('profileNameDisplay').textContent = savedName;
+                document.getElementById('bottomNav').style.display = 'grid';
+                switchScreen('home');
+            } else {
+                switchScreen('auth');
+            }
+        });
+
+        // دالة تسجيل الدخول / إنشاء الحساب بربط تلقائي مع وظيفة "مسؤول مزارع"
+        function handleLogin() {
+            const userVal = document.getElementById('loginUser').value.trim();
+            if (!userVal) {
+                alert('الرجاء إدخال اسم المستخدم أو رقم الحساب');
+                return;
+            }
+            
+            // حفظ البيانات وربط الحساب بصلاحية مسؤول مزارع
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userName', userVal);
+            localStorage.setItem('userRole', 'مسؤول مزارع');
+
+            document.getElementById('profileNameDisplay').textContent = userVal;
+            document.getElementById('bottomNav').style.display = 'grid';
+            switchScreen('home');
+            alert('✅ أهلاً بك، تم إنشاء وتسجيل الحساب بنجاح برتبة: مسؤول مزارع');
+        }
+
+        // دالة تسجيل الخروج
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            document.getElementById('bottomNav').style.display = 'none';
+            switchScreen('auth');
+            alert('🚪 تم تسجيل الخروج بنجاح');
+        }
+
+        // دالة تبديل الشاشات
         function switchScreen(screenName) {
-            // إخفاء جميع الشاشات أولاً
             document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('screen-active'));
             
-            // إعادة تعيين ألوان جميع أزرار الشريط السفلي إلى الوضع العادي (غير النشط)
+            if (screenName === 'auth') {
+                document.getElementById('screen-auth').classList.add('screen-active');
+                document.getElementById('bottomNav').style.display = 'none';
+                return;
+            }
+
+            // إعادة تعيين أزرار الشريط السفلي
             document.getElementById('btn-home').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white";
             document.getElementById('btn-account').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white";
 
-            // تفعيل الشاشة المطلوبة وتغيير لون الزر الخاص بها للون الأصفر المميز
             if (screenName === 'home') {
                 document.getElementById('screen-home').classList.add('screen-active');
                 document.getElementById('btn-home').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold";
@@ -183,7 +266,7 @@
             const rowsData = [];
             document.querySelectorAll('.chicken-row').forEach(row => {
                 const type = row.querySelector('td').textContent.trim();
-                const boxes = row.querySelector('.boxes').value;
+                const boxes = row.querySelector('.boxes'].value;
                 const packing = row.querySelector('.packing').value;
                 const total = row.querySelector('.total-chickens').textContent;
                 const price = row.querySelector('.price').value;
