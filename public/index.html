@@ -509,7 +509,7 @@
         }
 
         const roleNames = { warehouse: 'مدير مخازن', marketer: 'مسوق مزارع', pharmacist: 'صيدلي', collector: 'متقاضي مديونية', accountant: 'محاسب', driver_bus: 'سواق باص دجاج', worker: 'عامل', customer: 'عميل / زبون', admin: 'مدير عام' };
-        const roleThemes = { warehouse: { primary: 'text-yellow-400' }, admin: { primary: 'text-yellow-400' } };
+        const roleThemes = { warehouse: { primary: 'text-yellow-400' }, admin: { primary: 'text-yellow-400' }, marketer: { primary: 'text-yellow-400' } };
 
         let selectedCustomer = 'شركة الأصيل للتوريدات';
         let pendingActionType = '';
@@ -562,7 +562,7 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    alert('✅ تم إنشاء الحساب وحفظ البيانات في قاعدة البيانات (MongoDB Atlas) بنجاح!');
+                    alert('✅ تم إنشاء الحساب وحفظ البيانات في قاعدة البيانات بنجاح!');
                     localStorage.setItem('currentUser', JSON.stringify(data.user));
                     document.getElementById('registerModal').classList.add('hidden');
                     document.getElementById('registerForm').reset();
@@ -626,10 +626,15 @@
             const container = document.getElementById('tabContentContainer');
 
             if (tabName === 'home') {
-                if (user.role === 'warehouse' || user.role === 'admin' || user.role === 'marketer') {
+                if (user.role === 'marketer') {
+                    // واجهة مسوق المزارع فقط
+                    container.innerHTML = getMarketerHomeUI();
+                } else if (user.role === 'warehouse' || user.role === 'admin') {
+                    // الواجهة الكاملة للإدارة ومدير المخازن
                     container.innerHTML = getManagerHomeUI();
                     setTimeout(() => { initManagerChart(); }, 100);
                 } else {
+                    // الواجهة الافتراضية لباقي الأدوار
                     container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">مرحباً بك (${user.name}) في النظام الشامل لتربية وتسويق الدواجن.</div>`;
                 }
             } else if (tabName === 'tasks') {
@@ -641,6 +646,94 @@
             } else {
                 container.innerHTML = `<div class="p-6 text-center text-slate-400">محتوى قسم (${tabName}) جاهز.</div>`;
             }
+        }
+
+        function getMarketerHomeUI() {
+            return `
+                <div class="manager-home-container pb-6 space-y-6">
+                    <!-- واجهة عرض رئيسية مزارع (معزولة عن الوظائف) -->
+                    <div class="w-full space-y-4 bg-[#131c31]/40 p-3 rounded-2xl border border-slate-800">
+                        <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
+                            <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
+                            <span class="text-xs text-slate-400">محافظة البيضاء[span_3](start_span)[span_3](end_span)</span>
+                        </div>
+
+                        <!-- حقول معلومات الشحنة -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">المسوق:</label><input type="text" id="marketer" value="عمران الدوحي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                        </div>
+
+                        <!-- جدول أنواع الدجاج -->
+                        <div class="overflow-y-auto max-h-[50vh] custom-scrollbar border border-slate-800 rounded-xl">
+                            <table class="w-full text-center border-collapse text-xs">
+                                <thead>
+                                    <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
+                                        <th class="py-3 px-3 text-right">نوع الدجاج</th>
+                                        <th class="py-3 px-3">عدد الصناديق</th>
+                                        <th class="py-3 px-3">تعبئة الصندوق</th>
+                                        <th class="py-3 px-3">إجمالي الحبات</th>
+                                        <th class="py-3 px-3 text-left">سعر البيع</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#1f293d]/50 text-gray-200" id="chickenTableBody">
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج كبير</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="10" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="5500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج مخورج</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="5" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="5000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج متوسط</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="8" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="15" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="4800" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج مطاعم</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="6" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="4500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج صغير</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="4" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="20" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">80</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="4000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                    <tr class="chicken-row">
+                                        <td class="py-2.5 px-3 text-right font-medium">دجاج جفش</td>
+                                        <td class="py-2.5 px-3"><input type="number" value="2" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                        <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">20</td>
+                                        <td class="py-2.5 px-3 text-left"><input type="number" value="3500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- زر إضافة الكشف إلى قاعدة البيانات -->
+                        <div class="pt-2">
+                            <button onclick="saveToDatabase()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> حفظ الكشف في قاعدة البيانات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function getManagerHomeUI() {
@@ -1165,5 +1258,3 @@
     </script>
 </body>
 </html>
-
-
