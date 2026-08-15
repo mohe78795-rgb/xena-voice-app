@@ -35,11 +35,11 @@ app.get('/api/status', (req, res) => {
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = await User.findOne({ 
+        const user = await User.findOne({
             $or: [{ username: username }, { phone: username }],
-            password: password 
+            password: password
         });
-        
+
         if (!user) {
             return res.status(401).json({ success: false, message: 'خطأ في اسم المستخدم أو رقم الهاتف أو كلمة المرور' });
         }
@@ -53,7 +53,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/register', async (req, res) => {
     try {
         const { name, phone, password, role } = req.body;
-        
+
         const existingUser = await User.findOne({ phone });
         if (existingUser) {
             return res.status(400).json({ success: false, message: 'رقم الهاتف مسجل مسبقاً!' });
@@ -79,7 +79,7 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/customers', async (req, res) => {
     try {
         const newCustomer = new Customer(req.body);
-        await newCustomer.save(); 
+        await newCustomer.save();
         res.json({ success: true, message: 'تم حفظ الزبون وفتح الكولكشن بنجاح', data: newCustomer });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -115,7 +115,7 @@ app.get('/api/invoices', async (req, res) => {
     }
 });
 
-// 5. مسار حفظ شحنات مسوق المزارع
+// 5. مسار حفظ شحنات مسوق المزارع (المحدث لمنع أخطاء تطابق النوع CastError)
 app.post('/api/shipments/save', async (req, res) => {
     try {
         const { farm, driver, marketer, date, rows } = req.body;
@@ -124,16 +124,32 @@ app.post('/api/shipments/save', async (req, res) => {
             return res.status(400).json({ success: false, message: '⚠️ تعذر الحفظ، بعض البيانات الأساسية ناقصة.' });
         }
 
-        const newShipment = new Shipment({ farm, driver, marketer, date, rows });
+        // تنسيق صفوف الجدول وتحويل الأرقام والنصوص بشكل آمن للتوافق مع قاعدة البيانات
+        const formattedRows = rows.map(r => ({
+            chickenType: r.type || r.chickenType || 'غير محدد',
+            boxes: Number(r.boxes) || 0,
+            packing: Number(r.packing) || 0,
+            total: Number(r.total) || 0,
+            price: Number(r.price) || 0
+        }));
+
+        const newShipment = new Shipment({ 
+            farm, 
+            driver, 
+            marketer, 
+            date, 
+            rows: formattedRows 
+        });
+
         await newShipment.save();
 
-        res.status(200).json({ 
-            success: true, 
-            message: '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح وسُجلت باسم السائق: ' + driver 
+        res.status(200).json({
+            success: true,
+            message: '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح وسُجلت باسم السائق: ' + driver
         });
     } catch (error) {
         console.error('خطأ أثناء حفظ الكشف:', error);
-        res.status(500).json({ success: false, message: '❌ حدث خطأ داخلي في الخادم أثناء حفظ الكشف.' });
+        res.status(500).json({ success: false, message: '❌ حدث خطأ داخلي في الخادم أثناء حفظ الكشف: ' + error.message });
     }
 });
 

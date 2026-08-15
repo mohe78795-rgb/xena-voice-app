@@ -36,7 +36,7 @@ const inventorySchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// 5. نموذج شحنات مسوق المزارع
+// 5. نموذج شحنات مسوق المزارع (تم تغيير اسم المفتاح إلى chickenType لتجنب التعارض مع الكلمات المحجوزة)
 const shipmentSchema = new mongoose.Schema({
     farm: { type: String, required: true },
     driver: { type: String, required: true },
@@ -44,16 +44,17 @@ const shipmentSchema = new mongoose.Schema({
     date: { type: String, required: true },
     rows: [
         {
-            type: String,
-            boxes: Number,
-            packing: Number,
-            total: Number,
-            price: Number
+            chickenType: { type: String, required: true },
+            boxes: { type: Number, required: true },
+            packing: { type: Number, required: true },
+            total: { type: Number, required: true },
+            price: { type: Number, required: true }
         }
     ],
     createdAt: { type: Date, default: Date.now }
 });
 
+// تصدير النماذج لتعمل تلقائياً وفتح الكولكشنات في قاعدة بيانات magm
 module.exports = {
     User: mongoose.model('User', userSchema, 'users'),
     Invoice: mongoose.model('Invoice', invoiceSchema, 'invoices'),
