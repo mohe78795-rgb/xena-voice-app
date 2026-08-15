@@ -3,301 +3,1064 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معجم لتربية وتسويق الدواجن - مسوق المزارع</title>
+    <title>معجم لتربية وتسويق الدواجن - النظام الشامل</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
-        body { background-color: #0b111e; color: #fff; margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        .app-screen { display: none; width: 100%; height: 100%; flex-direction: column; flex: 1; overflow: hidden; }
-        .screen-active { display: flex; }
-        .action-btn { background-color: #131c31; border: 1px solid #1e293b; color: #facc15; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; width: 100%; transition: 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.3); text-align: right; }
-        .action-btn:hover { border-color: #facc15; background-color: #162038; }
-        .logout-btn { border-color: #7f1d1d !important; color: #f87171 !important; background-color: #1a1518 !important; }
-        .logout-btn:hover { background-color: #2b1117 !important; border-color: #f87171 !important; }
+        * { font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; }
+        body { background-color: #0b111e; color: #fff; margin: 0; padding: 0; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0b111e; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .gold-frame-btn {
+            background: linear-gradient(135deg, #161f32 0%, #0b0f19 100%);
+            border: 2px solid #d4af37;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+            position: relative;
+        }
+        .gold-frame-btn:hover {
+            border-color: #f3e5ab;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .bio-screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
+        .bio-active { display: flex; }
+
+        .legal-notice {
+            color: #ef4444; font-size: 16px; font-weight: bold; margin-bottom: 35px; text-align: center; line-height: 1.8;
+            background: rgba(239, 68, 68, 0.08); border: 2px solid rgba(239, 68, 68, 0.2); border-radius: 20px; padding: 24px; max-width: 600px; width: 90%;
+        }
+
+        .fingerprint-btn { background: none; border: none; cursor: pointer; padding: 0; margin: 25px 0; outline: none; transition: transform 0.15s ease; }
+        .fingerprint-btn:active { transform: scale(0.93); }
+        .custom-fingerprint-img { width: 150px; height: 150px; object-fit: contain; filter: drop-shadow(0 4px 15px rgba(37, 99, 235, 0.35)); animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.06); opacity: 1; filter: drop-shadow(0 0 20px rgba(37, 99, 235, 0.6)); }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        .scanner-animation-box { position: relative; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+        .scanner-animation-box img { width: 150px; height: 150px; object-fit: contain; animation: scanning 1.5s infinite alternate; }
+
+        @keyframes scanning {
+            0% { opacity: 0.4; filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.2)); }
+            100% { opacity: 1; filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.8)); }
+        }
+        .success-img { width: 180px; height: 180px; object-fit: contain; animation: bounceIn 0.6s ease; }
+        @keyframes bounceIn { 0% { transform: scale(0); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .manager-home-container { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .chart-container-box { background-color: #131c31; border: 1px solid #1e293b; border-radius: 12px; padding: 15px; height: 280px; flex-shrink: 0; position: relative; }
+        .grid-buttons-box { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .action-dashboard-btn {
+            background-color: #131c31; border: 1px solid #facc15; color: #facc15;
+            padding: 14px 10px; border-radius: 12px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: 0.2s; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .action-dashboard-btn:hover { background-color: #facc15; color: #0b111e; }
+        .full-width-btn { grid-column: span 2; }
+
+        .sub-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.92); display: none; justify-content: center; align-items: center; z-index: 100; padding: 0;
+        }
+        .sub-modal-card {
+            background-color: #0f172a; border-top: 2px solid #facc15; width: 100%; height: 100%;
+            max-width: 100%; max-height: 100vh; padding: 20px; display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .sub-modal-card h2 { font-size: 16px; font-weight: 700; color: #facc15; margin-bottom: 15px; text-align: center; }
+        .sub-form-group { margin-bottom: 12px; }
+        .sub-form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+        .sub-form-group input { width: 100%; padding: 12px; background-color: #131c31; border: 1px solid #334155; border-radius: 10px; color: #fff; font-size: 13px; outline: none; }
+        .sub-fixed-field { background-color: #162032 !important; color: #facc15 !important; border: 1px dashed #facc15 !important; cursor: not-allowed; font-weight: 600; }
+        .incoming-info-box { background-color: #131c31; border: 1px solid #1e293b; border-radius: 10px; padding: 12px; margin-bottom: 12px; font-size: 12px; color: #cbd5e1; line-height: 1.7; }
+        .incoming-info-box span { color: #facc15; font-weight: 700; }
+        .sub-table-container { width: 100%; flex-grow: 1; overflow-y: auto; margin-bottom: 12px; border: 1px solid #1e293b; border-radius: 10px; }
+        .sub-table-container table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; }
+        .sub-table-container th { background-color: #162038; color: #facc15; padding: 10px 6px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 2; }
+        .sub-table-container td { padding: 10px 6px; border-bottom: 1px solid #1e293b; color: #fff; }
+        .sub-table-container tr:nth-child(even) { background-color: #131c31; }
+        .sub-modal-buttons { display: flex; gap: 10px; margin-top: auto; padding-top: 12px; }
+        .sub-modal-buttons button { flex: 1; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+        .messaging-wrapper { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; padding: 10px 0; }
+        .menu-msg-btn {
+            width: 100%; background-color: #161f32; border: 2px solid #facc15; color: #facc15;
+            padding: 15px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer;
+            transition: 0.2s; text-align: center; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .menu-msg-btn:hover { background-color: #facc15; color: #0b111e; }
+
+        .sub-menu-section {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0b111e;
+            display: none; flex-direction: column; z-index: 90; padding: 20px; align-items: center; overflow-y: auto;
+        }
+        .sub-header { width: 100%; max-width: 450px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .sub-title { color: #facc15; font-size: 16px; font-weight: 700; }
+        .customer-list { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; }
+        .customer-item {
+            background-color: #161f32; border: 1px solid #1e293b; padding: 14px 18px; border-radius: 12px;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+        }
+        .customer-item:hover { border-color: #facc15; background-color: #1c2a44; }
+        .customer-name { font-size: 14px; font-weight: 700; color: #fff; }
+        .customer-loc { font-size: 11px; color: #94a3b8; }
+
+        .chat-section {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0b111e;
+            display: none; flex-direction: column; z-index: 100;
+        }
+        .chat-header { background-color: #161f32; border-bottom: 2px solid #1e293b; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .chat-title { color: #facc15; font-size: 15px; font-weight: 700; }
+        .chat-back-btn {
+            background: transparent; border: 1px solid #facc15; color: #facc15;
+            padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600;
+        }
+        .chat-back-btn:hover { background-color: #facc15; color: #0b111e; }
+        .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg-bubble { max-width: 75%; padding: 12px 16px; border-radius: 14px; font-size: 13px; line-height: 1.5; word-wrap: break-word; }
+        .msg-bubble.incoming { background-color: #1e293b; color: #ffffff; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-bubble.outgoing { background-color: #facc15; color: #0b111e; align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 600; }
+        .chat-input-area { background-color: #161f32; border-top: 1px solid #1e293b; padding: 15px 20px; display: flex; gap: 10px; }
+        .chat-input-area input {
+            flex-grow: 1; background-color: #0b111e; border: 1px solid #334155; border-radius: 12px;
+            padding: 12px 16px; color: #fff; font-size: 13px; outline: none;
+        }
+        .send-msg-btn { background-color: #facc15; color: #0b111e; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+        .account-page-container {
+            width: 100%; min-height: 100%; background-color: #0f172a; display: flex; flex-direction: column; position: relative; overflow-y: auto;
+        }
+        .top-banner {
+            background-color: #131c31; border-bottom: 1px solid #1e293b; height: 120px; width: 100%;
+            position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+        }
+        .top-banner h1 { color: #facc15; font-size: 17px; font-weight: 700; }
+        .profile-container { padding: 0 20px; position: relative; margin-top: -45px; margin-bottom: 15px; display: flex; justify-content: flex-start; }
+        .profile-pic {
+            width: 90px; height: 90px; background-color: #131c31; border-radius: 50%; border: 3px solid #facc15;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .user-info { padding: 0 20px; text-align: right; margin-bottom: 20px; }
+        .user-name { font-size: 17px; font-weight: 800; color: #facc15; margin-bottom: 2px; }
+        .user-role { font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; }
+        .user-detail { font-size: 13px; color: #cbd5e1; margin-bottom: 5px; font-weight: 600; }
+        .user-detail span { color: #facc15; }
+        .actions-container { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; flex-grow: 1; }
+        .action-btn {
+            background-color: #131c31; border: 1px solid #1e293b; color: #facc15; padding: 14px 20px; border-radius: 12px;
+            font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); transition: 0.2s; text-align: right; width: 100%;
+        }
+        .action-btn:hover { border-color: #facc15; background-color: #162038; }
+        .logout-btn { border-color: #7f1d1d !important; color: #f87171 !important; background-color: #1a1518 !important; }
+        .logout-btn:hover { background-color: #2b1117 !important; border-color: #f87171 !important; }
+        .icon-badge { font-size: 16px; }
+
+        .settings-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0b111e;
+            display: none; flex-direction: column; z-index: 200; overflow-y: auto;
+        }
+        .settings-top-bar { background-color: #131c31; border-bottom: 1px solid #1e293b; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .settings-top-bar h2 { font-size: 17px; font-weight: 700; color: #facc15; }
+        .section-title { color: #facc15; font-size: 13px; font-weight: 700; padding: 15px 20px 5px 20px; text-align: right; }
+        .settings-card { background-color: #0f172a; border-top: 1px solid #1e293b; border-bottom: 1px solid #1e293b; margin-bottom: 10px; }
+        .setting-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #131c31; font-size: 13px; color: #fff; font-weight: 600; }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-item-left { display: flex; align-items: center; gap: 12px; }
+        .setting-icon { font-size: 16px; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: #facc15; }
+        input:checked + .slider:before { transform: translateX(22px); background-color: #0b111e; }
+        .highlight-item { background-color: #1a1518 !important; color: #f87171 !important; }
     </style>
 </head>
-<body class="w-screen h-screen flex flex-col justify-between m-0 p-2 bg-[#0b111e]">
+<body class="text-white min-h-screen w-full m-0 p-0 flex flex-col selection:bg-yellow-500 selection:text-black overflow-x-hidden">
 
-    <!-- 0. شاشة تسجيل الدخول / إنشاء حساب -->
-    <div id="screen-auth" class="app-screen">
-        <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-6 shadow-2xl flex flex-col justify-center items-center max-w-md mx-auto my-auto">
-            <div class="text-center mb-6">
-                <div class="w-20 h-20 bg-[#0f172a] rounded-full border-2 border-yellow-400 flex items-center justify-center mx-auto mb-3 shadow-lg">
-                    <i class="fa-solid fa-feather text-3xl text-yellow-400"></i>
+    <!-- شاشة تسجيل الدخول الرئيسية -->
+    <div id="loginScreen" class="w-full min-h-screen bg-[#0d111a] flex items-center justify-center p-0 md:p-6">
+        <div class="w-full min-h-screen md:min-h-fit md:max-w-xl bg-[#111827] md:rounded-3xl p-6 md:p-10 shadow-2xl border-0 md:border border-slate-800 relative flex flex-col justify-center overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-40 h-40 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="text-center mb-6 relative">
+                <div class="w-20 h-20 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-slate-700 shadow-inner overflow-hidden p-2">
+                    <img src="https://i.postimg.cc/DWtX86v7/logo.png" alt="شعار الشركة" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://i.postimg.cc/DWtX86v7/DWtX86v7.png';">
                 </div>
-                <h1 class="text-xl font-bold text-yellow-400">معجم لتربية وتسويق الدواجن</h1>
-                <p class="text-xs text-slate-400 mt-1">بوابة إدارة المزارع والشحنات</p>
+                <h1 class="text-xl font-bold text-white mb-1">معجم لتربية وتسويق الدواجن</h1>
+                <p class="text-[11px] text-yellow-400 font-semibold mb-0.5">Dictionary of Poultry Breeding and Marketing</p>
+                <p class="text-slate-400 text-[10px]">الجمهورية اليمنية - محافظة البيضاء[span_0](start_span)[span_0](end_span)</p>
             </div>
 
-            <div class="w-full space-y-3">
+            <form id="loginForm" class="space-y-4 relative max-w-md mx-auto w-full" onsubmit="handleLogin(event)">
                 <div>
-                    <label class="block text-xs text-gray-400 mb-1">اسم المستخدم / البريد:</label>
-                    <input type="text" id="loginUser" placeholder="أدخل اسمك أو رقمك" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-yellow-400 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">كلمة المرور:</label>
-                    <input type="password" id="loginPass" placeholder="••••••••" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-yellow-400 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">الوظيفة / الصلاحية:</label>
-                    <input type="text" id="userRole" value="مسؤول مزارع" readonly class="w-full bg-[#0f172a]/50 border border-slate-800 rounded-xl px-3 py-2 text-xs text-yellow-400 font-bold cursor-not-allowed">
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3 rounded-xl text-xs shadow-xl transition mt-2">
-                    تسجيل الدخول / إنشاء الحساب
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1. شاشة الرئيسية (مسؤول المزارع) -->
-    <div id="screen-home" class="app-screen">
-        <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-4 shadow-2xl flex flex-col justify-between">
-            <div>
-                <!-- الهيدر مع شعار وصورة المعجم -->
-                <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center bg-[#0f172a] p-3 rounded-xl border border-slate-800">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-[#162032] rounded-lg border border-yellow-400/50 flex items-center justify-center text-yellow-400 shadow">
-                            <i class="fa-solid fa-feather text-lg"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-sm font-bold text-yellow-400">معجم لتربية وتسويق الدواجن</h2>
-                            <span class="text-[10px] text-slate-400">تقارير شحنات المزارع - محافظة البيضاء</span>
-                        </div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">اسم المستخدم / رقم الهاتف</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="username" required class="w-full bg-[#0d111a] border border-slate-700 rounded-xl pr-10 pl-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500" placeholder="اكتب رقم الهاتف أو اسم المستخدم">
                     </div>
-                    <span class="text-xs bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 px-2.5 py-1 rounded-lg font-bold">مسؤول مزارع</span>
                 </div>
-
-                <!-- حقول معلومات الشحنة -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
-                    <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                    <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                    <div><label class="block text-[10px] text-gray-400 mb-0.5">المسوق:</label><input type="text" id="marketer" value="عمران الدوحي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                    <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">كلمة المرور</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="password" required class="w-full bg-[#0d111a] border border-slate-700 rounded-xl pr-10 pl-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500" placeholder="••••••••">
+                    </div>
                 </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3.5 rounded-xl text-sm shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول للنظام
+                </button>
+            </form>
 
-                <!-- جدول أنواع الدجاج -->
-                <div class="overflow-y-auto max-h-[45vh] custom-scrollbar border border-slate-800 rounded-xl">
-                    <table class="w-full text-center border-collapse text-xs">
-                        <thead>
-                            <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
-                                <th class="py-3 px-3 text-right">نوع الدجاج</th>
-                                <th class="py-3 px-3">عدد الصناديق</th>
-                                <th class="py-3 px-3">تعبئة الصندوق</th>
-                                <th class="py-3 px-3">إجمالي الحبات</th>
-                                <th class="py-3 px-3 text-left">سعر البيع</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-[#1f293d]/50 text-gray-200" id="chickenTableBody">
-                            <tr class="chicken-row">
-                                <td class="py-2.5 px-3 text-right font-medium">دجاج كبير</td>
-                                <td class="py-2.5 px-3"><input type="number" value="10" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
-                                <td class="py-2.5 px-3 text-left"><input type="number" value="5500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                            </tr>
-                            <tr class="chicken-row">
-                                <td class="py-2.5 px-3 text-right font-medium">دجاج مخورج</td>
-                                <td class="py-2.5 px-3"><input type="number" value="5" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
-                                <td class="py-2.5 px-3 text-left"><input type="number" value="5000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                            </tr>
-                            <tr class="chicken-row">
-                                <td class="py-2.5 px-3 text-right font-medium">دجاج متوسط</td>
-                                <td class="py-2.5 px-3"><input type="number" value="8" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3"><input type="number" value="15" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
-                                <td class="py-2.5 px-3 text-left"><input type="number" value="4800" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                            </tr>
-                            <tr class="chicken-row">
-                                <td class="py-2.5 px-3 text-right font-medium">دجاج مطاعم</td>
-                                <td class="py-2.5 px-3"><input type="number" value="6" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
-                                <td class="py-2.5 px-3 text-left"><input type="number" value="4500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                            </tr>
-                            <tr class="chicken-row">
-                                <td class="py-2.5 px-3 text-right font-medium">دجاج صغير</td>
-                                <td class="py-2.5 px-3"><input type="number" value="4" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3"><input type="number" value="20" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">80</td>
-                                <td class="py-2.5 px-3 text-left"><input type="number" value="4000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                            </tr>
-                            <tr class="chicken-row">
-                                <td class="py-2.5 px-3 text-right font-medium">دجاج جفش</td>
-                                <td class="py-2.5 px-3"><input type="number" value="2" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">20</td>
-                                <td class="py-2.5 px-3 text-left"><input type="number" value="3500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- زر إضافة الكشف إلى قاعدة البيانات -->
-            <div class="pt-2">
-                <button onclick="saveToDatabase()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-up text-base"></i> إضافة الكشف إلى قاعدة البيانات
+            <div class="mt-6 text-center border-t border-slate-800 pt-5 max-w-md mx-auto w-full space-y-2">
+                <p class="text-slate-400 text-xs">ليس لديك حساب وموظف جديد أو عميل في المنظومة؟</p>
+                <button onclick="document.getElementById('registerModal').classList.remove('hidden')"
+                    class="w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 hover:text-yellow-300 font-bold py-3.5 rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-user-plus text-sm"></i> إنشاء حساب جديد (قاعدة البيانات السحابية)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 2. شاشة الحساب -->
-    <div id="screen-account" class="app-screen">
-        <div class="w-full h-full bg-[#0f172a] border border-slate-800 rounded-xl shadow-2xl flex flex-col justify-between p-6">
-            <div>
-                <div class="bg-[#131c31] border border-slate-800 rounded-xl p-4 mb-6 flex items-center justify-between">
-                    <h1 class="text-yellow-400 text-base font-bold">حسابي والإعدادات</h1>
-                    <span onclick="switchScreen('home')" class="cursor-pointer text-yellow-400 text-lg"><i class="fa-solid fa-arrow-right"></i></span>
+    <!-- نافذة طلب تسجيل حساب جديد -->
+    <div id="registerModal" class="hidden fixed inset-0 bg-[#0d111a] flex flex-col items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="w-full h-full max-w-full max-h-screen bg-[#0f172a] rounded-none p-6 md:p-12 shadow-2xl flex flex-col justify-center relative">
+            <button onclick="document.getElementById('registerModal').classList.add('hidden')" class="absolute top-6 left-6 text-slate-400 hover:text-white text-xl bg-slate-800/60 w-10 h-10 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="max-w-md mx-auto w-full">
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-id-card"></i> إنشاء حساب جديد في المنظومة
+                    </h2>
+                    <p class="text-slate-400 text-xs">الجمهورية اليمنية - محافظة البيضاء[span_1](start_span)[span_1](end_span)</p>
                 </div>
-
-                <div class="flex items-center gap-4 mb-6 bg-[#131c31] p-4 rounded-xl border border-slate-800">
-                    <div class="w-16 h-16 bg-[#0f172a] rounded-full border-2 border-yellow-400 flex items-center justify-center">
-                        <i class="fa-solid fa-user-shield text-2xl text-yellow-400"></i>
+                <form id="registerForm" class="space-y-4" onsubmit="handleRegister(event)">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">الاسم الكامل</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"><i class="fa-solid fa-signature"></i></span>
+                            <input type="text" id="regName" placeholder="أدخل اسمك الكامل..." required class="w-full bg-[#131c31] border border-slate-700 rounded-xl pr-10 pl-4 py-3 text-sm text-white focus:outline-none focus:border-yellow-500">
+                        </div>
                     </div>
                     <div>
-                        <div class="text-base font-bold text-yellow-400" id="profileNameDisplay">عمران الدوحي</div>
-                        <div class="text-xs text-yellow-500 font-semibold mt-0.5">مسؤول مزارع</div>
-                        <div class="text-xs text-slate-300 mt-0.5">محافظة البيضاء</div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">رقم الهاتف</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"><i class="fa-solid fa-phone"></i></span>
+                            <input type="text" id="regPhone" placeholder="07xxxxxxxx" required class="w-full bg-[#131c31] border border-slate-700 rounded-xl pr-10 pl-4 py-3 text-sm text-white focus:outline-none focus:border-yellow-500">
+                        </div>
                     </div>
-                </div>
-
-                <div class="space-y-3 max-w-xl mx-auto w-full">
-                    <button class="action-btn" onclick="alert('🔒 تم إرسال رمز التحقق لتحديث كلمة السر')"><span>تحديث كلمة السر</span><span>🔒</span></button>
-                    <button class="action-btn" onclick="alert('⚙️ الإعدادات العامة مفعلة')"><span>الإعدادات العامة</span><span>⚙️</span></button>
-                    <button class="action-btn logout-btn" onclick="handleLogout()"><span>تسجيل الخروج</span><span>🚪</span></button>
-                </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">كلمة السر</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500"><i class="fa-solid fa-key"></i></span>
+                            <input type="password" id="regPassword" placeholder="••••••••" required class="w-full bg-[#131c31] border border-slate-700 rounded-xl pr-10 pl-4 py-3 text-sm text-white focus:outline-none focus:border-yellow-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-yellow-400 mb-1 font-bold">اختر صفتك / وظيفتك المعتمدة:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-500 pointer-events-none"><i class="fa-solid fa-briefcase"></i></span>
+                            <select id="regRole" required class="w-full bg-[#131c31] border border-slate-700 rounded-xl pr-10 pl-4 py-3 text-sm text-white focus:outline-none focus:border-yellow-500 appearance-none">
+                                <option value="" disabled selected>-- اختر تخصصك الوظيفي --</option>
+                                <option value="warehouse">مدير مخازن</option>
+                                <option value="marketer">مسوق مزارع</option>
+                                <option value="pharmacist">صيدلي</option>
+                                <option value="collector">متقاضي مديونية</option>
+                                <option value="accountant">محاسب</option>
+                                <option value="driver_bus">سواق باص دجاج</option>
+                                <option value="worker">عامل</option>
+                                <option value="customer">عميل / زبون</option>
+                                <option value="admin">مدير عام (Admin)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-slate-950 font-bold py-3.5 rounded-xl text-sm mt-4 flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fa-solid fa-check-circle"></i> تسجيل الحساب في قاعدة البيانات
+                    </button>
+                </form>
             </div>
-            <div class="text-center text-xs text-slate-500">معجم لتربية وتسويق الدواجن</div>
         </div>
     </div>
 
-    <!-- شريط التنقل السفلي (يظهر فقط بعد تسجيل الدخول) -->
-    <div id="bottomNav" class="w-full mt-2 pt-1 border-t border-slate-800 grid grid-cols-2 gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800 text-center shadow-lg shrink-0" style="display: none;">
-        <button id="btn-home" onclick="switchScreen('home')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold">
-            <i class="fa-solid fa-house text-sm"></i>
-            <span class="text-[10px] mt-0.5">الرئيسية</span>
-        </button>
-        <button id="btn-account" onclick="switchScreen('account')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white">
-            <i class="fa-solid fa-user-gear text-sm"></i>
-            <span class="text-[10px] mt-0.5">الحساب</span>
-        </button>
+    <!-- لوحة التحكم بملء الشاشة -->
+    <div id="dashboardScreen" class="hidden w-full min-h-screen bg-[#0d111a] p-3 md:p-6 flex flex-col justify-between">
+        <div class="w-full flex-1 flex flex-col">
+            <div class="w-full border-b border-slate-800/80 pb-3 mb-4 bg-[#161f32]/60 px-4 py-3 rounded-2xl shadow-sm flex justify-between items-center">
+                <div>
+                    <h2 class="text-sm md:text-base font-bold text-white tracking-wide">معجم لتربية وتسويق الدواجن</h2>
+                    <p class="text-[10px] text-yellow-400 font-medium">الجمهورية اليمنية - محافظة البيضاء[span_2](start_span)[span_2](end_span)</p>
+                </div>
+                <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden p-1 shrink-0">
+                    <img src="https://i.postimg.cc/DWtX86v7/logo.png" alt="شعار" class="w-full h-full object-contain">
+                </div>
+            </div>
+            <div id="tabContentContainer" class="w-full flex-1 space-y-4 custom-scrollbar"></div>
+        </div>
+
+        <!-- الهيدر السفلي الديناميكي (زرين لمسوق المزارع، و4 أزرار لبقية الواجهات) -->
+        <div id="bottomNavContainer" class="w-full mt-4 pt-2 border-t border-slate-800 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg">
+            <!-- سيتم توليد الأزرار ديناميكياً بواسطة الجافاسكريبت حسب دور المستخدم -->
+        </div>
+    </div>
+
+    <!-- نافذة نظام بصمة الإصبع -->
+    <div id="biometricModal" class="hidden fixed inset-0 bg-[#0d111a] flex flex-col items-center justify-center p-6 z-50">
+        <button onclick="closeBiometricModal()" class="absolute top-6 left-6 text-slate-400 hover:text-white text-xl bg-slate-800/60 w-10 h-10 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+
+        <div id="bio-screen-home" class="bio-screen bio-active">
+            <h2 class="text-white text-2xl font-bold mb-6">اعتماد الفاتورة القانوني</h2>
+            <div class="legal-notice">
+                الرجاء من المشتري وضع إصبعه على الشاشة لكي يتم اعتماد الفاتورة لتفادي أي مراجعات للنزاعات القانونية لاحقاً.
+            </div>
+            <button class="fingerprint-btn" onclick="startBiometricScan()">
+                <img src="https://i.postimg.cc/6Qnc6gtc/In-Shot-20260813-134925295.png" alt="بصمة الإصبع" class="custom-fingerprint-img">
+            </button>
+            <span class="text-sm text-slate-400 mt-4 tracking-wider">انقر على الأيقونة للتحقق والبصم</span>
+        </div>
+
+        <div id="bio-screen-scanner" class="bio-screen">
+            <h2 class="text-white text-xl font-bold mb-2">جاري مسح البصمة...</h2>
+            <p class="text-slate-400 text-sm mb-6">يرجى تثبيت الإصبع على الشاشة</p>
+            <div class="scanner-animation-box">
+                <img src="https://i.postimg.cc/6Qnc6gtc/In-Shot-20260813-134925295.png" alt="فحص البصمة">
+            </div>
+            <div id="scan-status" class="text-base font-bold text-blue-400 mt-4 h-8">جاري قراءة تفاصيل البصمة...</div>
+        </div>
+
+        <div id="bio-screen-success" class="bio-screen">
+            <img src="https://i.postimg.cc/mD4wPjgQ/In-Shot-20260813-134834142.png" alt="نجاح البصمة" class="success-img">
+            <p class="text-green-400 font-bold text-lg mt-6 tracking-wide">تم اعتماد وتوثيق الفاتورة بنجاح!</p>
+        </div>
+    </div>
+
+    <!-- نوافذ فرعية أخرى -->
+    <div id="subCustomerModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>إضافة زبون جديد لقاعدة البيانات</h2>
+            <div class="sub-form-group">
+                <label>اسم الزبون</label>
+                <input type="text" id="subCustName" placeholder="أدخل اسم الزبون الكامل">
+            </div>
+            <div class="sub-form-group">
+                <label>رقم الهاتف</label>
+                <input type="text" id="subCustPhone" placeholder="07xxxxxxxx">
+            </div>
+            <div class="sub-form-group">
+                <label>موقع البيع</label>
+                <input type="text" id="subCustLocation" placeholder="مثلاً: السوق المركزي">
+            </div>
+            <div class="sub-form-group">
+                <label>المحافظة (اختيار ثابت)</label>
+                <input type="text" class="sub-fixed-field" value="الجمهورية اليمنية - محافظة البيضاء" readonly>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e;" onclick="saveSubCustomer()">حفظ الزبون</button>
+                <button class="action-dashboard-btn" style="background:transparent; border-color:#64748b; color:#94a3b8;" onclick="closeSubModal('subCustomerModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subIncomingModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>تقرير وارد دجاج اليوم</h2>
+            <div class="incoming-info-box">
+                <div>بيانات الشحنة: <span>حمول دينة الفيضي</span></div>
+                <div>المسوق المسؤول: <span>صالح بصير</span></div>
+                <div>تاريخ الوارد: <span class="currentDateText"></span></div>
+            </div>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوع الدجاج</th>
+                            <th>عدد الصناديق</th>
+                            <th>تعبئة الصندوق</th>
+                            <th>إجمالي الصناديق</th>
+                            <th>إجمالي الحبات</th>
+                            <th>سعر البيع</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subIncomingTableBody"></tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subIncomingModal')">إغلاق التقرير</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subSalesDetailsModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>سجل تفاصيل المبيعات</h2>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم الفاتورة</th>
+                            <th>الزبون</th>
+                            <th>النوع والصنف</th>
+                            <th>العدد</th>
+                            <th>الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>#101</td><td>حسين العبيدي</td><td>بعد الكبير</td><td>20</td><td>36,000 ر.ي</td></tr>
+                        <tr><td>#102</td><td>نبيل السالمي</td><td>مخورج</td><td>15</td><td>24,750 ر.ي</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subSalesDetailsModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subCustomersDetailsModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>قائمة وتفاصيل الزبائن المسجلين</h2>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الزبون</th>
+                            <th>رقم الهاتف</th>
+                            <th>موقع البيع</th>
+                            <th>المحافظة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subCustomersTableBody"></tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subCustomersDetailsModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="subInventoryModal" class="sub-modal-overlay">
+        <div class="sub-modal-card">
+            <h2>تقرير جرد المخازن الحالي</h2>
+            <div class="incoming-info-box">
+                <div>حالة المخزن: <span>محدث تلقائياً (من أمس + الوارد - المباع)</span></div>
+            </div>
+            <div class="sub-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوع الدجاج</th>
+                            <th>المخزون السابق</th>
+                            <th>الوارده اليوم</th>
+                            <th>المباع اليوم</th>
+                            <th>المتبقي بالمخزن</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>بعد الكبير</td><td>5</td><td>15</td><td>12</td><td><span style="color: #facc15; font-weight:bold;">8</span></td></tr>
+                        <tr><td>مخورج</td><td>10</td><td>20</td><td>18</td><td><span style="color: #facc15; font-weight:bold;">12</span></td></tr>
+                        <tr><td>متوسط</td><td>3</td><td>10</td><td>8</td><td><span style="color: #facc15; font-weight:bold;">5</span></td></tr>
+                        <tr><td>مطاعم</td><td>7</td><td>25</td><td>20</td><td><span style="color: #facc15; font-weight:bold;">12</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="sub-modal-buttons">
+                <button class="action-dashboard-btn" style="background:#facc15; color:#0b111e; width:100%;" onclick="closeSubModal('subInventoryModal')">إغلاق الجرد</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customerSubMenu" class="sub-menu-section">
+        <div class="sub-header">
+            <button class="chat-back-btn" onclick="closeCustomerMenu()">⬅ القائمة الرئيسية</button>
+            <div class="sub-title">اختر الزبون للمراسلة</div>
+        </div>
+        <div id="customerListContainer" class="customer-list"></div>
+    </div>
+
+    <div id="chatSection" class="chat-section">
+        <div class="chat-header">
+            <button class="chat-back-btn" onclick="closeChat()">⬅ رجوع</button>
+            <div id="chatTitle" class="chat-title">اسم الجهة</div>
+        </div>
+
+        <div id="chatMessages" class="chat-messages">
+            <div class="msg-bubble incoming">مرحباً بك، تم فتح قناة الاتصال بنجاح. كيف يمكننا الخدمة؟</div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا..." onkeypress="handleKeyPress(event)">
+            <button class="send-msg-btn" onclick="sendMessage()">إرسال</button>
+        </div>
     </div>
 
     <script>
-        // التحقق من حالة الدخول عند فتح التطبيق
+        if (!localStorage.getItem('invoicingCustomers')) {
+            localStorage.setItem('invoicingCustomers', JSON.stringify(['دعمك', 'حسين العبيدي', 'نبيل السالمي', 'عبدالله الدمج', 'عبدالله عبدرحمن', 'عبدرحمن المطوع', 'أبو خليل']));
+        }
+        if (!localStorage.getItem('savedInvoices')) {
+            localStorage.setItem('savedInvoices', JSON.stringify([]));
+        }
+
+        const roleNames = { warehouse: 'مدير مخازن', marketer: 'مسوق مزارع', pharmacist: 'صيدلي', collector: 'متقاضي مديونية', accountant: 'محاسب', driver_bus: 'سواق باص دجاج', worker: 'عامل', customer: 'عميل / زبون', admin: 'مدير عام' };
+        const roleThemes = { warehouse: { primary: 'text-yellow-400' }, admin: { primary: 'text-yellow-400' } };
+
+        let selectedCustomer = 'شركة الأصيل للتوريدات';
+        let pendingActionType = '';
+        let chartInstance = null;
+        let currentRecipient = "";
+
         window.addEventListener('DOMContentLoaded', () => {
-            const isLogged = localStorage.getItem('isLoggedIn');
-            if (isLogged === 'true') {
-                const savedName = localStorage.getItem('userName') || 'عمران الدوحي';
-                document.getElementById('profileNameDisplay').textContent = savedName;
-                document.getElementById('bottomNav').style.display = 'grid';
-                switchScreen('home');
-            } else {
-                switchScreen('auth');
-            }
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) { loadDashboard(JSON.parse(savedUser)); }
         });
 
-        // دالة تسجيل الدخول / إنشاء الحساب بربط تلقائي مع وظيفة "مسؤول مزارع"
-        function handleLogin() {
-            const userVal = document.getElementById('loginUser').value.trim();
-            if (!userVal) {
-                alert('الرجاء إدخال اسم المستخدم أو رقم الحساب');
-                return;
-            }
-            
-            // حفظ البيانات وربط الحساب بصلاحية مسؤول مزارع
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userName', userVal);
-            localStorage.setItem('userRole', 'مسؤول مزارع');
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-            document.getElementById('profileNameDisplay').textContent = userVal;
-            document.getElementById('bottomNav').style.display = 'grid';
-            switchScreen('home');
-            alert('✅ أهلاً بك، تم إنشاء وتسجيل الحساب بنجاح برتبة: مسؤول مزارع');
-        }
-
-        // دالة تسجيل الخروج
-        function handleLogout() {
-            localStorage.removeItem('isLoggedIn');
-            document.getElementById('bottomNav').style.display = 'none';
-            switchScreen('auth');
-            alert('🚪 تم تسجيل الخروج بنجاح');
-        }
-
-        // دالة تبديل الشاشات
-        function switchScreen(screenName) {
-            document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('screen-active'));
-            
-            if (screenName === 'auth') {
-                document.getElementById('screen-auth').classList.add('screen-active');
-                document.getElementById('bottomNav').style.display = 'none';
-                return;
-            }
-
-            // إعادة تعيين أزرار الشريط السفلي
-            document.getElementById('btn-home').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white";
-            document.getElementById('btn-account').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white";
-
-            if (screenName === 'home') {
-                document.getElementById('screen-home').classList.add('screen-active');
-                document.getElementById('btn-home').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold";
-            } else if (screenName === 'account') {
-                document.getElementById('screen-account').classList.add('screen-active');
-                document.getElementById('btn-account').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold";
-            }
-        }
-
-        function calcRow(input) {
-            const row = input.closest('.chicken-row');
-            const boxes = parseFloat(row.querySelector('.boxes').value) || 0;
-            const packing = parseFloat(row.querySelector('.packing').value) || 0;
-            row.querySelector('.total-chickens').textContent = boxes * packing;
-        }
-
-        function collectData() {
-            const rowsData = [];
-            document.querySelectorAll('.chicken-row').forEach(row => {
-                const type = row.querySelector('td').textContent.trim();
-                const boxes = row.querySelector('.boxes'].value;
-                const packing = row.querySelector('.packing').value;
-                const total = row.querySelector('.total-chickens').textContent;
-                const price = row.querySelector('.price').value;
-                rowsData.push({ type, boxes, packing, total, price });
-            });
-
-            return {
-                farm: document.getElementById('farmName').value,
-                driver: document.getElementById('driverName').value,
-                marketer: document.getElementById('marketer').value,
-                date: document.getElementById('shipDate').value,
-                rows: rowsData
-            };
-        }
-
-        async function saveToDatabase() {
-            const data = collectData();
             try {
-                const response = await fetch('/api/shipments/save', {
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ username, password })
                 });
-                const result = await response.json();
-                alert(result.message || '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح!');
+
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    loadDashboard(data.user);
+                } else {
+                    alert(data.message || 'خطأ في اسم المستخدم أو الهاتف أو كلمة المرور.');
+                }
             } catch (err) {
                 console.error(err);
-                alert('✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح (وضع المعاينة المحلي)');
+                alert('حدث خطأ أثناء الاتصال بالسيرفر.');
             }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const role = document.getElementById('regRole').value;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, password, role })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ تم إنشاء الحساب وحفظ البيانات في قاعدة البيانات (MongoDB Atlas) بنجاح!');
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    document.getElementById('registerModal').classList.add('hidden');
+                    document.getElementById('registerForm').reset();
+                    loadDashboard(data.user);
+                } else {
+                    alert('❌ خطأ: ' + (data.message || 'فشل حفظ الحساب'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('حدث خطأ في الاتصال بالخادم وقاعدة البيانات.');
+            }
+        }
+
+        function loadDashboard(user) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboardScreen').classList.remove('hidden');
+            renderBottomNav(user);
+            switchTab('home');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            document.getElementById('dashboardScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // دالة توليد الهيدر السفلي بناءً على دور المستخدم (زرين لمسوق المزارع، و4 أزرار لبقية الواجهات)
+        function renderBottomNav(user) {
+            const navContainer = document.getElementById('bottomNavContainer');
+            if (user.role === 'marketer') {
+                // مسوق المزارع له زرين فقط
+                navContainer.className = "w-full mt-4 pt-2 border-t border-slate-800 grid grid-cols-2 gap-1 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg";
+                navContainer.innerHTML = `
+                    <button onclick="switchTab('home')" class="bottom-nav-btn flex flex-col items-center justify-center p-2 rounded-xl transition text-yellow-400" data-nav="home"><i class="fa-solid fa-house text-lg"></i><span class="text-xs mt-1">رئيسية المزارع</span></button>
+                    <button onclick="switchTab('account')" class="bottom-nav-btn flex flex-col items-center justify-center p-2 rounded-xl transition text-slate-400 hover:text-white" data-nav="account"><i class="fa-solid fa-user-gear text-lg"></i><span class="text-xs mt-1">الحساب</span></button>
+                `;
+            } else {
+                // باقي الواجهات لها 4 أزرار
+                navContainer.className = "w-full mt-4 pt-2 border-t border-slate-800 grid grid-cols-4 gap-1 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg";
+                navContainer.innerHTML = `
+                    <button onclick="switchTab('home')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-yellow-400" data-nav="home"><i class="fa-solid fa-house text-base"></i><span class="text-[10px] mt-1">رئيسية</span></button>
+                    <button onclick="switchTab('tasks')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="tasks"><i class="fa-solid fa-file-invoice-dollar text-base"></i><span class="text-[10px] mt-1">فاتورة</span></button>
+                    <button onclick="switchTab('messages')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="messages"><i class="fa-solid fa-comments text-base"></i><span class="text-[10px] mt-1">رسائل</span></button>
+                    <button onclick="switchTab('account')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white" data-nav="account"><i class="fa-solid fa-user-gear text-base"></i><span class="text-[10px] mt-1">الحساب</span></button>
+                `;
+            }
+        }
+
+        function switchTab(tabName) {
+            const user = JSON.parse(localStorage.getItem('currentUser')) || { role: 'warehouse' };
+            const theme = roleThemes[user.role] || roleThemes['warehouse'];
+
+            document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-nav') === tabName) {
+                    btn.className = `bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition ${theme.primary} font-bold`;
+                } else {
+                    btn.className = `bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-slate-400 hover:text-white`;
+                }
+            });
+
+            const container = document.getElementById('tabContentContainer');
+
+            if (tabName === 'home') {
+                if (user.role === 'warehouse' || user.role === 'admin' || user.role === 'marketer') {
+                    container.innerHTML = getManagerHomeUI();
+                    setTimeout(() => { initManagerChart(); }, 100);
+                } else {
+                    container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">مرحباً بك (${user.name}) في النظام الشامل لتربية وتسويق الدواجن.</div>`;
+                }
+            } else if (tabName === 'tasks') {
+                container.innerHTML = getInvoiceUI(user);
+            } else if (tabName === 'messages') {
+                container.innerHTML = getMessagingUI();
+            } else if (tabName === 'account') {
+                container.innerHTML = getAccountUI(user);
+            } else {
+                container.innerHTML = `<div class="p-6 text-center text-slate-400">محتوى قسم (${tabName}) جاهز.</div>`;
+            }
+        }
+
+        function getManagerHomeUI() {
+            return `
+                <div class="manager-home-container pb-6">
+                    <div class="chart-container-box">
+                        <canvas id="managerWeekChart"></canvas>
+                    </div>
+                    <div class="grid-buttons-box">
+                        <button class="action-dashboard-btn" onclick="openSubModal('subCustomerModal')"><i class="fa-solid fa-user-plus"></i> إضافة زبون جديد</button>
+                        <button class="action-dashboard-btn" onclick="switchTab('tasks')"><i class="fa-solid fa-file-invoice-dollar"></i> اصدار فاتورة نقد</button>
+                        <button class="action-dashboard-btn" onclick="openSubModal('subIncomingModal')"><i class="fa-solid fa-truck-ramp-box"></i> وارد دجاج اليوم</button>
+                        <button class="action-dashboard-btn" onclick="alert('📦 تم عرض بيانات المخزن من أمس بنجاح')"><i class="fa-solid fa-boxes-stacked"></i> المخزن من أمس</button>
+                        <button class="action-dashboard-btn" onclick="openSubModal('subSalesDetailsModal')"><i class="fa-solid fa-chart-line"></i> تفاصيل البيع</button>
+                        <button class="action-dashboard-btn" onclick="openSubModal('subCustomersDetailsModal')"><i class="fa-solid fa-users"></i> تفاصيل الزبائن</button>
+                        <button class="action-dashboard-btn full-width-btn" onclick="openSubModal('subInventoryModal')"><i class="fa-solid fa-clipboard-list"></i> جرد المخازن</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getMessagingUI() {
+            return `
+                <div class="messaging-wrapper">
+                    <button class="menu-msg-btn" onclick="handleCustomerClick()"><span>مراسلة زبون</span> <i class="fa-solid fa-comments"></i></button>
+                    <button class="menu-msg-btn" onclick="openChat('سائق نقل')"><span>مراسلة سائق نقل</span> <i class="fa-solid fa-truck"></i></button>
+                    <button class="menu-msg-btn" onclick="openChat('سائق شاحنة')"><span>مراسلة سائق شاحنة</span> <i class="fa-solid fa-truck-fast"></i></button>
+                    <button class="menu-msg-btn" onclick="openChat('تسويق المزارع')"><span>تسويق المزارع</span> <i class="fa-solid fa-bullhorn"></i></button>
+                    <button class="menu-msg-btn" onclick="openChat('أحد العمال')"><span>أحد العمال</span> <i class="fa-solid fa-user-gear"></i></button>
+                    <button class="menu-msg-btn" onclick="openChat('المحصل النقدي')"><span>المحصل النقدي</span> <i class="fa-solid fa-wallet"></i></button>
+                    <button class="menu-msg-btn" onclick="openChat('الإدارة')"><span>الإدارة</span> <i class="fa-solid fa-building-shield"></i></button>
+                </div>
+            `;
+        }
+
+        function getAccountUI(user) {
+            return `
+                <div class="account-page-container pb-6">
+                    <div class="top-banner">
+                        <span class="back-icon" onclick="switchTab('home')" style="cursor:pointer; color:#facc15; font-size:18px;">➔</span>
+                        <h1>حسابي</h1>
+                        <span></span>
+                    </div>
+
+                    <div class="profile-container">
+                        <div class="profile-pic">
+                            <svg viewBox="0 0 24 24" width="60" height="60" fill="#facc15">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="user-info">
+                        <div class="user-name">${user.name || 'مستخدم النظام'}</div>
+                        <div class="user-role">${roleNames[user.role] || user.role}</div>
+                        <div class="user-detail">رقم الهاتف: <span>${user.phone || user.username || '---'}</span></div>
+                        <div class="user-detail">العنوان: <span>الجمهورية اليمنية - محافظة البيضاء[span_3](start_span)[span_3](end_span)</span></div>
+                    </div>
+
+                    <div class="actions-container">
+                        <button class="action-btn" onclick="alert('🔒 تم إرسال رمز التحقق لتحديث كلمة السر إلى هاتفك')">
+                            <span>تحديث كلمة السر</span>
+                            <span class="icon-badge">🔒</span>
+                        </button>
+
+                        <button class="action-btn" onclick="openSettingsModal()">
+                            <span>الإعدادات العامة</span>
+                            <span class="icon-badge">⚙️</span>
+                        </button>
+
+                        <button class="action-btn logout-btn" onclick="logout()">
+                            <span>تسجيل الخروج</span>
+                            <span class="icon-badge">🚪</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="settingsPageModal" class="settings-page">
+                    <div class="settings-top-bar">
+                        <span style="cursor:pointer; color: #facc15; font-size: 18px;" onclick="closeSettingsModal()">➔</span>
+                        <h2>الإعدادات</h2>
+                        <span style="font-size: 18px; color: #facc15;">🔗</span>
+                    </div>
+
+                    <div class="section-title">اعدادات الدخول</div>
+                    <div class="settings-card">
+                        <div class="setting-item">
+                            <span>تفعيل البصمة للدخول للحساب</span>
+                            <div class="setting-item-left">
+                                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                                <span class="setting-icon">👆</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">اعدادات اخرى</div>
+                    <div class="settings-card">
+                        <div class="setting-item highlight-item" style="cursor: pointer;" onclick="logout()">
+                            <span style="font-weight: 700;">تسجيل خروج</span>
+                            <span class="setting-icon">➡️</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsPageModal');
+            if(modal) modal.style.display = 'flex';
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsPageModal');
+            if(modal) modal.style.display = 'none';
+        }
+
+        function handleCustomerClick() {
+            const container = document.getElementById('customerListContainer');
+            container.innerHTML = "";
+            let customersList = JSON.parse(localStorage.getItem('invoicingCustomers')) || ['حسين العبيدي', 'نبيل السالمي', 'عبدالله الدمج'];
+
+            customersList.forEach(custName => {
+                const item = document.createElement('div');
+                item.className = "customer-item";
+                item.innerHTML = `
+                    <div>
+                        <div class="customer-name">${custName}</div>
+                        <div class="customer-loc">الجمهورية اليمنية - محافظة البيضاء[span_4](start_span)[span_4](end_span)</div>
+                    </div>
+                    <span style="color: #facc15; font-size: 16px;"><i class="fa-solid fa-comment-dots"></i></span>
+                `;
+                item.onclick = function() {
+                    openChat("الزبون: " + custName);
+                };
+                container.appendChild(item);
+            });
+
+            document.getElementById('customerSubMenu').style.display = 'flex';
+        }
+
+        function closeCustomerMenu() {
+            document.getElementById('customerSubMenu').style.display = 'none';
+        }
+
+        function openChat(recipientName) {
+            currentRecipient = recipientName;
+            document.getElementById('customerSubMenu').style.display = 'none';
+            document.getElementById('chatTitle').innerText = recipientName;
+            document.getElementById('chatSection').style.display = 'flex';
+
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `<div class="msg-bubble incoming">أهلاً بك، أنت الآن متصل مع (${recipientName}). تفضل بكتابة رسالتك.</div>`;
+        }
+
+        function closeChat() {
+            document.getElementById('chatSection').style.display = 'none';
+        }
+
+        function sendMessage() {
+            const inputField = document.getElementById('messageInput');
+            const messageText = inputField.value.trim();
+
+            if (messageText === "") return;
+
+            const messagesContainer = document.getElementById('chatMessages');
+
+            const outgoingMsg = document.createElement('div');
+            outgoingMsg.className = "msg-bubble outgoing";
+            outgoingMsg.innerText = messageText;
+            messagesContainer.appendChild(outgoingMsg);
+
+            inputField.value = "";
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            setTimeout(() => {
+                const incomingMsg = document.createElement('div');
+                incomingMsg.className = "msg-bubble incoming";
+                incomingMsg.innerText = "تم استلام رسالتك بنجاح من طرف (" + currentRecipient + "). سيتم الرد عليك قريباً.";
+                messagesContainer.appendChild(incomingMsg);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function initManagerChart() {
+            const ctxElem = document.getElementById('managerWeekChart');
+            if(!ctxElem) return;
+            const ctx = ctxElem.getContext('2d');
+            if(chartInstance) { chartInstance.destroy(); }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('.currentDateText').forEach(el => el.innerText = todayStr);
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'],
+                    datasets: [{
+                        label: 'حركة مبيعات الدواجن',
+                        data: [120, 190, 150, 220, 180, 250],
+                        borderColor: '#facc15',
+                        backgroundColor: 'rgba(250, 204, 21, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, labels: { color: '#facc15', font: { family: 'Cairo' } } }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } }
+                        },
+                        y: {
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', font: { size: 11, family: 'Cairo' } }
+                        }
+                    }
+                }
+            });
+            loadSubTables();
+        }
+
+        function loadSubTables() {
+            let incomingData = [
+                { type: "دجاج بعد الكبير", boxes: 15, packing: 10, totalBoxes: 15, totalBirds: 150, price: "1800 ريال" },
+                { type: "دجاج مخورج", boxes: 20, packing: 12, totalBoxes: 20, totalBirds: 240, price: "1650 ريال" },
+                { type: "دجاج متوسط", boxes: 10, packing: 10, totalBoxes: 10, totalBirds: 100, price: "1500 ريال" },
+                { type: "دجاج مطاعم", boxes: 25, packing: 8, totalBoxes: 25, totalBirds: 200, price: "1400 ريال" },
+                { type: "دجاج صغير", boxes: 8, packing: 15, totalBoxes: 8, totalBirds: 120, price: "1200 ريال" },
+                { type: "دجاج جفش", boxes: 5, packing: 10, totalBoxes: 5, totalBirds: 50, price: "900 ريال" }
+            ];
+            const incomingTbody = document.getElementById('subIncomingTableBody');
+            if(incomingTbody) {
+                incomingTbody.innerHTML = "";
+                incomingData.forEach(item => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${item.type}</td><td>${item.boxes}</td><td>${item.packing}</td><td>${item.totalBoxes}</td><td>${item.totalBirds}</td><td>${item.price}</td>`;
+                    incomingTbody.appendChild(tr);
+                });
+            }
+
+            let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
+            const custTbody = document.getElementById('subCustomersTableBody');
+            if(custTbody) {
+                custTbody.innerHTML = "";
+                custs.forEach(c => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء[span_5](start_span)[span_5](end_span)</td>`;
+                    custTbody.appendChild(tr);
+                });
+            }
+        }
+
+        function openSubModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            if(modalId === 'subCustomersDetailsModal') { loadSubTables(); }
+        }
+
+        function closeSubModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function saveSubCustomer() {
+            const name = document.getElementById('subCustName').value.trim();
+            if(name === "") {
+                alert("يرجى إدخال اسم الزبون على الأقل!");
+                return;
+            }
+            let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
+            if(!custs.includes(name)) { custs.push(name); }
+            localStorage.setItem('invoicingCustomers', JSON.stringify(custs));
+
+            document.getElementById('subCustName').value = "";
+            document.getElementById('subCustPhone').value = "";
+            document.getElementById('subCustLocation').value = "";
+            closeSubModal('subCustomerModal');
+            loadSubTables();
+            alert("تم تسجيل الزبون بنجاح في قاعدة البيانات!");
+        }
+
+        function getInvoiceUI(user) {
+            return `
+                <div class="w-full max-w-2xl mx-auto space-y-4 pb-6">
+                    <div class="relative w-full">
+                        <input type="text" id="globalInvSearch" onkeyup="filterCustomersDropdown()" placeholder="ابحث عن زبون..."
+                            class="w-full bg-[#161f32] border border-[#d4af37]/40 rounded-2xl pr-4 pl-12 py-3 text-xs text-white focus:outline-none focus:border-[#d4af37] shadow-lg">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-yellow-400"><i class="fa-solid fa-magnifying-glass"></i></span>
+                        <div id="customerDropResults" class="hidden absolute top-full left-0 right-0 bg-[#161f32] border border-[#d4af37]/40 rounded-2xl mt-1 max-h-40 overflow-y-auto z-30 shadow-2xl custom-scrollbar"></div>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-2.5 flex items-center justify-between shadow-md">
+                            <div class="flex items-center gap-2 text-yellow-400 font-bold text-xs w-1/3 pr-2"><i class="fa-solid fa-kiwi-bird text-sm"></i> <span>دجاج بعد الكبير</span></div>
+                            <div class="flex gap-2 w-2/3">
+                                <input type="number" id="q_big" placeholder="العدد" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
+                                <input type="number" id="p_big" placeholder="السعر" class="w-1/2 bg-[#0d111a] border border-slate-700 rounded-xl px-3 py-2 text-xs text-center text-white focus:outline-none focus:border-yellow-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-3 text-xs text-slate-300 flex justify-between items-center">
+                            <span class="text-yellow-400 font-bold">اسم المشتري:</span>
+                            <span id="selectedBuyerDisplay" class="font-bold text-white">${selectedCustomer}</span>
+                        </div>
+                        <div class="bg-[#161f32] border border-[#d4af37]/40 rounded-2xl p-3 text-xs text-slate-300 flex justify-between items-center">
+                            <span class="text-yellow-400 font-bold">اسم البائع:</span>
+                            <span class="font-bold text-white">عمران الدوحي</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 space-y-3">
+                        <div class="flex justify-center">
+                            <button onclick="triggerBiometric('save')" class="gold-frame-btn text-yellow-400 font-bold py-3 px-10 rounded-2xl text-sm transition tracking-widest flex items-center gap-2">
+                                <i class="fa-solid fa-file-circle-check"></i> حفظ فاتورة
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function filterCustomersDropdown() {
+            let val = document.getElementById('globalInvSearch').value.trim().toLowerCase();
+            let drop = document.getElementById('customerDropResults');
+            let customers = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
+            let matches = customers.filter(c => c.toLowerCase().includes(val));
+
+            if (!val || matches.length === 0) {
+                drop.classList.add('hidden');
+                drop.innerHTML = '';
+                return;
+            }
+
+            drop.classList.remove('hidden');
+            drop.innerHTML = matches.map(c => `
+                <div onclick="pickCustomer('${c}')" class="p-3 hover:bg-slate-800 cursor-pointer text-xs text-white border-b border-slate-800 flex items-center justify-between">
+                    <span><i class="fa-solid fa-user-check text-yellow-400 ml-2"></i> ${c}</span>
+                    <span class="text-[10px] text-yellow-500">تحديد</span>
+                </div>
+            `).join('');
+        }
+
+        function pickCustomer(name) {
+            selectedCustomer = name;
+            document.getElementById('globalInvSearch').value = name;
+            document.getElementById('selectedBuyerDisplay').innerText = name;
+            document.getElementById('customerDropResults').classList.add('hidden');
+        }
+
+        function triggerBiometric(actionType) {
+            pendingActionType = actionType;
+            document.getElementById('biometricModal').classList.remove('hidden');
+            switchBioScreen('bio-screen-home');
+        }
+
+        function closeBiometricModal() {
+            document.getElementById('biometricModal').classList.add('hidden');
+        }
+
+        function switchBioScreen(screenId) {
+            document.querySelectorAll('.bio-screen').forEach(s => s.classList.remove('bio-active'));
+            document.getElementById(screenId).classList.add('bio-active');
+        }
+
+        let scanAttempts = 0;
+        function startBiometricScan() {
+            scanAttempts++;
+            switchBioScreen('bio-screen-scanner');
+            const statusEl = document.getElementById('scan-status');
+
+            if (scanAttempts === 1) {
+                statusEl.style.color = "#ef4444";
+                statusEl.innerText = "لم يتم التعرف على البصمة بدقة...";
+                setTimeout(() => {
+                    statusEl.innerText = "أعد رفع الإصبع وكرر المحاولة...";
+                    setTimeout(() => { switchBioScreen('bio-screen-home'); }, 1200);
+                }, 1400);
+                return;
+            }
+
+            statusEl.style.color = "#10b981";
+            statusEl.innerText = "✔ تمت المطابقة والاعتماد بنجاح!";
+
+            setTimeout(() => {
+                switchBioScreen('bio-screen-success');
+                setTimeout(() => {
+                    closeBiometricModal();
+                    scanAttempts = 0;
+                    if(pendingActionType === 'save') {
+                        executeActualSave();
+                    }
+                }, 1500);
+            }, 1200);
+        }
+
+        function executeActualSave() {
+            let data = {
+                id: Date.now().toString().slice(-5),
+                buyer: selectedCustomer,
+                date: new Date().toISOString().split('T')[0]
+            };
+            let saved = JSON.parse(localStorage.getItem('savedInvoices')) || [];
+            saved.push(data);
+            localStorage.setItem('savedInvoices', JSON.stringify(saved));
+            alert(`✅ تم حفظ الفاتورة رسمياً واعتمادها ببصمة المشتري للزبون: (${selectedCustomer})`);
         }
     </script>
 </body>
 </html>
+
 
