@@ -196,7 +196,7 @@
                 </div>
                 <h1 class="text-xl font-bold text-white mb-1">معجم لتربية وتسويق الدواجن</h1>
                 <p class="text-[11px] text-yellow-400 font-semibold mb-0.5">Dictionary of Poultry Breeding and Marketing</p>
-                <p class="text-slate-400 text-[10px]">الجمهورية اليمنية - محافظة البيضاء[span_0](start_span)[span_0](end_span)</p>
+                <p class="text-slate-400 text-[10px]">الجمهورية اليمنية - محافظة البيضاء</p>
             </div>
 
             <form id="loginForm" class="space-y-4 relative max-w-md mx-auto w-full" onsubmit="handleLogin(event)">
@@ -240,7 +240,7 @@
                     <h2 class="text-xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-id-card"></i> إنشاء حساب جديد في المنظومة
                     </h2>
-                    <p class="text-slate-400 text-xs">الجمهورية اليمنية - محافظة البيضاء[span_1](start_span)[span_1](end_span)</p>
+                    <p class="text-slate-400 text-xs">الجمهورية اليمنية - محافظة البيضاء[span_0](start_span)[span_0](end_span)</p>
                 </div>
                 <form id="registerForm" class="space-y-4" onsubmit="handleRegister(event)">
                     <div>
@@ -296,7 +296,7 @@
             <div class="w-full border-b border-slate-800/80 pb-3 mb-4 bg-[#161f32]/60 px-4 py-3 rounded-2xl shadow-sm flex justify-between items-center">
                 <div>
                     <h2 class="text-sm md:text-base font-bold text-white tracking-wide">معجم لتربية وتسويق الدواجن</h2>
-                    <p class="text-[10px] text-yellow-400 font-medium">الجمهورية اليمنية - محافظة البيضاء[span_2](start_span)[span_2](end_span)</p>
+                    <p class="text-[10px] text-yellow-400 font-medium">الجمهورية اليمنية - محافظة البيضاء</p>
                 </div>
                 <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden p-1 shrink-0">
                     <img src="https://i.postimg.cc/DWtX86v7/logo.png" alt="شعار" class="w-full h-full object-contain">
@@ -697,7 +697,7 @@
                         <div class="user-name">${user.name || 'مستخدم النظام'}</div>
                         <div class="user-role">${roleNames[user.role] || user.role}</div>
                         <div class="user-detail">رقم الهاتف: <span>${user.phone || user.username || '---'}</span></div>
-                        <div class="user-detail">العنوان: <span>الجمهورية اليمنية - محافظة البيضاء[span_3](start_span)[span_3](end_span)</span></div>
+                        <div class="user-detail">العنوان: <span>الجمهورية اليمنية - محافظة البيضاء</span></div>
                     </div>
 
                     <div class="actions-container">
@@ -768,7 +768,7 @@
                 item.innerHTML = `
                     <div>
                         <div class="customer-name">${custName}</div>
-                        <div class="customer-loc">الجمهورية اليمنية - محافظة البيضاء[span_4](start_span)[span_4](end_span)</div>
+                        <div class="customer-loc">الجمهورية اليمنية - محافظة البيضاء</div>
                     </div>
                     <span style="color: #facc15; font-size: 16px;"><i class="fa-solid fa-comment-dots"></i></span>
                 `;
@@ -900,7 +900,7 @@
                 custTbody.innerHTML = "";
                 custs.forEach(c => {
                     let tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء[span_5](start_span)[span_5](end_span)</td>`;
+                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء</td>`;
                     custTbody.appendChild(tr);
                 });
             }
@@ -971,7 +971,7 @@
                             </button>
                         </div>
                     </div>
-                </div>`;
+                `;
         }
 
         function filterCustomersDropdown() {
