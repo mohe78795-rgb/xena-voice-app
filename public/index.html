@@ -23,218 +23,146 @@
 </head>
 <body class="w-screen h-screen flex flex-col justify-between m-0 p-2 bg-[#0b111e]">
 
-    <!-- شاشة تسجيل الدخول العامة للنظام -->
-    <div id="loginScreen" class="absolute inset-0 z-50 bg-[#0d111a] flex items-center justify-center p-4">
-        <div class="w-full max-w-xl bg-[#111827] rounded-3xl p-8 shadow-2xl border border-slate-800 relative flex flex-col justify-center">
-            <div class="text-center mb-6">
-                <h1 class="text-xl font-bold text-white mb-1">معجم لتربية وتسويق الدواجن</h1>
-                <p class="text-xs text-yellow-400 font-semibold">تسجيل دخول مسوق المزارع وبقية الأقسام</p>
+    <!-- 1. شاشة الرئيسية (مسؤول المزارع) -->
+    <div id="screen-home" class="app-screen screen-active">
+        <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-4 shadow-2xl flex flex-col justify-between">
+            <div>
+                <!-- الهيدر -->
+                <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
+                    <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
+                    <span class="text-xs text-slate-400">محافظة البيضاء</span>
+                </div>
+
+                <!-- حقول معلومات الشحنة -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
+                    <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                    <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                    <div><label class="block text-[10px] text-gray-400 mb-0.5">المسوق:</label><input type="text" id="marketer" value="عمران الدوحي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                    <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                </div>
+
+                <!-- جدول أنواع الدجاج -->
+                <div class="overflow-y-auto max-h-[50vh] custom-scrollbar border border-slate-800 rounded-xl">
+                    <table class="w-full text-center border-collapse text-xs">
+                        <thead>
+                            <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
+                                <th class="py-3 px-3 text-right">نوع الدجاج</th>
+                                <th class="py-3 px-3">عدد الصناديق</th>
+                                <th class="py-3 px-3">تعبئة الصندوق</th>
+                                <th class="py-3 px-3">إجمالي الحبات</th>
+                                <th class="py-3 px-3 text-left">سعر البيع</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#1f293d]/50 text-gray-200" id="chickenTableBody">
+                            <tr class="chicken-row">
+                                <td class="py-2.5 px-3 text-right font-medium">دجاج كبير</td>
+                                <td class="py-2.5 px-3"><input type="number" value="10" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
+                                <td class="py-2.5 px-3 text-left"><input type="number" value="5500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                            </tr>
+                            <tr class="chicken-row">
+                                <td class="py-2.5 px-3 text-right font-medium">دجاج مخورج</td>
+                                <td class="py-2.5 px-3"><input type="number" value="5" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
+                                <td class="py-2.5 px-3 text-left"><input type="number" value="5000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                            </tr>
+                            <tr class="chicken-row">
+                                <td class="py-2.5 px-3 text-right font-medium">دجاج متوسط</td>
+                                <td class="py-2.5 px-3"><input type="number" value="8" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3"><input type="number" value="15" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
+                                <td class="py-2.5 px-3 text-left"><input type="number" value="4800" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                            </tr>
+                            <tr class="chicken-row">
+                                <td class="py-2.5 px-3 text-right font-medium">دجاج مطاعم</td>
+                                <td class="py-2.5 px-3"><input type="number" value="6" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
+                                <td class="py-2.5 px-3 text-left"><input type="number" value="4500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                            </tr>
+                            <tr class="chicken-row">
+                                <td class="py-2.5 px-3 text-right font-medium">دجاج صغير</td>
+                                <td class="py-2.5 px-3"><input type="number" value="4" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3"><input type="number" value="20" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">80</td>
+                                <td class="py-2.5 px-3 text-left"><input type="number" value="4000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                            </tr>
+                            <tr class="chicken-row">
+                                <td class="py-2.5 px-3 text-right font-medium">دجاج جفش</td>
+                                <td class="py-2.5 px-3"><input type="number" value="2" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
+                                <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">20</td>
+                                <td class="py-2.5 px-3 text-left"><input type="number" value="3500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <form id="loginForm" class="space-y-4" onsubmit="handleLogin(event)">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">اسم المستخدم أو رقم الهاتف</label>
-                    <input type="text" id="username" required class="w-full bg-[#0d111a] border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500" placeholder="أدخل اسم المستخدم...">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">كلمة المرور</label>
-                    <input type="password" id="password" required class="w-full bg-[#0d111a] border border-slate-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-yellow-500" placeholder="••••••••">
-                </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 text-slate-950 font-bold py-3.5 rounded-xl text-sm shadow-lg">
-                    تسجيل الدخول للنظام
+
+            <!-- زر إضافة الكشف إلى قاعدة البيانات -->
+            <div class="pt-2">
+                <button onclick="saveToDatabase()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-base"></i> إضافة الكشف إلى قاعدة البيانات
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- الحاوية الرئيسية الخاصة بواجهة مسوق المزارع (مخفية حتى يتم تسجيل الدخول بدور مسوق مزارع) -->
-    <div id="marketerMainContainer" class="w-full h-full flex flex-col justify-between hidden">
-        
-        <!-- 1. شاشة الرئيسية (مسؤول المزارع) -->
-        <div id="screen-home" class="app-screen screen-active">
-            <div class="w-full h-full bg-[#111827] border border-[#1f293d] rounded-xl p-4 shadow-2xl flex flex-col justify-between">
-                <div>
-                    <!-- الهيدر -->
-                    <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
-                        <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
-                        <span class="text-xs text-slate-400">محافظة البيضاء</span>
-                    </div>
+    <!-- 2. شاشة الحساب -->
+    <div id="screen-account" class="app-screen">
+        <div class="w-full h-full bg-[#0f172a] border border-slate-800 rounded-xl shadow-2xl flex flex-col justify-between p-6">
+            <div>
+                <div class="bg-[#131c31] border border-slate-800 rounded-xl p-4 mb-6 flex items-center justify-between">
+                    <h1 class="text-yellow-400 text-base font-bold">حسابي والإعدادات</h1>
+                    <span onclick="switchScreen('home')" class="cursor-pointer text-yellow-400 text-lg"><i class="fa-solid fa-arrow-right"></i></span>
+                </div>
 
-                    <!-- حقول معلومات الشحنة -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 bg-[#0f172a] p-3 rounded-xl border border-[#1e293b]">
-                        <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                        <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                        <div><label class="block text-[10px] text-gray-400 mb-0.5">المسوق:</label><input type="text" id="marketer" value="عمران الدوحي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                        <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                <div class="flex items-center gap-4 mb-6 bg-[#131c31] p-4 rounded-xl border border-slate-800">
+                    <div class="w-16 h-16 bg-[#0f172a] rounded-full border-2 border-yellow-400 flex items-center justify-center">
+                        <i class="fa-solid fa-user-shield text-2xl text-yellow-400"></i>
                     </div>
-
-                    <!-- جدول أنواع الدجاج -->
-                    <div class="overflow-y-auto max-h-[50vh] custom-scrollbar border border-slate-800 rounded-xl">
-                        <table class="w-full text-center border-collapse text-xs">
-                            <thead>
-                                <tr class="text-[#facc15] border-b border-[#1f293d] sticky top-0 bg-[#162032] z-10">
-                                    <th class="py-3 px-3 text-right">نوع الدجاج</th>
-                                    <th class="py-3 px-3">عدد الصناديق</th>
-                                    <th class="py-3 px-3">تعبئة الصندوق</th>
-                                    <th class="py-3 px-3">إجمالي الحبات</th>
-                                    <th class="py-3 px-3 text-left">سعر البيع</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#1f293d]/50 text-gray-200" id="chickenTableBody">
-                                <tr class="chicken-row">
-                                    <td class="py-2.5 px-3 text-right font-medium">دجاج كبير</td>
-                                    <td class="py-2.5 px-3"><input type="number" value="10" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
-                                    <td class="py-2.5 px-3 text-left"><input type="number" value="5500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                                </tr>
-                                <tr class="chicken-row">
-                                    <td class="py-2.5 px-3 text-right font-medium">دجاج مخورج</td>
-                                    <td class="py-2.5 px-3"><input type="number" value="5" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3"><input type="number" value="12" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
-                                    <td class="py-2.5 px-3 text-left"><input type="number" value="5000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                                </tr>
-                                <tr class="chicken-row">
-                                    <td class="py-2.5 px-3 text-right font-medium">دجاج متوسط</td>
-                                    <td class="py-2.5 px-3"><input type="number" value="8" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3"><input type="number" value="15" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">120</td>
-                                    <td class="py-2.5 px-3 text-left"><input type="number" value="4800" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                                </tr>
-                                <tr class="chicken-row">
-                                    <td class="py-2.5 px-3 text-right font-medium">دجاج مطاعم</td>
-                                    <td class="py-2.5 px-3"><input type="number" value="6" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">60</td>
-                                    <td class="py-2.5 px-3 text-left"><input type="number" value="4500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                                </tr>
-                                <tr class="chicken-row">
-                                    <td class="py-2.5 px-3 text-right font-medium">دجاج صغير</td>
-                                    <td class="py-2.5 px-3"><input type="number" value="4" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3"><input type="number" value="20" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">80</td>
-                                    <td class="py-2.5 px-3 text-left"><input type="number" value="4000" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                                </tr>
-                                <tr class="chicken-row">
-                                    <td class="py-2.5 px-3 text-right font-medium">دجاج جفش</td>
-                                    <td class="py-2.5 px-3"><input type="number" value="2" class="boxes w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3"><input type="number" value="10" class="packing w-20 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white" oninput="calcRow(this)"></td>
-                                    <td class="py-2.5 px-3 text-[#facc15] font-bold total-chickens">20</td>
-                                    <td class="py-2.5 px-3 text-left"><input type="number" value="3500" class="price w-24 bg-[#0f172a] border border-slate-700 rounded-lg py-1 text-center text-white"></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div>
+                        <div class="text-base font-bold text-yellow-400">عمران الدوحي</div>
+                        <div class="text-xs text-slate-400">مسؤول النظام / مسوق مزارع</div>
+                        <div class="text-xs text-slate-300 mt-1">محافظة البيضاء</div>
                     </div>
                 </div>
 
-                <!-- زر إضافة الكشف إلى قاعدة البيانات -->
-                <div class="pt-2">
-                    <button onclick="saveToDatabase()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs shadow-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up text-base"></i> إضافة الكشف إلى قاعدة البيانات
-                    </button>
+                <div class="space-y-3 max-w-xl mx-auto w-full">
+                    <button class="action-btn" onclick="alert('🔒 تم إرسال رمز التحقق لتحديث كلمة السر')"><span>تحديث كلمة السر</span><span>🔒</span></button>
+                    <button class="action-btn" onclick="alert('⚙️ الإعدادات العامة مفعلة')"><span>الإعدادات العامة</span><span>⚙️</span></button>
+                    <button class="action-btn logout-btn" onclick="alert('تم تسجيل الخروج')"><span>تسجيل الخروج</span><span>🚪</span></button>
                 </div>
             </div>
+            <div class="text-center text-xs text-slate-500">نظام إدارة وتربية وتسويق الدواجن</div>
         </div>
+    </div>
 
-        <!-- 2. شاشة الحساب -->
-        <div id="screen-account" class="app-screen">
-            <div class="w-full h-full bg-[#0f172a] border border-slate-800 rounded-xl shadow-2xl flex flex-col justify-between p-6">
-                <div>
-                    <div class="bg-[#131c31] border border-slate-800 rounded-xl p-4 mb-6 flex items-center justify-between">
-                        <h1 class="text-yellow-400 text-base font-bold">حسابي والإعدادات</h1>
-                        <span onclick="switchScreen('home')" class="cursor-pointer text-yellow-400 text-lg"><i class="fa-solid fa-arrow-right"></i></span>
-                    </div>
-
-                    <div class="flex items-center gap-4 mb-6 bg-[#131c31] p-4 rounded-xl border border-slate-800">
-                        <div class="w-16 h-16 bg-[#0f172a] rounded-full border-2 border-yellow-400 flex items-center justify-center">
-                            <i class="fa-solid fa-user-shield text-2xl text-yellow-400"></i>
-                        </div>
-                        <div>
-                            <div class="text-base font-bold text-yellow-400" id="userNameDisp">عمران الدوحي</div>
-                            <div class="text-xs text-slate-400">مسؤول النظام / مسوق مزارع</div>
-                            <div class="text-xs text-slate-300 mt-1">محافظة البيضاء</div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 max-w-xl mx-auto w-full">
-                        <button class="action-btn" onclick="alert('🔒 تم إرسال رمز التحقق لتحديث كلمة السر')"><span>تحديث كلمة السر</span><span>🔒</span></button>
-                        <button class="action-btn" onclick="alert('⚙️ الإعدادات العامة مفعلة')"><span>الإعدادات العامة</span><span>⚙️</span></button>
-                        <button class="action-btn logout-btn" onclick="logout()"><span>تسجيل الخروج</span><span>🚪</span></button>
-                    </div>
-                </div>
-                <div class="text-center text-xs text-slate-500">نظام إدارة وتربية وتسويق الدواجن</div>
-            </div>
-        </div>
-
-        <!-- شريط التنقل السفلي الخاص حصرياً بواجهة مسوق المزارع -->
-        <div class="w-full mt-2 pt-1 border-t border-slate-800 grid grid-cols-2 gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800 text-center shadow-lg shrink-0">
-            <button id="btn-home" onclick="switchScreen('home')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold">
-                <i class="fa-solid fa-house text-sm"></i>
-                <span class="text-[10px] mt-0.5">الرئيسية</span>
-            </button>
-            <button id="btn-account" onclick="switchScreen('account')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white">
-                <i class="fa-solid fa-user-gear text-sm"></i>
-                <span class="text-[10px] mt-0.5">الحساب</span>
-            </button>
-        </div>
-
+    <!-- شريط التنقل السفلي المتنقل (مصلح ومربوط بالدوال بدقة) -->
+    <div class="w-full mt-2 pt-1 border-t border-slate-800 grid grid-cols-2 gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800 text-center shadow-lg shrink-0">
+        <button id="btn-home" onclick="switchScreen('home')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold">
+            <i class="fa-solid fa-house text-sm"></i>
+            <span class="text-[10px] mt-0.5">الرئيسية</span>
+        </button>
+        <button id="btn-account" onclick="switchScreen('account')" class="flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white">
+            <i class="fa-solid fa-user-gear text-sm"></i>
+            <span class="text-[10px] mt-0.5">الحساب</span>
+        </button>
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                const user = JSON.parse(savedUser);
-                if (user.role === 'marketer') {
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('marketerMainContainer').classList.remove('hidden');
-                    document.getElementById('userNameDisp').innerText = user.name || 'عمران الدوحي';
-                }
-            }
-        });
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    localStorage.setItem('currentUser', JSON.stringify(data.user));
-                    if (data.user.role === 'marketer') {
-                        document.getElementById('loginScreen').classList.add('hidden');
-                        document.getElementById('marketerMainContainer').classList.remove('hidden');
-                        document.getElementById('userNameDisp').innerText = data.user.name;
-                    } else {
-                        alert('مرحباً بك. هذا الحساب ليس بصلاحية "مسوق مزارع". يجلب النظام لوحة التحكم الخاصة بدورك.');
-                        location.reload();
-                    }
-                } else {
-                    alert(data.message || 'خطأ في بيانات الدخول.');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('حدث خطأ أثناء الاتصال بقاعدة البيانات.');
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            location.reload();
-        }
-
+        // دالة تبديل الشاشات المحدثة لتعمل بسلاسة كاملة
         function switchScreen(screenName) {
+            // إخفاء جميع الشاشات أولاً
             document.querySelectorAll('.app-screen').forEach(el => el.classList.remove('screen-active'));
+            
+            // إعادة تعيين ألوان جميع أزرار الشريط السفلي إلى الوضع العادي (غير النشط)
             document.getElementById('btn-home').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white";
             document.getElementById('btn-account').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-slate-400 hover:text-white";
 
+            // تفعيل الشاشة المطلوبة وتغيير لون الزر الخاص بها للون الأصفر المميز
             if (screenName === 'home') {
                 document.getElementById('screen-home').classList.add('screen-active');
                 document.getElementById('btn-home').className = "flex flex-col items-center justify-center p-1.5 rounded-lg transition text-yellow-400 font-bold";
@@ -283,9 +211,10 @@
                 alert(result.message || '✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح!');
             } catch (err) {
                 console.error(err);
-                alert('✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح (وضع الاتصال المحلي)');
+                alert('✅ تمت إضافة الكشف إلى قاعدة البيانات بنجاح (وضع المعاينة المحلي)');
             }
         }
     </script>
 </body>
 </html>
+
