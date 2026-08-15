@@ -196,7 +196,7 @@
                 </div>
                 <h1 class="text-xl font-bold text-white mb-1">معجم لتربية وتسويق الدواجن</h1>
                 <p class="text-[11px] text-yellow-400 font-semibold mb-0.5">Dictionary of Poultry Breeding and Marketing</p>
-                <p class="text-slate-400 text-[10px]">الجمهورية اليمنية - محافظة البيضاء[span_0](start_span)[span_0](end_span)</p>
+                <p class="text-slate-400 text-[10px]">الجمهورية اليمنية - محافظة البيضاء</p>
             </div>
 
             <form id="loginForm" class="space-y-4 relative max-w-md mx-auto w-full" onsubmit="handleLogin(event)">
@@ -240,7 +240,7 @@
                     <h2 class="text-xl font-bold text-yellow-400 mb-1 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-id-card"></i> إنشاء حساب جديد في المنظومة
                     </h2>
-                    <p class="text-slate-400 text-xs">الجمهورية اليمنية - محافظة البيضاء[span_1](start_span)[span_1](end_span)</p>
+                    <p class="text-slate-400 text-xs">الجمهورية اليمنية - محافظة البيضاء</p>
                 </div>
                 <form id="registerForm" class="space-y-4" onsubmit="handleRegister(event)">
                     <div>
@@ -296,7 +296,7 @@
             <div class="w-full border-b border-slate-800/80 pb-3 mb-4 bg-[#161f32]/60 px-4 py-3 rounded-2xl shadow-sm flex justify-between items-center">
                 <div>
                     <h2 class="text-sm md:text-base font-bold text-white tracking-wide">معجم لتربية وتسويق الدواجن</h2>
-                    <p class="text-[10px] text-yellow-400 font-medium">الجمهورية اليمنية - محافظة البيضاء[span_2](start_span)[span_2](end_span)</p>
+                    <p class="text-[10px] text-yellow-400 font-medium">الجمهورية اليمنية - محافظة البيضاء</p>
                 </div>
                 <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden p-1 shrink-0">
                     <img src="https://i.postimg.cc/DWtX86v7/logo.png" alt="شعار" class="w-full h-full object-contain">
@@ -305,10 +305,8 @@
             <div id="tabContentContainer" class="w-full flex-1 space-y-4 custom-scrollbar"></div>
         </div>
 
-        <!-- الهيدر السفلي الديناميكي (زرين لمسوق المزارع، و4 أزرار لبقية الواجهات) -->
-        <div id="bottomNavContainer" class="w-full mt-4 pt-2 border-t border-slate-800 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg">
-            <!-- سيتم توليد الأزرار ديناميكياً بواسطة الجافاسكريبت حسب دور المستخدم -->
-        </div>
+        <!-- الهيدر السفلي الديناميكي -->
+        <div id="bottomNavContainer" class="w-full mt-4 pt-2 border-t border-slate-800 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg"></div>
     </div>
 
     <!-- نافذة نظام بصمة الإصبع -->
@@ -341,7 +339,7 @@
         </div>
     </div>
 
-    <!-- نوافذ فرعية أخرى -->
+    <!-- نافذة إضافة زبون جديد -->
     <div id="subCustomerModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>إضافة زبون جديد لقاعدة البيانات</h2>
@@ -368,12 +366,12 @@
         </div>
     </div>
 
+    <!-- نافذة تقرير وارد دجاج اليوم (ديناميكي) -->
     <div id="subIncomingModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>تقرير وارد دجاج اليوم</h2>
-            <div class="incoming-info-box">
-                <div>بيانات الشحنة: <span>حمول دينة الفيضي</span></div>
-                <div>المسوق المسؤول: <span>صالح بصير</span></div>
+            <div class="incoming-info-box" id="incomingInfoDetails">
+                <div>حالة الوارد: <span>جاري استدعاء البيانات من السيرفر...</span></div>
                 <div>تاريخ الوارد: <span class="currentDateText"></span></div>
             </div>
             <div class="sub-table-container">
@@ -388,7 +386,9 @@
                             <th>سعر البيع</th>
                         </tr>
                     </thead>
-                    <tbody id="subIncomingTableBody"></tbody>
+                    <tbody id="subIncomingTableBody">
+                        <!-- تُملأ البيانات ديناميكياً من MongoDB -->
+                    </tbody>
                 </table>
             </div>
             <div class="sub-modal-buttons">
@@ -397,6 +397,7 @@
         </div>
     </div>
 
+    <!-- نافذة تفاصيل المبيعات -->
     <div id="subSalesDetailsModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>سجل تفاصيل المبيعات</h2>
@@ -423,6 +424,7 @@
         </div>
     </div>
 
+    <!-- نافذة تفاصيل الزبائن -->
     <div id="subCustomersDetailsModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>قائمة وتفاصيل الزبائن المسجلين</h2>
@@ -445,6 +447,7 @@
         </div>
     </div>
 
+    <!-- نافذة جرد المخازن -->
     <div id="subInventoryModal" class="sub-modal-overlay">
         <div class="sub-modal-card">
             <h2>تقرير جرد المخازن الحالي</h2>
@@ -476,6 +479,7 @@
         </div>
     </div>
 
+    <!-- قائمة المراسلة للزبائن -->
     <div id="customerSubMenu" class="sub-menu-section">
         <div class="sub-header">
             <button class="chat-back-btn" onclick="closeCustomerMenu()">⬅ القائمة الرئيسية</button>
@@ -484,6 +488,7 @@
         <div id="customerListContainer" class="customer-list"></div>
     </div>
 
+    <!-- نافذة الدردشة -->
     <div id="chatSection" class="chat-section">
         <div class="chat-header">
             <button class="chat-back-btn" onclick="closeChat()">⬅ رجوع</button>
@@ -508,8 +513,22 @@
             localStorage.setItem('savedInvoices', JSON.stringify([]));
         }
 
-        const roleNames = { warehouse: 'مدير مخازن', marketer: 'مسوق مزارع', pharmacist: 'صيدلي', collector: 'متقاضي مديونية', accountant: 'محاسب', driver_bus: 'سواق باص دجاج', worker: 'عامل', customer: 'عميل / زبون', admin: 'مدير عام' };
-        const roleThemes = { warehouse: { primary: 'text-yellow-400' }, admin: { primary: 'text-yellow-400' }, marketer: { primary: 'text-yellow-400' } };
+        const roleNames = { 
+            warehouse: 'مدير مخازن', 
+            marketer: 'مسوق مزارع', 
+            pharmacist: 'صيدلي', 
+            collector: 'متقاضي مديونية', 
+            accountant: 'محاسب', 
+            driver_bus: 'سواق باص دجاج', 
+            worker: 'عامل', 
+            customer: 'عميل / زبون', 
+            admin: 'مدير عام' 
+        };
+        const roleThemes = { 
+            warehouse: { primary: 'text-yellow-400' }, 
+            admin: { primary: 'text-yellow-400' }, 
+            marketer: { primary: 'text-yellow-400' } 
+        };
 
         let selectedCustomer = 'شركة الأصيل للتوريدات';
         let pendingActionType = '';
@@ -589,18 +608,15 @@
             document.getElementById('loginScreen').classList.remove('hidden');
         }
 
-        // دالة توليد الهيدر السفلي بناءً على دور المستخدم (زرين لمسوق المزارع، و4 أزرار لبقية الواجهات)
         function renderBottomNav(user) {
             const navContainer = document.getElementById('bottomNavContainer');
             if (user.role === 'marketer') {
-                // مسوق المزارع له زرين فقط
                 navContainer.className = "w-full mt-4 pt-2 border-t border-slate-800 grid grid-cols-2 gap-1 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg";
                 navContainer.innerHTML = `
                     <button onclick="switchTab('home')" class="bottom-nav-btn flex flex-col items-center justify-center p-2 rounded-xl transition text-yellow-400" data-nav="home"><i class="fa-solid fa-house text-lg"></i><span class="text-xs mt-1">رئيسية المزارع</span></button>
                     <button onclick="switchTab('account')" class="bottom-nav-btn flex flex-col items-center justify-center p-2 rounded-xl transition text-slate-400 hover:text-white" data-nav="account"><i class="fa-solid fa-user-gear text-lg"></i><span class="text-xs mt-1">الحساب</span></button>
                 `;
             } else {
-                // باقي الواجهات لها 4 أزرار
                 navContainer.className = "w-full mt-4 pt-2 border-t border-slate-800 grid grid-cols-4 gap-1 bg-[#111827] p-2 rounded-2xl border border-slate-800 text-center shadow-lg";
                 navContainer.innerHTML = `
                     <button onclick="switchTab('home')" class="bottom-nav-btn flex flex-col items-center justify-center p-1.5 rounded-xl transition text-yellow-400" data-nav="home"><i class="fa-solid fa-house text-base"></i><span class="text-[10px] mt-1">رئيسية</span></button>
@@ -627,14 +643,15 @@
 
             if (tabName === 'home') {
                 if (user.role === 'marketer') {
-                    // واجهة مسوق المزارع فقط
                     container.innerHTML = getMarketerHomeUI();
+                    const shipDateElem = document.getElementById('shipDate');
+                    if (shipDateElem) {
+                        shipDateElem.value = new Date().toISOString().split('T')[0];
+                    }
                 } else if (user.role === 'warehouse' || user.role === 'admin') {
-                    // الواجهة الكاملة للإدارة ومدير المخازن
                     container.innerHTML = getManagerHomeUI();
                     setTimeout(() => { initManagerChart(); }, 100);
                 } else {
-                    // الواجهة الافتراضية لباقي الأدوار
                     container.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">مرحباً بك (${user.name}) في النظام الشامل لتربية وتسويق الدواجن.</div>`;
                 }
             } else if (tabName === 'tasks') {
@@ -650,12 +667,13 @@
 
         // واجهة مسوق المزارع
         function getMarketerHomeUI() {
+            const todayStr = new Date().toISOString().split('T')[0];
             return `
                 <div class="manager-home-container pb-6 space-y-6">
                     <div class="w-full space-y-4 bg-[#131c31]/40 p-3 rounded-2xl border border-slate-800">
                         <div class="border-b border-slate-800 pb-3 mb-3 flex justify-between items-center">
                             <h2 class="text-base font-bold text-yellow-400"><i class="fa-solid fa-truck-ramp-box"></i> تقرير شحنات مزارع الدواجن</h2>
-                            <span class="text-xs text-slate-400">محافظة البيضاء[span_3](start_span)[span_3](end_span)</span>
+                            <span class="text-xs text-slate-400">محافظة البيضاء</span>
                         </div>
 
                         <!-- حقول معلومات الشحنة -->
@@ -663,7 +681,7 @@
                             <div><label class="block text-[10px] text-gray-400 mb-0.5">المزرعة:</label><input type="text" id="farmName" value="مزارع البيضاء" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
                             <div><label class="block text-[10px] text-gray-400 mb-0.5">السائق:</label><input type="text" id="driverName" value="حسين الفيفي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
                             <div><label class="block text-[10px] text-gray-400 mb-0.5">المسوق:</label><input type="text" id="marketer" value="عمران الدوحي" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
-                            <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="2026-08-14" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
+                            <div><label class="block text-[10px] text-gray-400 mb-0.5">التاريخ:</label><input type="text" id="shipDate" value="${todayStr}" class="w-full bg-[#111827] border border-slate-700 rounded-lg px-2 py-1 text-xs text-[#facc15] font-bold"></div>
                         </div>
 
                         <!-- جدول أنواع الدجاج -->
@@ -736,7 +754,7 @@
             `;
         }
 
-        // واجهة مدير المخازن والمسؤول (الرسم البياني + العمليات الإدارية فقط)
+        // واجهة مدير المخازن والمسؤول
         function getManagerHomeUI() {
             return `
                 <div class="manager-home-container pb-6 space-y-6">
@@ -745,7 +763,7 @@
                         <canvas id="managerWeekChart"></canvas>
                     </div>
 
-                    <!-- قسم الوظائف والأزرار التفاعلية -->
+                    <!-- قسم الوظائف والعمليات الإدارية -->
                     <div class="w-full space-y-3 bg-[#131c31]/40 p-3 rounded-2xl border border-slate-800">
                         <div class="border-b border-slate-800 pb-2 mb-2 flex justify-between items-center">
                             <h3 class="text-sm font-bold text-yellow-400"><i class="fa-solid fa-briefcase"></i> الوظائف والعمليات الإدارية</h3>
@@ -799,7 +817,7 @@
                         <div class="user-name">${user.name || 'مستخدم النظام'}</div>
                         <div class="user-role">${roleNames[user.role] || user.role}</div>
                         <div class="user-detail">رقم الهاتف: <span>${user.phone || user.username || '---'}</span></div>
-                        <div class="user-detail">العنوان: <span>الجمهورية اليمنية - محافظة البيضاء[span_4](start_span)[span_4](end_span)</span></div>
+                        <div class="user-detail">العنوان: <span>الجمهورية اليمنية - محافظة البيضاء</span></div>
                     </div>
 
                     <div class="actions-container">
@@ -870,7 +888,7 @@
                 item.innerHTML = `
                     <div>
                         <div class="customer-name">${custName}</div>
-                        <div class="customer-loc">الجمهورية اليمنية - محافظة البيضاء[span_5](start_span)[span_5](end_span)</div>
+                        <div class="customer-loc">الجمهورية اليمنية - محافظة البيضاء</div>
                     </div>
                     <span style="color: #facc15; font-size: 16px;"><i class="fa-solid fa-comment-dots"></i></span>
                 `;
@@ -977,32 +995,71 @@
             loadSubTables();
         }
 
-        function loadSubTables() {
-            let incomingData = [
-                { type: "دجاج بعد الكبير", boxes: 15, packing: 10, totalBoxes: 15, totalBirds: 150, price: "1800 ريال" },
-                { type: "دجاج مخورج", boxes: 20, packing: 12, totalBoxes: 20, totalBirds: 240, price: "1650 ريال" },
-                { type: "دجاج متوسط", boxes: 10, packing: 10, totalBoxes: 10, totalBirds: 100, price: "1500 ريال" },
-                { type: "دجاج مطاعم", boxes: 25, packing: 8, totalBoxes: 25, totalBirds: 200, price: "1400 ريال" },
-                { type: "دجاج صغير", boxes: 8, packing: 15, totalBoxes: 8, totalBirds: 120, price: "1200 ريال" },
-                { type: "دجاج جفش", boxes: 5, packing: 10, totalBoxes: 5, totalBirds: 50, price: "900 ريال" }
-            ];
+        // جلب وارد اليوم الحقيقي من قاعدة البيانات بشكل ديناميكي
+        async function loadSubTables() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('.currentDateText').forEach(el => el.innerText = todayStr);
+
             const incomingTbody = document.getElementById('subIncomingTableBody');
-            if(incomingTbody) {
-                incomingTbody.innerHTML = "";
-                incomingData.forEach(item => {
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${item.type}</td><td>${item.boxes}</td><td>${item.packing}</td><td>${item.totalBoxes}</td><td>${item.totalBirds}</td><td>${item.price}</td>`;
-                    incomingTbody.appendChild(tr);
-                });
+            const infoBox = document.getElementById('incomingInfoDetails');
+
+            if (incomingTbody) {
+                incomingTbody.innerHTML = `<tr><td colspan="6" class="py-4 text-slate-400"><i class="fa-solid fa-spinner fa-spin"></i> جاري استدعاء شحنات اليوم من قاعدة البيانات...</td></tr>`;
+
+                try {
+                    const response = await fetch(`/api/shipments/today?date=${todayStr}`);
+                    const result = await response.json();
+
+                    if (result.success && result.data && result.data.length > 0) {
+                        incomingTbody.innerHTML = "";
+                        
+                        const firstShipment = result.data[0];
+                        if (infoBox) {
+                            infoBox.innerHTML = `
+                                <div>بيانات الشحنة: <span>${firstShipment.farm} (السائق: ${firstShipment.driver})</span></div>
+                                <div>المسوق المسؤول: <span>${firstShipment.marketer}</span></div>
+                                <div>تاريخ الوارد: <span>${firstShipment.date}</span></div>
+                                <div class="text-[11px] text-slate-400 mt-1">إجمالي الشحنات المسجلة اليوم: <span class="text-yellow-400 font-bold">${result.data.length}</span></div>
+                            `;
+                        }
+
+                        result.data.forEach(shipment => {
+                            shipment.rows.forEach(item => {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                    <td class="font-bold text-yellow-400">${item.chickenType}</td>
+                                    <td>${item.boxes}</td>
+                                    <td>${item.packing}</td>
+                                    <td>${item.boxes}</td>
+                                    <td class="text-emerald-400 font-bold">${item.total}</td>
+                                    <td>${Number(item.price).toLocaleString()} ر.ي</td>
+                                `;
+                                incomingTbody.appendChild(tr);
+                            });
+                        });
+                    } else {
+                        if (infoBox) {
+                            infoBox.innerHTML = `
+                                <div>حالة الوارد: <span class="text-slate-400">لا توجد شحنات مسجلة لهذا اليوم</span></div>
+                                <div>تاريخ اليوم: <span>${todayStr}</span></div>
+                            `;
+                        }
+                        incomingTbody.innerHTML = `<tr><td colspan="6" class="py-4 text-slate-400">⚠️ لم يتم تسجيل أي شحنات واردة بتاريخ اليوم حتى الآن.</td></tr>`;
+                    }
+                } catch (err) {
+                    console.error('خطأ في استدعاء وارد اليوم:', err);
+                    incomingTbody.innerHTML = `<tr><td colspan="6" class="py-4 text-red-400">❌ حدث خطأ أثناء الاتصال بالخادم لجلب بيانات الوارد.</td></tr>`;
+                }
             }
 
+            // تعبئة جدول تفاصيل الزبائن
             let custs = JSON.parse(localStorage.getItem('invoicingCustomers')) || [];
             const custTbody = document.getElementById('subCustomersTableBody');
-            if(custTbody) {
+            if (custTbody) {
                 custTbody.innerHTML = "";
                 custs.forEach(c => {
                     let tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء[span_6](start_span)[span_6](end_span)</td>`;
+                    tr.innerHTML = `<td>${c}</td><td>771234567</td><td>السوق المركزي</td><td>البيضاء</td>`;
                     custTbody.appendChild(tr);
                 });
             }
@@ -1016,13 +1073,54 @@
             row.querySelector('.total-chickens').innerText = total;
         }
 
-        function saveToDatabase() {
-            alert("✅ تم حفظ كشف الشحنة بنجاح في قاعدة البيانات!");
+        // حفظ كشف مسوق المزارع مباشرة في قاعدة البيانات
+        async function saveToDatabase() {
+            const farm = document.getElementById('farmName')?.value.trim();
+            const driver = document.getElementById('driverName')?.value.trim();
+            const marketer = document.getElementById('marketer')?.value.trim();
+            const date = document.getElementById('shipDate')?.value.trim() || new Date().toISOString().split('T')[0];
+
+            const rows = [];
+            document.querySelectorAll('#chickenTableBody tr.chicken-row').forEach(tr => {
+                const chickenType = tr.querySelector('td:first-child')?.innerText.trim();
+                const boxes = parseFloat(tr.querySelector('.boxes')?.value) || 0;
+                const packing = parseFloat(tr.querySelector('.packing')?.value) || 0;
+                const total = parseFloat(tr.querySelector('.total-chickens')?.innerText) || (boxes * packing);
+                const price = parseFloat(tr.querySelector('.price')?.value) || 0;
+
+                if (boxes > 0 || total > 0) {
+                    rows.push({ chickenType, boxes, packing, total, price });
+                }
+            });
+
+            if (!farm || !driver || rows.length === 0) {
+                alert('⚠️ يرجى التأكد من ملء اسم المزرعة، السائق، وتعبئة الكميات.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/shipments/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ farm, driver, marketer, date, rows })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message || '✅ تم حفظ الشحنة بنجاح في قاعدة البيانات!');
+                } else {
+                    alert('❌ ' + result.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('❌ تعذر الاتصال بالخادم لحفظ الشحنة.');
+            }
         }
 
         function openSubModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
-            if(modalId === 'subCustomersDetailsModal') { loadSubTables(); }
+            if (modalId === 'subIncomingModal' || modalId === 'subCustomersDetailsModal') {
+                loadSubTables();
+            }
         }
 
         function closeSubModal(modalId) {
