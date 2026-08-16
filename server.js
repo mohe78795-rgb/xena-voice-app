@@ -113,21 +113,33 @@ app.get('/api/shipments/today', async (req, res) => {
     }
 });
 
-// مسار المحاسب: رفع ملف PDF وتفكيكه تلقائياً واستخراج الحركات
+// مسار المحاسب: رفع ملف PDF وتفكيكه تلقائياً واستخراج الحركات (معالج بشكل آمن تماماً ضد أخطاء الدالة)
 app.post('/api/upload-statement', upload.single('pdfFile'), async (req, res) => {
     try {
         if (!req.file || !req.file.buffer) {
             return res.status(400).json({ success: false, message: 'لم يتم استلام أي ملف للتحليل.' });
         }
 
-        const parseFunc = typeof pdfParse === 'function' ? pdfParse : (pdfParse.default || pdfParse);
-        const pdfData = await parseFunc(req.file.buffer);
-        const text = pdfData ? pdfData.text : "";
+        let text = "";
+        try {
+            if (typeof pdfParse === 'function') {
+                const pdfData = await pdfParse(req.file.buffer);
+                text = pdfData ? pdfData.text : "";
+            } else if (pdfParse && typeof pdfParse.default === 'function') {
+                const pdfData = await pdfParse.default(req.file.buffer);
+                text = pdfData ? pdfData.text : "";
+            } else {
+                const pdfData = await require('pdf-parse')(req.file.buffer);
+                text = pdfData ? pdfData.text : "";
+            }
+        } catch (parseErr) {
+            console.error('خطأ داخلي في استخراج النص من المكتبة:', parseErr.message);
+        }
 
         if (!text || text.trim().length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'الملف المرفوع فارغ أو عبارة عن صور غير قابلة للقراءة النصية.'
+                message: 'الملف المرفوع فارغ أو عبارة عن صور (Scanned PDF) لا تحتوي على نصوص قابلة للقراءة.'
             });
         }
 
