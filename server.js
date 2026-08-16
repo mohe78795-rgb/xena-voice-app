@@ -113,68 +113,86 @@ app.get('/api/shipments/today', async (req, res) => {
     }
 });
 
-// مسار المحاسب: رفع ملف PDF وقراءته (مُحدث وآمن ضد أخطاء المعالجة)
+// مسار المحاسب: رفع ملف PDF وتفكيكه تلقائياً واستخراج الحركات
 app.post('/api/upload-statement', upload.single('pdfFile'), async (req, res) => {
     try {
         if (!req.file || !req.file.buffer) {
             return res.status(400).json({ success: false, message: 'لم يتم استلام أي ملف للتحليل.' });
         }
 
-        let text = "";
-        try {
-            const parseFunc = typeof pdfParse === 'function' ? pdfParse : (pdfParse.default || pdfParse);
-            const pdfData = await parseFunc(req.file.buffer);
-            text = pdfData ? pdfData.text : "";
-        } catch (pdfErr) {
-            console.warn('⚠️ تحذير: لم يتم استخراج نصوص من ملف الـ PDF عبر المكتبة:', pdfErr.message);
-        }
+        const parseFunc = typeof pdfParse === 'function' ? pdfParse : (pdfParse.default || pdfParse);
+        const pdfData = await parseFunc(req.file.buffer);
+        const text = pdfData ? pdfData.text : "";
 
-        let extractedTransactions = [];
-
-        if (text && text.trim().length > 0) {
-            const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            let currentCustomer = "عميل غير محدد";
-
-            lines.forEach(line => {
-                if (line.includes('اسم الحساب:') || line.includes('العميل:')) {
-                    currentCustomer = line.split(':')[1].trim();
-                }
-
-                const transactionMatch = line.match(/^(\d{4}-\d{2}-\d{2})\s+(.+?)\s+(\d+(?:[.,]\d+)?)/);
-                if (transactionMatch) {
-                    extractedTransactions.push({
-                        customerName: currentCustomer,
-                        date: transactionMatch[1],
-                        statement: transactionMatch[2].trim(),
-                        credit: parseFloat(transactionMatch[3].replace(/,/g, '')),
-                        debit: 0
-                    });
-                }
+        if (!text || text.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'الملف المرفوع فارغ أو عبارة عن صور غير قابلة للقراءة النصية.'
             });
         }
 
-        // إذا لم تطابق الأسطر النمط أو كان الملف عبارة عن صور (Scanned)، ندرج بيانات تجريبية كي يكتمل الاختبار بنجاح
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+        let extractedTransactions = [];
+        let detectedCustomerName = "حساب عام / موظف";
+
+        // البحث التلقائي عن اسم الحساب أو الموظف في الترويسة العليا للملف
+        for (let i = 0; i < Math.min(lines.length, 15); i++) {
+            let l = lines[i];
+            if ((l.includes('محمد') || l.includes('الحساب') || l.includes('الموظف')) && !l.includes('مزارع معجم')) {
+                detectedCustomerName = l.replace('رقم الموظف', '').replace('رقم الحساب', '').trim();
+                break;
+            }
+        }
+
+        // الاستخراج التلقائي التام للصفوف (تاريخ + بيان + مبلغ)
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            const dateMatch = line.match(/(\d{2}\/\d{2}\/\d{4})|(\d{4}-\d{2}-\d{2})/);
+            const moneyMatches = line.match(/\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b|\b\d{3,6}(?:\.\d+)?\b/g);
+
+            if (dateMatch && moneyMatches) {
+                let dStr = dateMatch[0];
+                if (dStr.includes('/')) {
+                    const parts = dStr.split('/');
+                    if (parts.length === 3) dStr = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
+                let amt = parseFloat(moneyMatches[moneyMatches.length - 1].replace(/,/g, ''));
+                let desc = line.replace(dateMatch[0], '').replace(moneyMatches[moneyMatches.length - 1], '').trim();
+                desc = desc.replace(/سند صرف نقدي|قيد يومية|الرصيد|الإجمالي/g, '').trim();
+
+                if (amt > 0 && desc.length > 1) {
+                    extractedTransactions.push({
+                        customerName: detectedCustomerName,
+                        date: dStr,
+                        statement: desc,
+                        credit: amt,
+                        debit: 0
+                    });
+                }
+            }
+        }
+
         if (extractedTransactions.length === 0) {
-            extractedTransactions = [
-                { customerName: 'حسين العبيدي (تجريبي)', date: new Date().toISOString().split('T')[0], statement: 'دفعة نقدية حساب', credit: 150000, debit: 0 },
-                { customerName: 'نبيل السالمي (تجريبي)', date: new Date().toISOString().split('T')[0], statement: 'مشتريات دجاج', credit: 0, debit: 75000 }
-            ];
+            return res.status(400).json({
+                success: false,
+                message: 'لم يتمكن النظام من قراءة حركات واضحة من هذا التنسيق. يرجى التأكد من ملف الكشف.'
+            });
         }
 
         await Transaction.insertMany(extractedTransactions);
 
         res.json({
             success: true,
-            message: 'تمت معالجة الملف وحفظ البيانات بنجاح',
+            message: `تم تفكيك ملف الـ PDF واستخراج ${extractedTransactions.length} حركة بنجاح`,
             count: extractedTransactions.length,
             data: extractedTransactions
         });
 
     } catch (error) {
-        console.error('❌ خطأ في معالجة PDF:', error);
+        console.error('❌ خطأ في المعالجة التلقائية لـ PDF:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'حدث خطأ في النظام أثناء معالجة الملف: ' + error.message 
+            message: 'حدث خطأ أثناء تحليل ملف الـ PDF: ' + error.message 
         });
     }
 });
