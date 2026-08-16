@@ -15,24 +15,28 @@ const userSchema = new mongoose.Schema({
 const invoiceSchema = new mongoose.Schema({
     invoiceNumber: { type: String, required: true },
     buyerName: { type: String, required: true },
-    totalAmount: Number,
-    items: Array,
+    sellerName: { type: String, default: 'عمران الدوحي' },
+    totalAmount: { type: Number, default: 0 },
+    items: { type: Array, default: [] },
     date: { type: Date, default: Date.now }
 });
 
 // 3. نموذج الزبائن
 const customerSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    phone: String,
-    location: String,
+    phone: { type: String },
+    location: { type: String },
+    province: { type: String, default: 'الجمهورية اليمنية - محافظة البيضاء' },
     createdAt: { type: Date, default: Date.now }
 });
 
-// 4. نموذج المخازن والوارد
+// 4. نموذج المخازن والجرد
 const inventorySchema = new mongoose.Schema({
-    productName: String,
-    quantity: Number,
-    category: String,
+    productName: { type: String, required: true },
+    previousStock: { type: Number, default: 0 },
+    incomingToday: { type: Number, default: 0 },
+    soldToday: { type: Number, default: 0 },
+    remainingStock: { type: Number, default: 0 },
     updatedAt: { type: Date, default: Date.now }
 });
 
@@ -54,16 +58,44 @@ const shipmentSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-// 6. نموذج الحركات المالية (المستخرجة من كشوفات الـ PDF للمحاسب)
+// 6. نموذج الحركات المالية العامة (Transactions)
 const transactionSchema = new mongoose.Schema({
     customerName: { type: String, required: true },
     accountNumber: { type: String },
     date: { type: String },
     statement: { type: String },
-    debit: { type: Number, default: 0 },  // مدين (عليه)
-    credit: { type: Number, default: 0 }, // دائن (له)
-    currency: { type: String, default: 'YER' }, // العملة
+    debit: { type: Number, default: 0 },
+    credit: { type: Number, default: 0 },
+    currency: { type: String, default: 'ريال يمني' },
     uploadedAt: { type: Date, default: Date.now }
+});
+
+// 7. الهيكل التحليلي لكشوفات العمال (Worker Statements)
+const workerStatementSchema = new mongoose.Schema({
+    workerName: { type: String, required: true },
+    employeeNumber: { type: String },
+    accountNumber: { type: String },
+    accountType: { type: String },
+    docType: { type: String, default: 'سند صرف / قيد' },
+    docNumber: { type: String },
+    referenceNumber: { type: String },
+    date: { type: Date, required: true },
+    statement: { type: String },
+    debit: { type: Number, default: 0 },
+    credit: { type: Number, default: 0 },
+    displayDebit: { type: String, default: '0' },
+    displayCredit: { type: String, default: '0' },
+    runningBalance: { type: Number, default: 0 },
+    currency: { type: String, default: 'ريال يمني' },
+    statementPeriodFrom: { type: String },
+    statementPeriodTo: { type: String },
+    generationDate: { type: String },
+    totalDebitSum: { type: Number, default: 0 },
+    totalCreditSum: { type: Number, default: 0 },
+    netBalance: { type: Number, default: 0 },
+    balanceInWords: { type: String },
+    printedBy: { type: String },
+    createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = {
@@ -72,5 +104,6 @@ module.exports = {
     Customer: mongoose.model('Customer', customerSchema, 'customers'),
     Inventory: mongoose.model('Inventory', inventorySchema, 'inventory'),
     Shipment: mongoose.model('Shipment', shipmentSchema, 'shipments'),
-    Transaction: mongoose.model('Transaction', transactionSchema, 'transactions')
+    Transaction: mongoose.model('Transaction', transactionSchema, 'transactions'),
+    WorkerStatement: mongoose.model('WorkerStatement', workerStatementSchema, 'كشوف عمال')
 };
