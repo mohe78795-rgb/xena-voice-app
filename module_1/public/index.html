@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوابة التسديد والخدمات الذكية</title>
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* الثيمات الخاصة بالشبكات */
+        .theme-ym { --primary: #991b3b; --primary-hover: #801430; --light: #fff1f2; --border: #fecdd3; }
+        .theme-you { --primary: #d97706; --primary-hover: #b45309; --light: #fffbeb; --border: #fef3c7; }
+        .theme-saba { --primary: #0284c7; --primary-hover: #0369a1; --light: #f0f9ff; --border: #bae6fd; }
+        .theme-why { --primary: #7c3aed; --primary-hover: #6d28d9; --light: #f5f3ff; --border: #ddd6fe; }
+        .theme-yem4g { --primary: #2563eb; --primary-hover: #1d4ed8; --light: #eff6ff; --border: #bfdbfe; }
+        .theme-adenet { --primary: #0891b2; --primary-hover: #0e7490; --light: #ecfeff; --border: #a5f3fc; }
+
+        .active-tab {
+            background-color: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .network-card.active {
+            border-color: var(--primary);
+            background-color: var(--light);
+            transform: translateY(-2px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body id="appBody" class="theme-ym text-slate-800 min-h-screen pb-16 flex flex-col items-center">
+
+    <!-- Header (الهيدر العلوي) -->
+    <header class="w-full max-w-lg bg-[var(--primary)] text-white shadow-lg sticky top-0 z-40 transition-colors duration-300">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-amber-300">
+                    <i class="fa-solid fa-bolt text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-extrabold leading-tight">بوابة التسديد والخدمات</h1>
+                    <span class="text-[10px] text-white/80 font-bold block">الجمهورية اليمنية</span>
+                </div>
+            </div>
+
+            <!-- كارت فحص الرصيد -->
+            <button onclick="fetchAgentBalance()" class="bg-white/15 hover:bg-white/25 border border-white/20 px-3 py-1.5 rounded-xl flex items-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-wallet text-amber-300 text-xs"></i>
+                <div class="text-right">
+                    <span class="text-[9px] text-white/70 block font-bold">رصيد الحساب</span>
+                    <span id="agentBalanceText" class="text-xs font-black tracking-wider">فحص الرصيد</span>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <main class="w-full max-w-lg px-3.5 pt-4 space-y-4">
+
+        <!-- أدوات إدخال الرقم واختيار الشبكة -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3.5">
+            <div class="flex justify-between items-center">
+                <label class="text-xs font-black text-slate-700">رقم الهاتف / الحساب</label>
+                <span id="charCount" class="text-[10px] font-bold text-slate-400">0/9</span>
+            </div>
+
+            <div class="relative flex items-center">
+                <button onclick="pickContactFromPhone()" title="اختيار من جهات الاتصال" 
+                        class="absolute right-2.5 w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition active:scale-95">
+                    <i class="fa-solid fa-address-book text-sm"></i>
+                </button>
+                
+                <input type="tel" id="mobileNumber" placeholder="77XXXXXXX" maxlength="9"
+                       class="w-full text-center font-mono font-extrabold text-lg py-2.5 px-12 rounded-xl border-2 border-slate-200 focus:border-[var(--primary)] focus:outline-none transition"
+                       oninput="detectNetwork(this.value)">
+
+                <button id="clearBtn" onclick="clearInput()" class="absolute left-3 text-slate-400 hover:text-rose-500 font-bold text-xs hidden">
+                    <i class="fa-solid fa-circle-xmark text-base"></i>
+                </button>
+            </div>
+
+            <!-- شبكات الاتصال -->
+            <div class="pt-1">
+                <label class="block text-[11px] font-bold text-slate-500 mb-2">مزود الخدمة</label>
+                <div class="grid grid-cols-6 gap-1.5" id="networkGrid">
+                    <button onclick="selectNetwork('ym')" data-net="ym" class="network-card active border-2 border-slate-200 p-1.5 rounded-xl text-center hover:border-slate-300 transition">
+                        <i class="fa-solid fa-mobile-screen text-rose-700 text-base block mb-0.5"></i>
+                        <span class="text-[10px] font-extrabold block">يمن موبايل</span>
+                    </button>
+                    <button onclick="selectNetwork('you')" data-net="you" class="network-card border-2 border-slate-200 p-1.5 rounded-xl text-center hover:border-slate-300 transition">
+                        <i class="fa-solid fa-signal text-amber-600 text-base block mb-0.5"></i>
+                        <span class="text-[10px] font-extrabold block">يو YOU</span>
+                    </button>
+                    <button onclick="selectNetwork('saba')" data-net="saba" class="network-card border-2 border-slate-200 p-1.5 rounded-xl text-center hover:border-slate-300 transition">
+                        <i class="fa-solid fa-tower-cell text-sky-600 text-base block mb-0.5"></i>
+                        <span class="text-[10px] font-extrabold block">سبأفون</span>
+                    </button>
+                    <button onclick="selectNetwork('why')" data-net="why" class="network-card border-2 border-slate-200 p-1.5 rounded-xl text-center hover:border-slate-300 transition">
+                        <i class="fa-solid fa-wifi text-purple-600 text-base block mb-0.5"></i>
+                        <span class="text-[10px] font-extrabold block">واي</span>
+                    </button>
+                    <button onclick="selectNetwork('yem4g')" data-net="yem4g" class="network-card border-2 border-slate-200 p-1.5 rounded-xl text-center hover:border-slate-300 transition">
+                        <i class="fa-solid fa-network-wired text-blue-600 text-base block mb-0.5"></i>
+                        <span class="text-[10px] font-extrabold block">فورجي</span>
+                    </button>
+                    <button onclick="selectNetwork('adenet')" data-net="adenet" class="network-card border-2 border-slate-200 p-1.5 rounded-xl text-center hover:border-slate-300 transition">
+                        <i class="fa-solid fa-globe text-cyan-600 text-base block mb-0.5"></i>
+                        <span class="text-[10px] font-extrabold block">عدن نت</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- التبويبات الرئيسية -->
+        <nav class="flex bg-slate-200/80 p-1 rounded-2xl gap-1 custom-scrollbar overflow-x-auto text-xs font-black">
+            <button onclick="switchTab('packages')" id="tab-packages" class="tab-btn active-tab flex-1 py-2.5 px-3 rounded-xl whitespace-nowrap transition">
+                <i class="fa-solid fa-box-open ml-1"></i> الباقات
+            </button>
+            <button onclick="switchTab('balance')" id="tab-balance" class="tab-btn flex-1 py-2.5 px-3 rounded-xl whitespace-nowrap text-slate-700 transition">
+                <i class="fa-solid fa-money-bill-wave ml-1"></i> رصيد مباشر
+            </button>
+            <button onclick="switchTab('gomla')" id="tab-gomla" class="tab-btn flex-1 py-2.5 px-3 rounded-xl whitespace-nowrap text-slate-700 transition">
+                <i class="fa-solid fa-layer-group ml-1"></i> جملة
+            </button>
+            <button onclick="switchTab('query')" id="tab-query" class="tab-btn flex-1 py-2.5 px-3 rounded-xl whitespace-nowrap text-slate-700 transition">
+                <i class="fa-solid fa-magnifying-glass ml-1"></i> استعلام
+            </button>
+        </nav>
+
+        <!-- Tab 1: الباقات والعروض -->
+        <section id="section-packages" class="tab-content">
+            <div id="packagesLoader" class="text-center py-10 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <i class="fa-solid fa-circle-notch animate-spin text-3xl text-[var(--primary)] mb-2"></i>
+                <p class="text-xs font-bold text-slate-500">جاري جلب الباقات المتاحة...</p>
+            </div>
+            <div id="packagesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 hidden"></div>
+        </section>
+
+        <!-- Tab 2: رصيد مباشر -->
+        <section id="section-balance" class="tab-content hidden">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-extrabold text-slate-800 text-sm border-b pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-hand-holding-dollar text-[var(--primary)]"></i> تسديد رصيد مباشر
+                </h3>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">المبلغ المطلوب (ريال)</label>
+                    <input type="number" id="directAmount" placeholder="ادخل المبلغ" 
+                           class="w-full p-3 border-2 border-slate-200 rounded-xl font-bold focus:border-[var(--primary)] focus:outline-none">
+                </div>
+                <button onclick="payDirectBalance()" 
+                        class="w-full bg-[var(--primary)] text-white font-extrabold py-3.5 rounded-xl shadow-md hover:brightness-110 active:scale-98 transition">
+                    تأكيد التسديد
+                </button>
+            </div>
+        </section>
+
+        <!-- Tab 3: شحن بالجملة -->
+        <section id="section-gomla" class="tab-content hidden">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="font-extrabold text-slate-800 text-sm border-b pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked text-emerald-600"></i> شحن كميات بالجملة
+                </h3>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">مبلغ الجملة المطلوب</label>
+                    <input type="number" id="gomlaAmount" placeholder="المبلغ المطلوبة" 
+                           class="w-full p-3 border-2 border-slate-200 rounded-xl font-bold focus:border-emerald-600 focus:outline-none">
+                </div>
+                <button onclick="submitGomla()" 
+                        class="w-full bg-emerald-600 text-white font-extrabold py-3.5 rounded-xl shadow-md hover:bg-emerald-700 active:scale-98 transition">
+                    إرسال طلب الجملة
+                </button>
+            </div>
+        </section>
+
+        <!-- Tab 4: استعلام عن الحساب -->
+        <section id="section-query" class="tab-content hidden">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center space-y-3">
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+                <h3 class="font-extrabold text-slate-800 text-sm">الاستعلام عن حساب الرقم</h3>
+                <p class="text-xs text-slate-500 font-bold">فحص الفاتورة، الرصيد المتبقي، وحالة الخدمة للرقم</p>
+                <button onclick="executeQuery()" 
+                        class="w-full bg-slate-800 text-white font-extrabold py-3 rounded-xl hover:bg-slate-900 active:scale-98 transition text-xs">
+                    بدء الاستعلام
+                </button>
+                <div id="queryResult" class="mt-3 text-right hidden bg-slate-50 p-3 rounded-xl text-xs font-mono border border-slate-200 overflow-x-auto"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal تأكيد العمليات -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 animate-fade-in border border-slate-100">
+            <div class="flex items-center justify-between border-b pb-2">
+                <h3 class="text-sm font-black text-slate-800">تأكيد عملية التسديد</h3>
+                <button onclick="closeConfirmModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-700 leading-relaxed font-bold" id="modalDescription">
+                تفاصيل الطلب...
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <button onclick="sendFinalOrder()" id="finalSubmitBtn" class="flex-1 bg-[var(--primary)] text-white font-extrabold py-2.5 rounded-xl shadow active:scale-95 transition text-xs">
+                    تأكيد وتنفيذ
+                </button>
+                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-100 text-slate-600 font-extrabold py-2.5 rounded-xl hover:bg-slate-200 transition text-xs">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentNetwork = 'ym';
+        let currentActionExecution = null;
+        let allPackages = [];
+
+        // تعريف ألوان وثيمات الشبكات
+        const networkThemes = {
+            ym: 'theme-ym',
+            you: 'theme-you',
+            saba: 'theme-saba',
+            why: 'theme-why',
+            yem4g: 'theme-yem4g',
+            adenet: 'theme-adenet'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPackages();
+        });
+
+        // التبديل بين المزودين / الشبكات
+        function selectNetwork(net) {
+            currentNetwork = net;
+            
+            // تحديث ثيم الصفحة
+            document.getElementById('appBody').className = `${networkThemes[net] || 'theme-ym'} text-slate-800 min-h-screen pb-16 flex flex-col items-center`;
+
+            // تحديث البطاقات
+            document.querySelectorAll('.network-card').forEach(card => card.classList.remove('active'));
+            const selectedCard = document.querySelector(`[data-net="${net}"]`);
+            if (selectedCard) selectedCard.classList.add('active');
+            
+            filterPackages();
+        }
+
+        // التكشوف التلقائي عند كتابة الرقم
+        function detectNetwork(phone) {
+            document.getElementById('charCount').innerText = `${phone.length}/9`;
+            const clearBtn = document.getElementById('clearBtn');
+            
+            if (phone.length > 0) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+
+            if (phone.startsWith('77') || phone.startsWith('73')) selectNetwork('ym');
+            else if (phone.startsWith('70')) selectNetwork('you');
+            else if (phone.startsWith('71')) selectNetwork('saba');
+            else if (phone.startsWith('78')) selectNetwork('why');
+            else if (phone.startsWith('10') || phone.startsWith('01')) selectNetwork('yem4g');
+            else if (phone.startsWith('04')) selectNetwork('adenet');
+        }
+
+        // التبديل بين التبويبات
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('text-slate-700');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.classList.add('active-tab');
+            activeBtn.classList.remove('text-slate-700');
+            
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+        }
+
+        // جلب الباقات من السيرفر
+        async function loadPackages() {
+            try {
+                const res = await fetch('/api/packages');
+                const data = await res.json();
+                if (data.success && Array.isArray(data.data)) {
+                    allPackages = data.data;
+                    filterPackages();
+                }
+            } catch (err) {
+                console.error("خطأ في جلب الباقات:", err);
+            } finally {
+                document.getElementById('packagesLoader').classList.add('hidden');
+                document.getElementById('packagesGrid').classList.remove('hidden');
+            }
+        }
+
+        // تصفية الباقات بناءً على المزود المحدد
+        function filterPackages() {
+            const grid = document.getElementById('packagesGrid');
+            grid.innerHTML = '';
+            
+            const filtered = allPackages.filter(pkg => {
+                const prov = (pkg.provider || pkg.company || '').toLowerCase();
+                if (currentNetwork === 'ym') return prov.includes('yemen') || prov.includes('ym');
+                if (currentNetwork === 'you') return prov.includes('you') || prov.includes('mtn');
+                if (currentNetwork === 'saba') return prov.includes('saba');
+                if (currentNetwork === 'why') return prov.includes('why');
+                if (currentNetwork === 'yem4g') return prov.includes('4g');
+                return true;
+            });
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 text-xs font-bold bg-white rounded-2xl border">لا توجد باقات متاحة لهذه الشبكة حالياً</div>`;
+                return;
+            }
+
+            filtered.forEach(pkg => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex justify-between items-center hover:border-[var(--primary)] transition";
+                card.innerHTML = `
+                    <div class="space-y-0.5">
+                        <h4 class="font-extrabold text-slate-800 text-xs">${pkg.name || pkg.name_ar || 'باقة تفعيل'}</h4>
+                        <p class="text-[10px] text-slate-500 font-bold">${pkg.description || pkg.category || 'عرض مميز'}</p>
+                        <span class="inline-block font-mono font-black text-[var(--primary)] text-xs">${pkg.price || pkg.amount || 0} ريال</span>
+                    </div>
+                    <button onclick="preparePackagePayment('${pkg.id || pkg._id || pkg.pkg_id}', '${pkg.name || pkg.name_ar}', ${pkg.price || pkg.amount})" 
+                            class="bg-[var(--primary)] text-white hover:brightness-110 px-3.5 py-2 rounded-xl text-xs font-black shadow-sm active:scale-95 transition">
+                        تسديد
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // تجهيز العملية للباقات
+        function preparePackagePayment(pkgId, pkgName, price) {
+            const phone = document.getElementById('mobileNumber').value;
+            if (!phone) return alert('يرجى كتابة رقم الهاتف أولاً');
+
+            document.getElementById('modalDescription').innerText = `طلب تسديد: ${pkgName}\nالرقم: ${phone}\nالمبلغ: ${price} ريال`;
+            currentActionExecution = async () => {
+                const res = await fetch(`/api/provider/${getNetworkEndpoint()}?mobile=${phone}&offerid=${pkgId}&action=billoffer_direct`);
+                return await res.json();
+            };
+            openConfirmModal();
+        }
+
+        // التسديد المباشر
+        function payDirectBalance() {
+            const phone = document.getElementById('mobileNumber').value;
+            const amount = document.getElementById('directAmount').value;
+            if (!phone || !amount) return alert('يرجى إدخال الرقم والمبلغ بشكل صحيح');
+
+            document.getElementById('modalDescription').innerText = `تسديد رصيد مباشر للرقم: ${phone}\nالمبلغ: ${amount} ريال`;
+            currentActionExecution = async () => {
+                const res = await fetch(`/api/provider/${getNetworkEndpoint()}?mobile=${phone}&amount=${amount}&action=bill`);
+                return await res.json();
+            };
+            openConfirmModal();
+        }
+
+        // إرسال طلب الجملة
+        function submitGomla() {
+            const phone = document.getElementById('mobileNumber').value;
+            const amount = document.getElementById('gomlaAmount').value;
+            if (!phone || !amount) return alert('يرجى إدخال الرقم ومبلغ الجملة');
+
+            document.getElementById('modalDescription').innerText = `شحن جملة للرقم: ${phone}\nالمبلغ: ${amount} ريال`;
+            currentActionExecution = async () => {
+                const res = await fetch(`/api/provider/${currentNetwork}/gomla?mobile=${phone}&amount=${amount}`);
+                return await res.json();
+            };
+            openConfirmModal();
+        }
+
+        // التنفيذ النهائي بعد التأكيد
+        async function sendFinalOrder() {
+            const phone = document.getElementById('mobileNumber').value;
+            if (!phone) return alert('الرجاء إدخال رقم الهاتف أولاً');
+
+            const submitBtn = document.getElementById('finalSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> جاري التنفيذ...';
+
+            try {
+                if (typeof currentActionExecution === 'function') {
+                    const result = await currentActionExecution();
+                    if (result.success || result.status === 'success') {
+                        alert("تم تنفيذ العملية بنجاح!");
+                        fetchAgentBalance();
+                    } else {
+                        alert("فشلت العملية: " + (result.message || result.error || "حدث خطأ أثناء المعالجة"));
+                    }
+                }
+            } catch (err) {
+                alert("حدث خطأ أثناء التواصل مع السيرفر");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'تأكيد وتنفيذ';
+                closeConfirmModal();
+            }
+        }
+
+        // الاستعلام عن الحساب
+        async function executeQuery() {
+            const phone = document.getElementById('mobileNumber').value;
+            if (!phone) return alert('يرجى إدخال رقم الهاتف للاستعلام');
+
+            const resultDiv = document.getElementById('queryResult');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerText = 'جاري الاستعلام عن بيانات الرقم...';
+
+            try {
+                const res = await fetch(`/api/provider/${getNetworkEndpoint()}?mobile=${phone}&action=query`);
+                const data = await res.json();
+                resultDiv.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                resultDiv.innerText = 'فشل الحصول على بيانات الاستعلام';
+            }
+        }
+
+        // جلب رصيد الوكيل
+        async function fetchAgentBalance() {
+            const btnText = document.getElementById('agentBalanceText');
+            btnText.innerText = "...";
+            try {
+                const res = await fetch('/api/provider/agent/balance');
+                const data = await res.json();
+                if (data.success) {
+                    btnText.innerText = `${data.data?.balance || data.data} ريال`;
+                } else {
+                    btnText.innerText = "خطأ بالحساب";
+                }
+            } catch (err) {
+                btnText.innerText = "خطأ بالاتصال";
+            }
+        }
+
+        function getNetworkEndpoint() {
+            if (currentNetwork === 'you') return 'you/bill';
+            if (currentNetwork === 'saba') return 'sabaphone';
+            if (currentNetwork === 'why') return 'why';
+            if (currentNetwork === 'yem4g') return 'yem4g';
+            if (currentNetwork === 'adenet') return 'adenet';
+            return 'yemen-mobile';
+        }
+
+        function clearInput() {
+            const input = document.getElementById('mobileNumber');
+            input.value = '';
+            detectNetwork('');
+        }
+
+        async function pickContactFromPhone() {
+            if ('contacts' in navigator && 'ContactsManager' in window) {
+                try {
+                    const contacts = await navigator.contacts.select(['tel'], { multiple: false });
+                    if (contacts && contacts[0]?.tel?.length > 0) {
+                        let num = contacts[0].tel[0].replace(/\D/g, '');
+                        if (num.startsWith('967')) num = num.substring(3);
+                        if (num.startsWith('0')) num = num.substring(1);
+                        document.getElementById('mobileNumber').value = num.substring(0, 9);
+                        detectNetwork(num);
+                    }
+                } catch (e) {}
+            } else {
+                const manual = prompt('ادخل رقم الهاتف:');
+                if (manual) {
+                    document.getElementById('mobileNumber').value = manual;
+                    detectNetwork(manual);
+                }
+            }
+        }
+
+        function openConfirmModal() { document.getElementById('confirmModal').classList.remove('hidden'); }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
+    </script>
+</body>
+</html>
