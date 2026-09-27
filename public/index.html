@@ -3,105 +3,365 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إدارة زبناء الصناديق - ZOE</title>
+  <title>إدارة الزبائن والمواقع - مكتب معجم لتسويق الدواجن</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS الخريطة -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <style>
+    .digital-glow {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+      background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+    }
+    #map { height: 280px; width: 100%; border-radius: 1rem; }
+  </style>
 </head>
-<body class="bg-gray-100 p-4 min-h-screen text-gray-800">
+<body class="bg-slate-900 font-sans min-h-screen text-slate-100 p-3 sm:p-6 flex items-center justify-center">
 
-  <div class="max-w-4xl mx-auto space-y-6">
-    <h1 class="text-2xl font-bold text-center text-indigo-700">نظام إدارة الزبناء والصناديق (ZOE)</h1>
+  <div class="w-full max-w-md bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-700 shadow-2xl space-y-5">
 
-    <!-- نموذج إضافة زبون جديد -->
-    <div class="bg-white p-6 rounded-xl shadow-md">
-      <h2 class="text-lg font-semibold mb-4 text-gray-700">إضافة زبون جديد</h2>
-      <form id="addCustomerForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm mb-1">اسم الزبون</label>
-          <input type="text" id="name" required class="w-full border p-2 rounded-lg border-gray-300">
-        </div>
-        <div>
-          <label class="block text-sm mb-1">رقم الهاتف</label>
-          <input type="text" id="phone" required class="w-full border p-2 rounded-lg border-gray-300">
-        </div>
-        <div>
-          <label class="block text-sm mb-1">رابط الموقع (Google Maps)</label>
-          <input type="url" id="google_maps_url" class="w-full border p-2 rounded-lg border-gray-300">
-        </div>
-        <div>
-          <label class="block text-sm mb-1">الصناديق المسلمة (فارغة لدى الزبون)</label>
-          <input type="number" id="total_delivered" value="0" min="0" class="w-full border p-2 rounded-lg border-gray-300">
-        </div>
-        <div>
-          <label class="block text-sm mb-1">الصناديق المحصلة منه</label>
-          <input type="number" id="total_returned" value="0" min="0" class="w-full border p-2 rounded-lg border-gray-300">
-        </div>
-        <div class="md:col-span-2">
-          <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">حفظ البيانات</button>
-        </div>
-      </form>
+    <!-- الهيدر والوصول السريع -->
+    <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-boxes-packing text-emerald-400"></i> معجم لتسويق الدواجن
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">تسجيل حركة الصناديق الفارغة والمواقع</p>
+      </div>
+
+      <!-- زر قائمة أسماء الزبائن -->
+      <button onclick="toggleCustomersMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow flex items-center gap-2">
+        <i class="fa-solid fa-users"></i> أسماء الزبائن
+      </button>
     </div>
 
-    <!-- قائمة عرض واستدعاء الزبناء -->
-    <div class="bg-white p-6 rounded-xl shadow-md">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-700">قائمة الزبناء</h2>
-        <button onclick="fetchCustomers()" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm hover:bg-gray-300">تحديث البيانات</button>
+    <!-- قائمة منسدلة سريعة لأسماء الزبائن -->
+    <div id="customersListMenu" class="hidden bg-slate-800 border border-slate-700 rounded-2xl p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-700">
+        <span class="text-xs font-bold text-slate-300">قائمة الزبائن المسجلين</span>
+        <button onclick="toggleCustomersMenu()" class="text-slate-400 hover:text-slate-200 text-sm">&times;</button>
       </div>
-      <div id="customersList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- سيتم استدعاء وعرض البطاقات هنا تلقائياً -->
+      <ul id="namesOnlyList" class="max-h-48 overflow-y-auto space-y-1.5 text-sm text-slate-200 divide-y divide-slate-700/50">
+        <li class="py-1 text-slate-400 text-xs text-center">جاري تحميل الأسماء...</li>
+      </ul>
+    </div>
+
+    <!-- النموذج -->
+    <form id="customerCratesForm" class="space-y-4">
+
+      <!-- الحقل 1: اسم الزبون -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">اسم الزبون</label>
+        <div class="relative flex gap-2">
+          <input type="text" id="customer_name" required placeholder="أدخل اسم الزبون..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <button type="button" onclick="selectFromContacts()" title="اختر من جهات الاتصال" class="bg-slate-700 hover:bg-slate-600 text-emerald-400 px-3.5 rounded-xl text-base transition flex items-center justify-center border border-slate-600 shrink-0">
+            <i class="fa-solid fa-address-book"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- الحقل 2: رقم الهاتف -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">رقم هاتف الزبون</label>
+        <div class="relative">
+          <input type="tel" id="customer_phone" required placeholder="مثال: 770000000" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none dir-ltr text-right">
+          <i class="fa-solid fa-phone absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+        </div>
+      </div>
+
+      <!-- الحقل 3: تحديد موقع المحل -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">موقع محل الزبون</label>
+        <button type="button" onclick="openMapModal()" class="w-full bg-slate-700 hover:bg-slate-650 text-indigo-300 hover:text-white border border-slate-600 p-3 rounded-xl text-xs font-semibold transition flex items-center justify-between">
+          <span id="mapButtonLabel" class="flex items-center gap-2 truncate">
+            <i class="fa-solid fa-map-location-dot text-indigo-400 text-sm"></i> اضغط لتحديد موقع محل الزبون يدويًا
+          </span>
+          <i class="fa-solid fa-chevron-left text-xs opacity-60"></i>
+        </button>
+        <input type="hidden" id="google_maps_url">
+      </div>
+
+      <!-- الحقل 4: تسليم صناديق فارغة جديدة -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">تسليم صناديق فارغة اليوم (+)</label>
+        <div class="relative">
+          <input type="number" id="delivered_crates" value="0" min="0" oninput="calculateTotalGlow()" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <i class="fa-solid fa-box-archive absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+        </div>
+      </div>
+
+      <!-- الحقل 5: إرجاع صناديق فارغة -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">إرجاع صناديق فارغة من الزبون (-)</label>
+        <div class="relative">
+          <input type="number" id="returned_crates" value="0" min="0" oninput="calculateTotalGlow()" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <i class="fa-solid fa-rotate-left absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+        </div>
+      </div>
+
+      <!-- المربع الضوئي الرقمي لإجمالي المتبقي -->
+      <div class="pt-1">
+        <label class="block text-xs font-semibold text-slate-400 mb-2 text-center">إجمالي الصناديق المتبقية ذمة على الزبون</label>
+        <div class="digital-glow rounded-2xl p-4 border border-emerald-500/40 text-center space-y-1">
+          <div id="remaining_display" class="text-4xl font-black text-emerald-400 tracking-wider font-mono drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]">
+            0
+          </div>
+          <span class="text-[10px] text-emerald-300 uppercase tracking-widest font-semibold">صندوق فارغ</span>
+        </div>
+      </div>
+
+      <!-- زر الحفظ والطباعة -->
+      <button type="submit" id="submitBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition text-sm shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-cloud-arrow-up"></i> حفظ البيانات وطباعة الإيصال
+      </button>
+
+    </form>
+  </div>
+
+  <!-- نافذة الخريطة -->
+  <div id="mapModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 rounded-3xl max-w-lg w-full p-5 border border-slate-700 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="font-bold text-white text-sm flex items-center gap-2">
+          <i class="fa-solid fa-location-crosshairs text-emerald-400"></i> حدد موقع محل الزبون
+        </h3>
+        <button onclick="closeMapModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <div id="map"></div>
+      
+      <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
+        <i class="fa-solid fa-circle-info text-indigo-400"></i> انقر على الخريطة لتحديد موقع المحل.
+      </p>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="confirmMapLocation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm shadow transition">
+          <i class="fa-solid fa-check ml-1"></i> اعتماد هذا الموقع
+        </button>
+        <button onclick="closeMapModal()" class="bg-slate-700 text-slate-300 hover:bg-slate-600 px-4 py-2.5 rounded-xl text-sm">إلغاء</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // 1. استدعاء البيانات عند تحميل الصفحة
-    async function fetchCustomers() {
-      const list = document.getElementById('customersList');
-      list.innerHTML = '<p class="text-gray-500">جاري تحميل البيانات...</p>';
-      
-      try {
-        const res = await fetch('/api/zoe');
-        const data = await res.json();
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        if (data.success && data.data.length > 0) {
-          list.innerHTML = data.data.map(item => `
-            <div class="border rounded-lg p-4 bg-gray-50 space-y-2 shadow-sm">
-              <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-bold text-indigo-900">${item.name}</span>
-                <span class="text-sm bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">${item.phone}</span>
-              </div>
-              <div class="text-sm text-gray-600">
-                <p>صناديق لديه: <strong>${item.crates_balance?.total_delivered || 0}</strong></p>
-                <p>صناديق محصلة: <strong>${item.crates_balance?.total_returned || 0}</strong></p>
-                <p class="text-red-600 font-bold">باقي لديه (المتبقي): ${item.crates_balance?.remaining_debt || 0}</p>
-              </div>
-              ${item.location?.google_maps_url ? `
-                <a href="${item.location.google_maps_url}" target="_blank" class="inline-block text-xs text-blue-600 hover:underline">عرض الموقع على الخريطة 📍</a>
-              ` : ''}
-            </div>
-          `).join('');
-        } else {
-          list.innerHTML = '<p class="text-gray-500">لا يوجد زبناء مسجلين حالياً.</p>';
-        }
-      } catch (err) {
-        list.innerHTML = '<p class="text-red-500">حدث خطأ أثناء جلب البيانات.</p>';
+  <script>
+    // استخدام المسار النسبي ليعمل تلقائياً على Render وعلى localhost
+    const API_URL = '/api/zoe';
+    
+    let map = null;
+    let marker = null;
+    let selectedLat = 13.9800;
+    let selectedLng = 45.5700;
+    let previousDebt = 0;
+
+    // 1. إظهار/إخفاء قائمة الأسماء
+    async function toggleCustomersMenu() {
+      const menu = document.getElementById('customersListMenu');
+      menu.classList.toggle('hidden');
+
+      if (!menu.classList.contains('hidden')) {
+        fetchNamesOnly();
       }
     }
 
-    // 2. إرسال وإضافة البيانات
-    document.getElementById('addCustomerForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // 2. جلب قائمة أسماء الزبائن
+    async function fetchNamesOnly() {
+      const listContainer = document.getElementById('namesOnlyList');
+      try {
+        const res = await fetch(API_URL);
+        const result = await res.json();
+
+        if (result.success && result.data.length > 0) {
+          listContainer.innerHTML = result.data.map(c => `
+            <li class="py-2 px-1 flex justify-between items-center hover:text-emerald-400 cursor-pointer rounded-lg hover:bg-slate-750 transition" 
+                onclick="selectCustomer('${c.name}', '${c.phone}', '${c.location?.google_maps_url || ''}', ${c.crates_balance?.remaining_debt || 0})">
+              <span><i class="fa-solid fa-user text-xs text-indigo-400 ml-2"></i>${c.name}</span>
+              <span class="text-[11px] text-emerald-400 font-mono font-bold">${c.crates_balance?.remaining_debt || 0} صندوق</span>
+            </li>
+          `).join('');
+        } else {
+          listContainer.innerHTML = '<li class="py-2 text-slate-400 text-xs text-center">لا يوجد زبائن مسجلين.</li>';
+        }
+      } catch (err) {
+        listContainer.innerHTML = '<li class="py-2 text-rose-400 text-xs text-center">خطأ في الاتصال بالسيرفر!</li>';
+      }
+    }
+
+    // 3. اختيار زبون من القائمة المنسدلة
+    function selectCustomer(name, phone, mapUrl, currentDebt) {
+      document.getElementById('customer_name').value = name;
+      document.getElementById('customer_phone').value = phone;
+      document.getElementById('google_maps_url').value = mapUrl;
       
+      if (mapUrl) {
+        document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400 text-sm"></i> تم تحديد الموقع سابقاً`;
+      } else {
+        document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-map-location-dot text-indigo-400 text-sm"></i> اضغط لتحديد موقع محل الزبون يدويًا`;
+      }
+
+      previousDebt = Number(currentDebt) || 0;
+      calculateTotalGlow();
+
+      document.getElementById('customersListMenu').classList.add('hidden');
+    }
+
+    // 4. استيراد جهات الاتصال
+    async function selectFromContacts() {
+      if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+          const props = ['name', 'tel'];
+          const contacts = await navigator.contacts.select(props, { multiple: false });
+          
+          if (contacts.length > 0) {
+            const contact = contacts[0];
+            if (contact.name && contact.name[0]) {
+              document.getElementById('customer_name').value = contact.name[0];
+            }
+            if (contact.tel && contact.tel[0]) {
+              document.getElementById('customer_phone').value = contact.tel[0].replace(/\s+/g, '');
+            }
+          }
+        } catch (ex) {
+          alert('تعذر الوصول لجهات الاتصال.');
+        }
+      } else {
+        alert('ميزة استيراد جهات الاتصال غير مدعومة في متصفحك.');
+      }
+    }
+
+    // 5. إدارة الخريطة
+    function openMapModal() {
+      const modal = document.getElementById('mapModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      if (!map) {
+        map = L.map('map').setView([selectedLat, selectedLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        marker = L.marker([selectedLat, selectedLng], { draggable: true }).addTo(map);
+
+        map.on('click', function (e) {
+          selectedLat = e.latlng.lat;
+          selectedLng = e.latlng.lng;
+          marker.setLatLng(e.latlng);
+        });
+
+        marker.on('dragend', function () {
+          const position = marker.getLatLng();
+          selectedLat = position.lat;
+          selectedLng = position.lng;
+        });
+      } else {
+        setTimeout(() => { map.invalidateSize(); }, 200);
+      }
+    }
+
+    function closeMapModal() {
+      const modal = document.getElementById('mapModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmMapLocation() {
+      const generatedUrl = `https://www.google.com/maps?q=${selectedLat},${selectedLng}`;
+      document.getElementById('google_maps_url').value = generatedUrl;
+      document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400 text-sm"></i> تم تحديد الموقع بنجاح`;
+      closeMapModal();
+    }
+
+    // 6. حساب المجموع الكلي
+    function calculateTotalGlow() {
+      const newDelivered = Number(document.getElementById('delivered_crates').value) || 0;
+      const newReturned = Number(document.getElementById('returned_crates').value) || 0;
+      const totalRemaining = previousDebt + newDelivered - newReturned;
+      document.getElementById('remaining_display').innerText = totalRemaining;
+    }
+
+    // 7. طباعة الإيصال الحراري (80mm)
+    function printCrateReceipt(data) {
+      const printWindow = window.open('', '_blank', 'width=400,height=600');
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="ar" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <title>إيصال حركة صناديق - ${data.customerName}</title>
+          <style>
+            @media print { @page { size: 80mm auto; margin: 0; } body { padding: 8px; } }
+            body { font-family: sans-serif; width: 78mm; margin: 0 auto; padding: 8px; font-size: 12px; }
+            .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 6px; margin-bottom: 8px; }
+            .header h2 { margin: 0; font-size: 15px; }
+            .info-table, .crates-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            .crates-table th, .crates-table td { border: 1px solid #000; padding: 5px; text-align: center; }
+            .total-box { border: 2px solid #000; padding: 6px; text-align: center; font-weight: bold; font-size: 13px; margin-top: 8px; }
+            .footer { text-align: center; margin-top: 10px; font-size: 10px; border-top: 1px dashed #000; padding-top: 5px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>مكتب معجم لتسويق الدواجن</h2>
+            <p style="margin:3px 0;">إيصال حركة صناديق فارغة</p>
+            <p style="margin:0; font-size:10px;">التاريخ: ${new Date().toLocaleString('ar-YE')}</p>
+          </div>
+          <table class="info-table">
+            <tr><td><strong>اسم الزبون:</strong> ${data.customerName}</td></tr>
+            <tr><td><strong>رقم الهاتف:</strong> ${data.phone}</td></tr>
+          </table>
+          <table class="crates-table">
+            <thead>
+              <tr><th>البيان</th><th>العدد</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>صناديق سابقة</td><td>${data.previousBalance}</td></tr>
+              <tr><td>مسلمة اليوم (+)</td><td>${data.delivered}</td></tr>
+              <tr><td>مرجعة اليوم (-)</td><td>${data.returned}</td></tr>
+            </tbody>
+          </table>
+          <div class="total-box">
+            إجمالي المتبقي ذمة: ${data.totalRemaining} صندوق
+          </div>
+          <div class="footer">شكراً لتعاملكم معنا</div>
+          <script>
+            window.onload = function() { window.print(); setTimeout(() => { window.close(); }, 500); };
+          <\/script>
+        </body>
+        </html>
+      `;
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
+
+    // 8. إرسال البيانات للسيرفر وطباعة الإيصال
+    document.getElementById('customerCratesForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ والطباعة...`;
+
+      const customerName = document.getElementById('customer_name').value;
+      const customerPhone = document.getElementById('customer_phone').value;
+      const deliveredVal = Number(document.getElementById('delivered_crates').value) || 0;
+      const returnedVal = Number(document.getElementById('returned_crates').value) || 0;
+
       const payload = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
+        name: customerName,
+        phone: customerPhone,
         google_maps_url: document.getElementById('google_maps_url').value,
-        total_delivered: document.getElementById('total_delivered').value,
-        total_returned: document.getElementById('total_returned').value,
+        total_delivered: deliveredVal,
+        total_returned: returnedVal
       };
 
       try {
-        const res = await fetch('/api/zoe', {
+        const res = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -109,19 +369,34 @@
         const result = await res.json();
 
         if (result.success) {
-          alert('تم إضافة الزبون بنجاح!');
-          document.getElementById('addCustomerForm').reset();
-          fetchCustomers(); // إعادة استدعاء التحديث لتظهر الإضافة مباشرة
+          alert('تم حفظ البيانات بنجاح!');
+
+          // طباعة الإيصال الحراري فوراً
+          printCrateReceipt({
+            customerName: customerName,
+            phone: customerPhone,
+            previousBalance: result.meta?.previousBalance || previousDebt,
+            delivered: deliveredVal,
+            returned: returnedVal,
+            totalRemaining: result.data.crates_balance.remaining_debt
+          });
+
+          // إعادة ضبط النموذج
+          document.getElementById('customerCratesForm').reset();
+          document.getElementById('google_maps_url').value = '';
+          document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-map-location-dot text-indigo-400 text-sm"></i> اضغط لتحديد موقع محل الزبون يدويًا`;
+          previousDebt = 0;
+          calculateTotalGlow();
         } else {
-          alert('خطأ: ' + result.message);
+          alert('خطأ من السيرفر: ' + result.message);
         }
       } catch (err) {
-        alert('حدث خطأ أثناء الإضافة!');
+        alert('حدث خطأ أثناء الاتصال بالسيرفر!');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> حفظ البيانات وطباعة الإيصال`;
       }
     });
-
-    // استدعاء البيانات تلقائياً أول مرة
-    fetchCustomers();
   </script>
 </body>
 </html>
