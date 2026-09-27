@@ -10,42 +10,37 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* خلفية بيضاء مموجة */
-    .wavy-bg {
-      background-color: #f8fafc;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(224, 231, 255, 0.6) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(254, 243, 199, 0.6) 0px, transparent 50%),
-        radial-gradient(at 50% 100%, rgba(241, 245, 249, 0.8) 0px, transparent 50%);
+    /* خلفية فاتحة ومريحة للعين */
+    body {
+      background-color: #f1f5f9;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="wavy-bg font-sans min-h-screen text-slate-800 flex flex-col justify-between pb-24 select-none">
+<body class="font-sans min-h-screen text-slate-900 flex flex-col justify-between pb-24 select-none">
 
-  <!-- ==================== 1. الهيدر العلوي (رصاصي) ==================== -->
-  <header class="sticky top-0 z-40 bg-slate-800 text-white border-b border-slate-700 px-4 py-3 shadow-md">
+  <!-- ==================== 1. الهيدر العلوي (كحلي واضح وبخطوط كبيرة) ==================== -->
+  <header class="sticky top-0 z-40 bg-slate-900 text-white border-b-2 border-amber-400 px-4 py-3.5 shadow-lg">
     <div class="max-w-md mx-auto flex items-center justify-between">
       
       <!-- شعار وعنوان المكتب -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-slate-200 flex items-center justify-center font-bold text-lg shadow-inner">
-          <!-- أيقونة بلون أسود -->
-          <i class="fa-solid fa-boxes-packing text-black"></i>
+        <div class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-md border-2 border-white">
+          <i class="fa-solid fa-boxes-packing"></i>
         </div>
         <div>
-          <h1 class="text-base font-bold text-white tracking-wide flex items-center gap-1.5">
+          <h1 class="text-lg font-black text-white tracking-wide leading-tight">
             معجم لتسويق الدواجن
           </h1>
-          <p class="text-[11px] text-slate-300 font-medium">نظام محصل الشبوك الفارغة</p>
+          <p class="text-xs text-amber-300 font-bold">نظام محصل الشبوك الفارغة</p>
         </div>
       </div>
 
       <!-- مؤشر الاتصال بالسيرفر -->
       <div class="flex items-center gap-2">
-        <span id="serverStatus" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-900 text-emerald-400 border border-slate-700">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="serverStatus" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-slate-800 text-emerald-400 border border-emerald-500/50 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           مربوط
         </span>
       </div>
@@ -56,55 +51,51 @@
   <!-- ==================== 2. محتوى الصفحة الرئيسية ==================== -->
   <main class="max-w-md mx-auto w-full px-4 py-4 space-y-4 flex-1">
 
-    <!-- شريط البحث السريع -->
+    <!-- شريط البحث السريع بأسلوب واضح وبحجم خط كبير -->
     <div class="relative">
       <input type="text" id="searchInput" oninput="filterCustomers()" placeholder="ابحث باسم الزبون أو رقم الهاتف..." 
-             class="w-full bg-white/80 backdrop-blur border border-slate-300 pl-4 pr-10 py-3 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-600 shadow-sm font-medium">
-      <!-- أيقونة سودة -->
-      <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3.5 text-black text-sm"></i>
+             class="w-full bg-white border-2 border-slate-300 pl-4 pr-11 py-3.5 rounded-2xl text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 shadow-md">
+      <i class="fa-solid fa-magnifying-glass absolute right-4 top-4 text-slate-500 text-base"></i>
     </div>
 
-    <!-- قائمة الزبائن (بطاقات بألوان متناسقة وعصرية) -->
+    <!-- قائمة الزبائن (بطاقات بيضاء ناصعة بخطوط بارزة) -->
     <div id="customersContainer" class="space-y-4">
-      <div class="text-center py-10 text-slate-700 font-bold">
-        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-black"></i>
-        <p class="text-xs">جاري الاتصال بقاعدة البيانات...</p>
+      <div class="text-center py-12 text-slate-600 font-extrabold">
+        <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-600"></i>
+        <p class="text-sm">جاري الاتصال بقاعدة البيانات...</p>
       </div>
     </div>
 
   </main>
 
-  <!-- ==================== 3. الشريط السفلي (رصاصي) ==================== -->
-  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-800 text-white border-t border-slate-700 py-2.5 px-6 shadow-2xl">
+  <!-- ==================== 3. الشريط السفلي (كحلي مع أصفر) ==================== -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 text-white border-t-2 border-amber-400 py-2.5 px-6 shadow-2xl">
     <div class="max-w-md mx-auto flex justify-between items-center">
 
       <!-- 1. الرئيسية -->
       <button onclick="switchTab('home')" id="tab-home" class="flex flex-col items-center gap-1 transition group">
-        <div class="w-10 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-black group-hover:scale-110 transition shadow">
-          <!-- أيقونة سودة -->
-          <i class="fa-solid fa-house text-sm text-black"></i>
+        <div class="w-12 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black group-hover:scale-105 transition shadow">
+          <i class="fa-solid fa-house text-base"></i>
         </div>
-        <span class="text-[11px] text-white font-bold">الرئيسية</span>
+        <span class="text-xs text-amber-400 font-black">الرئيسية</span>
       </button>
 
       <!-- 2. الرسائل -->
       <button onclick="switchTab('messages')" id="tab-messages" class="flex flex-col items-center gap-1 transition group">
-        <div class="relative w-10 h-8 rounded-xl bg-slate-700 border border-slate-600 flex items-center justify-center group-hover:scale-110 transition">
-          <!-- أيقونة سودة -->
-          <i class="fa-solid fa-comments text-sm text-black"></i>
-          <span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 text-slate-900 text-[9px] font-bold rounded-full flex items-center justify-center">3</span>
+        <div class="relative w-12 h-9 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition">
+          <i class="fa-solid fa-comments text-base"></i>
+          <span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 text-slate-950 text-[10px] font-black rounded-full flex items-center justify-center border border-slate-900">3</span>
         </div>
-        <span class="text-[11px] text-slate-300 font-medium">الرسائل</span>
+        <span class="text-xs text-slate-300 font-bold">الرسائل</span>
       </button>
 
       <!-- 3. التنبيهات -->
       <button onclick="switchTab('notifications')" id="tab-notifications" class="flex flex-col items-center gap-1 transition group">
-        <div class="relative w-10 h-8 rounded-xl bg-slate-700 border border-slate-600 flex items-center justify-center group-hover:scale-110 transition">
-          <!-- أيقونة سودة -->
-          <i class="fa-solid fa-bell text-sm text-black"></i>
-          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border border-slate-800 animate-pulse"></span>
+        <div class="relative w-12 h-9 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition">
+          <i class="fa-solid fa-bell text-base"></i>
+          <span class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border border-slate-900 animate-pulse"></span>
         </div>
-        <span class="text-[11px] text-slate-300 font-medium">التنبيهات</span>
+        <span class="text-xs text-slate-300 font-bold">التنبيهات</span>
       </button>
 
     </div>
@@ -115,7 +106,7 @@
     const API_URL = '/api/zoe';
     let allCustomers = [];
 
-    // 1. جلب البيانات من السيرفر وقاعدة البيانات
+    // 1. جلب البيانات من السيرفر
     async function fetchCustomersFromDB() {
       const container = document.getElementById('customersContainer');
       try {
@@ -127,31 +118,31 @@
           renderCustomers(allCustomers);
         } else {
           container.innerHTML = `
-            <div class="text-center py-10 text-rose-700 font-bold">
-              <i class="fa-solid fa-triangle-exclamation text-2xl mb-2 text-black"></i>
-              <p class="text-xs">خطأ في استجابة السيرفر: ${result.message}</p>
+            <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-6 text-center text-rose-700 font-bold">
+              <i class="fa-solid fa-triangle-exclamation text-3xl mb-2 text-rose-600"></i>
+              <p class="text-sm">خطأ في استجابة السيرفر: ${result.message}</p>
             </div>
           `;
         }
       } catch (err) {
         container.innerHTML = `
-          <div class="text-center py-10 text-slate-800 font-bold">
-            <i class="fa-solid fa-wifi text-2xl mb-2 text-black"></i>
-            <p class="text-xs">فشل الاتصال بالسيرفر. تأكد من تشغيل الخادم.</p>
+          <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 text-center text-amber-800 font-bold">
+            <i class="fa-solid fa-wifi text-3xl mb-2 text-amber-600"></i>
+            <p class="text-sm">فشل الاتصال بالسيرفر. تأكد من تشغيل الخادم.</p>
           </div>
         `;
       }
     }
 
-    // 2. عرض كروت الزبائن بألوان جديدة ومريحة
+    // 2. عرض كروت الزبائن بألوان فاتحة وواضحة جداً
     function renderCustomers(list) {
       const container = document.getElementById('customersContainer');
       
       if (!list || list.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-10 text-slate-700 font-bold">
-            <i class="fa-solid fa-box-open text-3xl mb-2 text-black"></i>
-            <p class="text-xs">لا يوجد زبائن مسجلين في قاعدة البيانات</p>
+          <div class="bg-white border-2 border-slate-200 rounded-2xl p-8 text-center text-slate-600 font-bold">
+            <i class="fa-solid fa-box-open text-4xl mb-3 text-slate-400"></i>
+            <p class="text-sm">لا يوجد زبائن مسجلين في قاعدة البيانات</p>
           </div>
         `;
         return;
@@ -164,62 +155,69 @@
         const mapsUrl = c.location?.google_maps_url || `https://maps.google.com/?q=13.9800,45.5700`;
 
         return `
-          <!-- بطاقات بألوان تناسب الخلفية (رمادي فاتح رمادي ناعم مع حدود محددة) -->
-          <div class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-xl space-y-4 relative overflow-hidden text-white">
+          <!-- بطاقة بيضاء ناصعة بحواف وظلال واضحة -->
+          <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-md space-y-4 relative">
             
-            <!-- الهيدر الداخلي للبطاقة -->
-            <div class="flex items-start justify-between pb-3 border-b border-slate-800">
+            <!-- الهيدر الداخلي للبطاقة (اسم كبير ورقم أزرق) -->
+            <div class="flex items-center justify-between pb-3 border-b-2 border-slate-100">
               <div class="space-y-1">
-                <h2 class="text-base font-bold text-amber-400 flex items-center gap-2">
-                  <!-- أيقونة سودة بخلفية دائرية فاتحة -->
-                  <span class="w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center">
-                    <i class="fa-solid fa-store text-black text-xs"></i>
+                <h2 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-store text-sm"></i>
                   </span>
                   ${c.name}
                 </h2>
-                <div class="flex items-center gap-3 text-xs text-slate-300 font-mono">
-                  <span><i class="fa-solid fa-phone text-[10px] text-amber-400 ml-1"></i>${c.phone}</span>
+                <div class="flex items-center gap-2 text-sm text-slate-600 font-extrabold font-mono pr-1">
+                  <i class="fa-solid fa-phone text-blue-600"></i>
+                  <span>${c.phone}</span>
                 </div>
               </div>
 
-              <!-- أزرار اتصال سريع وخريطة (خلفية فاتحة بأيقونة سودة) -->
-              <div class="flex items-center gap-1.5">
-                <a href="tel:${c.phone}" class="w-8 h-8 rounded-xl bg-slate-200 hover:bg-white text-black flex items-center justify-center text-xs transition shadow">
-                  <i class="fa-solid fa-phone text-black"></i>
+              <!-- أزرار اتصال سريع وخريطة (أزرق زاهي) -->
+              <div class="flex items-center gap-2">
+                <a href="tel:${c.phone}" class="w-10 h-10 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-base transition shadow-sm font-bold">
+                  <i class="fa-solid fa-phone"></i>
                 </a>
-                <a href="${mapsUrl}" target="_blank" class="w-8 h-8 rounded-xl bg-slate-200 hover:bg-white text-black flex items-center justify-center text-xs transition shadow" title="فتح الموقع في الخريطة">
-                  <i class="fa-solid fa-location-dot text-black"></i>
+                <a href="${mapsUrl}" target="_blank" class="w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-900 text-amber-400 flex items-center justify-center text-base transition shadow-sm font-bold" title="فتح الموقع في الخريطة">
+                  <i class="fa-solid fa-location-dot"></i>
                 </a>
               </div>
             </div>
 
-            <!-- تفاصيل الشبوك بألوان تباين ممتازة -->
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="bg-slate-800/80 p-2.5 rounded-2xl border border-slate-700">
-                <span class="block text-[10px] text-slate-400 mb-0.5">شبوك سابقة</span>
-                <span class="text-sm font-bold text-white font-mono">${previousCrates}</span>
+            <!-- تفاصيل الشبوك (خطوط وأرقام ضخمة وواضحة جداً) -->
+            <div class="grid grid-cols-3 gap-2.5 text-center">
+              
+              <!-- شبوك سابقة -->
+              <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                <span class="block text-xs font-extrabold text-slate-500 mb-1">شبوك سابقة</span>
+                <span class="text-base font-black text-slate-800 font-mono">${previousCrates}</span>
               </div>
-              <div class="bg-slate-800/80 p-2.5 rounded-2xl border border-slate-700">
-                <span class="block text-[10px] text-amber-400 mb-0.5 font-semibold">معه اليوم</span>
-                <span class="text-sm font-bold text-amber-400 font-mono">+${todayCrates}</span>
+
+              <!-- معه اليوم -->
+              <div class="bg-amber-50 p-3 rounded-2xl border border-amber-200">
+                <span class="block text-xs font-black text-amber-700 mb-1">معه اليوم</span>
+                <span class="text-base font-black text-amber-600 font-mono">+${todayCrates}</span>
               </div>
-              <div class="bg-amber-400 text-slate-950 p-2.5 rounded-2xl font-bold shadow">
-                <span class="block text-[10px] text-slate-900 mb-0.5 font-black">إجمالي الشبوك</span>
-                <span class="text-base font-black font-mono tracking-wider">${totalRemaining}</span>
+
+              <!-- الإجمالي (برتقالي/أحمر للتنبيه) -->
+              <div class="bg-rose-500 text-white p-3 rounded-2xl shadow-sm border border-rose-600">
+                <span class="block text-xs font-black text-rose-100 mb-1">إجمالي الشبوك</span>
+                <span class="text-xl font-black font-mono tracking-wider">${totalRemaining}</span>
               </div>
+
             </div>
 
-            <!-- حقل استلام شباك وزر -->
+            <!-- حقل استلام وزر أخضر زاهي لإنهاء العملية بسرعة -->
             <form onsubmit="handleReceiveCrates(event, '${c.name}', '${c.phone}', '${mapsUrl}')" class="pt-1 flex gap-2">
               <div class="relative flex-1">
                 <input type="number" id="input_crates_${c.phone}" min="1" max="${totalRemaining}" placeholder="عدد الشبوك..." required
-                       class="w-full bg-slate-800 border border-slate-700 p-2.5 pr-8 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 font-mono placeholder-slate-500">
-                <i class="fa-solid fa-box-archive absolute right-3 top-3 text-black text-xs"></i>
+                       class="w-full bg-slate-50 border-2 border-slate-200 p-3 pr-9 rounded-2xl text-sm font-black text-slate-900 focus:outline-none focus:border-blue-600 font-mono placeholder-slate-400">
+                <i class="fa-solid fa-box-archive absolute right-3.5 top-4 text-slate-400 text-sm"></i>
               </div>
 
-              <!-- زر الاستلام -->
-              <button type="submit" id="btn_submit_${c.phone}" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-4 rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
-                <i class="fa-solid fa-check text-black"></i> استلام
+              <!-- زر الاستلام الأخضر الداكن والمستقر -->
+              <button type="submit" id="btn_submit_${c.phone}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 rounded-2xl text-sm transition shadow-md flex items-center gap-2 shrink-0">
+                <i class="fa-solid fa-check text-base"></i> استلام
               </button>
             </form>
 
@@ -239,7 +237,7 @@
       if (!amount || amount <= 0) return;
 
       btnEl.disabled = true;
-      btnEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-black"></i> جاري الحفظ...`;
+      btnEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> حفظ...`;
 
       const payload = {
         name: customerName,
@@ -258,7 +256,7 @@
         const result = await res.json();
 
         if (result.success) {
-          alert(`تم استلام ${amount} صندوق فارغ من (${customerName}) وحفظ التحديث بقاعدة البيانات بنجاح!`);
+          alert(`تم استلام ${amount} صندوق فارغ من (${customerName}) وتعديل الرصيد بنجاح!`);
           fetchCustomersFromDB();
         } else {
           alert('خطأ من السيرفر: ' + result.message);
@@ -267,11 +265,11 @@
         alert('فشل الاتصال بالسيرفر لتحديث البيانات!');
       } finally {
         btnEl.disabled = false;
-        btnEl.innerHTML = `<i class="fa-solid fa-check text-black"></i> استلام`;
+        btnEl.innerHTML = `<i class="fa-solid fa-check text-base"></i> استلام`;
       }
     }
 
-    // 4. فلترة وتصفية الزبائن
+    // 4. فلترة الزبائن
     function filterCustomers() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const filtered = allCustomers.filter(c => 
@@ -281,7 +279,7 @@
       renderCustomers(filtered);
     }
 
-    // 5. التنقل بين الأزرار السفلية
+    // 5. التنقل بين الصفحات
     function switchTab(tabName) {
       const tabs = ['home', 'messages', 'notifications'];
       tabs.forEach(t => {
@@ -290,11 +288,11 @@
         const textSpan = el.querySelector('span');
 
         if (t === tabName) {
-          iconDiv.className = "w-10 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-black group-hover:scale-110 transition shadow";
-          textSpan.className = "text-[11px] text-white font-bold";
+          iconDiv.className = "w-12 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black group-hover:scale-105 transition shadow";
+          textSpan.className = "text-xs text-amber-400 font-black";
         } else {
-          iconDiv.className = "relative w-10 h-8 rounded-xl bg-slate-700 border border-slate-600 flex items-center justify-center group-hover:scale-110 transition";
-          textSpan.className = "text-[11px] text-slate-300 font-medium";
+          iconDiv.className = "relative w-12 h-9 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition";
+          textSpan.className = "text-xs text-slate-300 font-bold";
         }
       });
 
