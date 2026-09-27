@@ -10,9 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    body {
-      background-color: #f8fafc;
-    }
+    body { background-color: #f8fafc; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
@@ -23,7 +21,6 @@
   <header class="sticky top-0 z-40 bg-slate-900 text-white border-b-2 border-emerald-500 px-4 py-3.5 shadow-md">
     <div class="max-w-md mx-auto flex items-center justify-between">
       
-      <!-- شعار وعنوان المكتب -->
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xl shadow">
           <i class="fa-solid fa-boxes-packing"></i>
@@ -36,7 +33,6 @@
         </div>
       </div>
 
-      <!-- مؤشر الاتصال بالسيرفر -->
       <div class="flex items-center gap-2">
         <span id="serverStatus" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-emerald-400 border border-emerald-500/30 shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -71,7 +67,6 @@
   <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900 text-white border-t border-slate-800 py-2.5 px-6 shadow-2xl">
     <div class="max-w-md mx-auto flex justify-between items-center">
 
-      <!-- 1. الرئيسية -->
       <button onclick="switchTab('home')" id="tab-home" class="flex flex-col items-center gap-1 transition group">
         <div class="w-11 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black group-hover:scale-105 transition shadow">
           <i class="fa-solid fa-house text-sm"></i>
@@ -79,7 +74,6 @@
         <span class="text-xs text-emerald-400 font-bold">الرئيسية</span>
       </button>
 
-      <!-- 2. الرسائل -->
       <button onclick="switchTab('messages')" id="tab-messages" class="flex flex-col items-center gap-1 transition group">
         <div class="relative w-11 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition">
           <i class="fa-solid fa-comments text-sm"></i>
@@ -88,7 +82,6 @@
         <span class="text-xs text-slate-300 font-medium">الرسائل</span>
       </button>
 
-      <!-- 3. التنبيهات -->
       <button onclick="switchTab('notifications')" id="tab-notifications" class="flex flex-col items-center gap-1 transition group">
         <div class="relative w-11 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition">
           <i class="fa-solid fa-bell text-sm"></i>
@@ -100,29 +93,39 @@
     </div>
   </nav>
 
-  <!-- ==================== 4. النافذة المنبثقة الاحترافية (Modal) ==================== -->
+  <!-- ==================== 4. النافذة المنبثقة التفاعلية (Modal) ==================== -->
   <div id="statusModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center px-4 transition-all">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-in fade-in zoom-in duration-200">
       
       <!-- أيقونة الحالة -->
-      <div id="modalIconContainer" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl shadow-inner">
-        <i id="modalIcon" class="fa-solid"></i>
+      <div id="modalIconContainer" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl shadow-inner bg-emerald-100 text-emerald-600">
+        <i id="modalIcon" class="fa-solid fa-circle-check"></i>
       </div>
 
       <!-- العنوان والرسالة -->
       <div class="space-y-1">
-        <h3 id="modalTitle" class="text-lg font-black text-slate-900"></h3>
+        <h3 id="modalTitle" class="text-lg font-black text-slate-900">تمت العملية بنجاح!</h3>
         <p id="modalMessage" class="text-xs text-slate-600 font-medium leading-relaxed"></p>
       </div>
 
-      <!-- ملخص العملية -->
-      <div id="modalDetails" class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1 text-right font-medium text-slate-700 hidden">
+      <!-- ملخص تفاصيل الخصم والرصيد الدقيق -->
+      <div id="modalDetails" class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5 text-right font-medium text-slate-700">
       </div>
 
-      <!-- زر الإغلاق -->
-      <button onclick="closeModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
-        موافق
-      </button>
+      <!-- أزرار التحكم بالنافذة المنبثقة -->
+      <div class="flex gap-2 pt-2">
+        <!-- زر فتح الواتساب بالرسالة المجهزة -->
+        <a id="modalWaBtn" href="#" target="_blank" onclick="closeModal()" 
+           class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2">
+          <i class="fa-brands fa-whatsapp text-sm"></i> إرسال واتساب
+        </a>
+        
+        <!-- زر إغلاق عادي -->
+        <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-4 py-3 rounded-xl text-xs transition">
+          إغلاق
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -159,26 +162,25 @@
       }
     }
 
-    // 2. بناء رابط الواتساب الديناميكي بالرسالة المخصصة
-    function buildWhatsAppUrl(customerName, rawPhone, returnedCrates, remainingCrates) {
-      // تنظيف رقم الهاتف وإضافة الرمز الدولي لليمن إن لم يوجد
+    // 2. تجميع رابط رسالة الواتساب بالصيغة المطلوبة
+    function generateWhatsAppLink(rawPhone, name, returned, remaining) {
       let cleanPhone = rawPhone.replace(/\D/g, '');
       if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
       if (!cleanPhone.startsWith('967')) cleanPhone = '967' + cleanPhone;
 
-      const message = 
-`عميلنا العزيز (${customerName})،
-معجم لتسويق الدواجن (محصل الشبوك الفاضية).
+      const text = `عميلنا العزيز (${name})
+معجم لتسويق الدواجن
+محصل الشبوك الفاضية
 
-تم استلام: (${returnedCrates}) شبوك فاضية.
-المتبقي عليكم: (${remainingCrates}) شبوك.
+تم استلام لكم: (${returned}) شبوك فاضية.
+المتبقي عليكم: (${remaining}) شبوك.
 
 الرجاء توضيح وابلاغنا عن موقع باقي شبوكنا، مالم سيتم إدراجهم على حسابكم الخاص وتتحملون كافة المسؤولية عند إتلاف الصناديق أو ضياعها.`;
 
-      return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+      return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
     }
 
-    // 3. عرض كروت الزبائن بألوان واضحة وأزرار الواتساب والاتصال والموقع
+    // 3. عرض كروت الزبائن مع حساب دقيق للشبوك
     function renderCustomers(list) {
       const container = document.getElementById('customersContainer');
       
@@ -193,17 +195,21 @@
       }
 
       container.innerHTML = list.map(c => {
-        const previousCrates = c.crates_balance?.previous_debt || 0;
-        const todayCrates = c.crates_balance?.today_delivered || 0;
-        const totalRemaining = c.crates_balance?.remaining_debt || (previousCrates + todayCrates);
+        // حساب الرصيد الدقيق
+        const previousCrates = Number(c.crates_balance?.previous_debt || 0);
+        const todayDelivered = Number(c.crates_balance?.today_delivered || 0);
+        const totalReturned = Number(c.crates_balance?.total_returned || 0);
+        
+        // إجمالي المتبقي الحقيقي الدقيق
+        const calculatedRemaining = (previousCrates + todayDelivered) - totalReturned;
+        const totalRemaining = calculatedRemaining > 0 ? calculatedRemaining : 0;
+        
         const mapsUrl = c.location?.google_maps_url || `https://maps.google.com/?q=13.9800,45.5700`;
-        const initialWaUrl = buildWhatsAppUrl(c.name, c.phone, 0, totalRemaining);
 
         return `
-          <!-- بطاقة زبون احترافية بحدود ناعمة -->
           <div class="bg-white border border-slate-200/80 rounded-3xl p-4 shadow-sm space-y-3.5 relative hover:shadow-md transition">
             
-            <!-- الهيدر: الاسم، الرقم والأزرار الثلاثة (واتساب - اتصال - موقع) -->
+            <!-- الهيدر والاسم والاتصال -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
               <div class="space-y-1">
                 <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
@@ -217,23 +223,13 @@
                 </div>
               </div>
 
-              <!-- أزرار التواصل والتوجيه -->
               <div class="flex items-center gap-1.5">
-                <!-- 1. زر محادثة واتساب تلقائي -->
-                <a href="${initialWaUrl}" id="wa_btn_${c.phone}" target="_blank" 
-                   class="w-9 h-9 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center text-sm transition shadow-sm"
-                   title="محادثة واتساب تلقائية">
-                  <i class="fa-brands fa-whatsapp"></i>
-                </a>
-
-                <!-- 2. زر الاتصال الهاتفي -->
                 <a href="tel:${c.phone}" 
                    class="w-9 h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-xs transition shadow-sm"
                    title="اتصال تلفوني">
                   <i class="fa-solid fa-phone"></i>
                 </a>
 
-                <!-- 3. زر موقع الخريطة -->
                 <a href="${mapsUrl}" target="_blank" 
                    class="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 flex items-center justify-center text-xs transition shadow-sm" 
                    title="فتح الموقع بالخريطة">
@@ -242,7 +238,7 @@
               </div>
             </div>
 
-            <!-- تفاصيل أعداد الشبوك -->
+            <!-- شبكة تفاصيل أعداد الشبوك بالكامل -->
             <div class="grid grid-cols-3 gap-2 text-center">
               <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200/60">
                 <span class="block text-[10px] font-bold text-slate-500 mb-0.5">شبوك سابقة</span>
@@ -250,8 +246,8 @@
               </div>
 
               <div class="bg-amber-50 p-2.5 rounded-2xl border border-amber-200/60">
-                <span class="block text-[10px] font-bold text-amber-700 mb-0.5">معه اليوم</span>
-                <span class="text-xs font-black text-amber-600 font-mono">+${todayCrates}</span>
+                <span class="block text-[10px] font-bold text-amber-700 mb-0.5">مستلم اليوم</span>
+                <span class="text-xs font-black text-amber-600 font-mono">+${todayDelivered}</span>
               </div>
 
               <div class="bg-slate-900 text-white p-2.5 rounded-2xl shadow-sm border border-slate-800">
@@ -260,10 +256,10 @@
               </div>
             </div>
 
-            <!-- حقل استلام شباك وزر استلام -->
+            <!-- نموذج استلام الشبوك -->
             <form onsubmit="handleReceiveCrates(event, '${c.name}', '${c.phone}', '${mapsUrl}', ${totalRemaining})" class="pt-1 flex gap-2">
               <div class="relative flex-1">
-                <input type="number" id="input_crates_${c.phone}" min="1" max="${totalRemaining}" placeholder="عدد الشبوك المستلمة..." required
+                <input type="number" id="input_crates_${c.phone}" min="1" max="${totalRemaining > 0 ? totalRemaining : 999}" placeholder="عدد الشبوك المستلمة..." required
                        class="w-full bg-slate-50 border border-slate-300 p-2.5 pr-8 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-slate-800 font-mono placeholder-slate-400">
                 <i class="fa-solid fa-box-archive absolute right-3 top-3 text-slate-400 text-xs"></i>
               </div>
@@ -278,8 +274,8 @@
       }).join('');
     }
 
-    // 4. إرسال عملية استلام الشبوك للسيرفر وعرض النافذة المنبثقة الاحترافية
-    async function handleReceiveCrates(event, customerName, customerPhone, mapUrl, currentTotal) {
+    // 4. معالجة العملية وعرض النافذة المنبثقة التفاعلية
+    async function handleReceiveCrates(event, customerName, customerPhone, mapUrl, currentRemaining) {
       event.preventDefault();
 
       const inputEl = document.getElementById(`input_crates_${customerPhone}`);
@@ -308,72 +304,43 @@
         const result = await res.json();
 
         if (result.success) {
-          const newRemaining = Math.max(0, currentTotal - amount);
+          const newRemaining = Math.max(0, currentRemaining - amount);
+          const waUrl = generateWhatsAppLink(customerPhone, customerName, amount, newRemaining);
 
-          // تحديث رابط الواتساب بالرسالة المحدثة تلقائياً
-          const newWaUrl = buildWhatsAppUrl(customerName, customerPhone, amount, newRemaining);
-          const waBtn = document.getElementById(`wa_btn_${customerPhone}`);
-          if (waBtn) waBtn.href = newWaUrl;
-
-          // عرض نافذة النجاح المنبثقة
+          // عرض النافذة المنبثقة
           showModal({
-            type: 'success',
-            title: 'تمت العملية بنجاح!',
-            message: `تم تسجيل استلام ${amount} صندوق فارغ من الزبون (${customerName}).`,
+            title: 'تم تسجيل الاستلام بنجاح!',
+            message: `تم خصم وتسجيل استلام الشبوك بنجاح للزبون (${customerName}).`,
+            waUrl: waUrl,
             details: `
-              <div class="flex justify-between"><span>الزبون:</span> <strong>${customerName}</strong></div>
-              <div class="flex justify-between"><span>عدد المستلم:</span> <strong class="text-emerald-600">${amount} صندوق</strong></div>
-              <div class="flex justify-between"><span>المتبقي عليه:</span> <strong class="text-rose-600">${newRemaining} صندوق</strong></div>
+              <div class="flex justify-between border-b border-slate-200 pb-1"><span>اسم الزبون:</span> <strong class="text-slate-900">${customerName}</strong></div>
+              <div class="flex justify-between border-b border-slate-200 pb-1"><span>الشبوك المستلمة:</span> <strong class="text-emerald-600">${amount} صندوق</strong></div>
+              <div class="flex justify-between"><span>المتبقي عليه الآن:</span> <strong class="text-rose-600">${newRemaining} صندوق</strong></div>
             `
           });
 
           inputEl.value = '';
           fetchCustomersFromDB();
         } else {
-          showModal({
-            type: 'error',
-            title: 'فشلت العملية!',
-            message: result.message || 'حدث خطأ غير متوقع أثناء الاتصال بالسيرفر.'
-          });
+          alert('خطأ في العملية: ' + result.message);
         }
       } catch (err) {
-        showModal({
-          type: 'error',
-          title: 'فشل الاتصال بالسيرفر!',
-          message: 'تعذر حفظ البيانات في الوقت الحالي. تحقق من خادم Render والشبكة.'
-        });
+        alert('تعذر الاتصال بالسيرفر لحفظ الحركة!');
       } finally {
         btnEl.disabled = false;
         btnEl.innerHTML = `<i class="fa-solid fa-check"></i> استلام`;
       }
     }
 
-    // 5. التحكم بالبطاقة المنبثقة (Modal)
-    function showModal({ type, title, message, details = '' }) {
+    // 5. إظهار وإغلاق النافذة المنبثقة
+    function showModal({ title, message, details, waUrl }) {
       const modal = document.getElementById('statusModal');
-      const iconContainer = document.getElementById('modalIconContainer');
-      const icon = document.getElementById('modalIcon');
-      const modalTitle = document.getElementById('modalTitle');
-      const modalMessage = document.getElementById('modalMessage');
-      const modalDetails = document.getElementById('modalDetails');
-
-      if (type === 'success') {
-        iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl bg-emerald-100 text-emerald-600 shadow-inner";
-        icon.className = "fa-solid fa-circle-check";
-      } else {
-        iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl bg-rose-100 text-rose-600 shadow-inner";
-        icon.className = "fa-solid fa-triangle-exclamation";
-      }
-
-      modalTitle.innerText = title;
-      modalMessage.innerText = message;
-
-      if (details) {
-        modalDetails.innerHTML = details;
-        modalDetails.classList.remove('hidden');
-      } else {
-        modalDetails.classList.add('hidden');
-      }
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalMessage').innerText = message;
+      document.getElementById('modalDetails').innerHTML = details;
+      
+      const waBtn = document.getElementById('modalWaBtn');
+      waBtn.href = waUrl;
 
       modal.classList.remove('hidden');
     }
@@ -382,7 +349,7 @@
       document.getElementById('statusModal').classList.add('hidden');
     }
 
-    // 6. فلترة وتصفية القائمة
+    // 6. فلترة الزبائن
     function filterCustomers() {
       const query = document.getElementById('searchInput').value.trim().toLowerCase();
       const filtered = allCustomers.filter(c => 
