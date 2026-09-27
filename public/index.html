@@ -7,15 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Leaflet CSS الخريطة -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
   <style>
     .digital-glow {
       box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
       background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
     }
-    #map { height: 280px; width: 100%; border-radius: 1rem; }
   </style>
 </head>
 <body class="bg-slate-900 font-sans min-h-screen text-slate-100 p-3 sm:p-6 flex items-center justify-center">
@@ -71,16 +67,30 @@
         </div>
       </div>
 
-      <!-- الحقل 3: تحديد موقع المحل -->
+      <!-- الحقل 3: تحديد موقع المحل عبر Google Maps السريع -->
       <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1.5">موقع محل الزبون</label>
-        <button type="button" onclick="openMapModal()" class="w-full bg-slate-700 hover:bg-slate-650 text-indigo-300 hover:text-white border border-slate-600 p-3 rounded-xl text-xs font-semibold transition flex items-center justify-between">
-          <span id="mapButtonLabel" class="flex items-center gap-2 truncate">
-            <i class="fa-solid fa-map-location-dot text-indigo-400 text-sm"></i> اضغط لتحديد موقع محل الزبون يدويًا
-          </span>
-          <i class="fa-solid fa-chevron-left text-xs opacity-60"></i>
-        </button>
-        <input type="hidden" id="google_maps_url">
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">موقع محل الزبون (Google Maps)</label>
+        
+        <div class="space-y-2">
+          <div class="flex gap-2">
+            <!-- زر جلب الموقع الحالي GPS فوراً -->
+            <button type="button" onclick="getCurrentLocationGPS()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-emerald-600 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-crosshairs text-emerald-300"></i> جلب موقعك الحالي
+            </button>
+
+            <!-- زر فتح Google Maps للتحديد السريع -->
+            <button type="button" onclick="openGoogleMapsDirectly()" class="flex-1 bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-indigo-600 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-map-marked-alt text-indigo-300"></i> فتح خرائط جوجل
+            </button>
+          </div>
+
+          <!-- حقل رابط الخريطة -->
+          <div class="relative">
+            <input type="url" id="google_maps_url" placeholder="أو إلصق رابط Google Maps هنا..." class="w-full bg-slate-900 border border-slate-700 p-2.5 pr-8 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            <i class="fa-solid fa-link absolute right-3 top-3 text-slate-500 text-xs"></i>
+          </div>
+          <p id="locationStatus" class="text-[11px] text-slate-400 flex items-center gap-1 hidden"></p>
+        </div>
       </div>
 
       <!-- الحقل 4: تسليم صناديق فارغة جديدة -->
@@ -120,45 +130,46 @@
     </form>
   </div>
 
-  <!-- نافذة الخريطة -->
-  <div id="mapModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-slate-800 rounded-3xl max-w-lg w-full p-5 border border-slate-700 shadow-2xl space-y-4">
-      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-        <h3 class="font-bold text-white text-sm flex items-center gap-2">
-          <i class="fa-solid fa-location-crosshairs text-emerald-400"></i> حدد موقع محل الزبون
-        </h3>
-        <button onclick="closeMapModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
-      </div>
-
-      <div id="map"></div>
-      
-      <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
-        <i class="fa-solid fa-circle-info text-indigo-400"></i> انقر على الخريطة لتحديد موقع المحل.
-      </p>
-
-      <div class="flex gap-2 pt-2">
-        <button onclick="confirmMapLocation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-sm shadow transition">
-          <i class="fa-solid fa-check ml-1"></i> اعتماد هذا الموقع
-        </button>
-        <button onclick="closeMapModal()" class="bg-slate-700 text-slate-300 hover:bg-slate-600 px-4 py-2.5 rounded-xl text-sm">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script>
-    // استخدام المسار النسبي ليعمل تلقائياً على Render وعلى localhost
     const API_URL = '/api/zoe';
-    
-    let map = null;
-    let marker = null;
-    let selectedLat = 13.9800;
-    let selectedLng = 45.5700;
     let previousDebt = 0;
 
-    // 1. إظهار/إخفاء قائمة الأسماء
+    // 1. فتح تطبيق/موقع Google Maps مباشرة
+    function openGoogleMapsDirectly() {
+      window.open('https://www.google.com/maps', '_blank');
+    }
+
+    // 2. جلب الموقع الحالي فوراً عبر GPS وبناء رابط Google Maps
+    function getCurrentLocationGPS() {
+      const statusEl = document.getElementById('locationStatus');
+      statusEl.classList.remove('hidden');
+      statusEl.className = "text-[11px] text-indigo-400 flex items-center gap-1";
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري جلب الإحداثيات الدقيقة...`;
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            
+            document.getElementById('google_maps_url').value = mapsUrl;
+            statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تحديد الموقع بنجاح!`;
+          },
+          (error) => {
+            statusEl.className = "text-[11px] text-rose-400 flex items-center gap-1";
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> متعذر تحديد الموقع. تأكد من تفعيل الـ GPS.`;
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      } else {
+        statusEl.className = "text-[11px] text-rose-400 flex items-center gap-1";
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ميزة تحديد الموقع غير مدعومة بجهازك.`;
+      }
+    }
+
+    // 3. إظهار/إخفاء قائمة الأسماء
     async function toggleCustomersMenu() {
       const menu = document.getElementById('customersListMenu');
       menu.classList.toggle('hidden');
@@ -168,7 +179,7 @@
       }
     }
 
-    // 2. جلب قائمة أسماء الزبائن
+    // 4. جلب قائمة أسماء الزبائن
     async function fetchNamesOnly() {
       const listContainer = document.getElementById('namesOnlyList');
       try {
@@ -191,17 +202,11 @@
       }
     }
 
-    // 3. اختيار زبون من القائمة المنسدلة
+    // 5. اختيار زبون من القائمة
     function selectCustomer(name, phone, mapUrl, currentDebt) {
       document.getElementById('customer_name').value = name;
       document.getElementById('customer_phone').value = phone;
       document.getElementById('google_maps_url').value = mapUrl;
-      
-      if (mapUrl) {
-        document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400 text-sm"></i> تم تحديد الموقع سابقاً`;
-      } else {
-        document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-map-location-dot text-indigo-400 text-sm"></i> اضغط لتحديد موقع محل الزبون يدويًا`;
-      }
 
       previousDebt = Number(currentDebt) || 0;
       calculateTotalGlow();
@@ -209,7 +214,7 @@
       document.getElementById('customersListMenu').classList.add('hidden');
     }
 
-    // 4. استيراد جهات الاتصال
+    // 6. استيراد جهات الاتصال
     async function selectFromContacts() {
       if ('contacts' in navigator && 'ContactsManager' in window) {
         try {
@@ -233,50 +238,7 @@
       }
     }
 
-    // 5. إدارة الخريطة
-    function openMapModal() {
-      const modal = document.getElementById('mapModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-
-      if (!map) {
-        map = L.map('map').setView([selectedLat, selectedLng], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        marker = L.marker([selectedLat, selectedLng], { draggable: true }).addTo(map);
-
-        map.on('click', function (e) {
-          selectedLat = e.latlng.lat;
-          selectedLng = e.latlng.lng;
-          marker.setLatLng(e.latlng);
-        });
-
-        marker.on('dragend', function () {
-          const position = marker.getLatLng();
-          selectedLat = position.lat;
-          selectedLng = position.lng;
-        });
-      } else {
-        setTimeout(() => { map.invalidateSize(); }, 200);
-      }
-    }
-
-    function closeMapModal() {
-      const modal = document.getElementById('mapModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function confirmMapLocation() {
-      const generatedUrl = `https://www.google.com/maps?q=${selectedLat},${selectedLng}`;
-      document.getElementById('google_maps_url').value = generatedUrl;
-      document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-location-dot text-emerald-400 text-sm"></i> تم تحديد الموقع بنجاح`;
-      closeMapModal();
-    }
-
-    // 6. حساب المجموع الكلي
+    // 7. حساب المجموع الكلي
     function calculateTotalGlow() {
       const newDelivered = Number(document.getElementById('delivered_crates').value) || 0;
       const newReturned = Number(document.getElementById('returned_crates').value) || 0;
@@ -284,7 +246,7 @@
       document.getElementById('remaining_display').innerText = totalRemaining;
     }
 
-    // 7. طباعة الإيصال الحراري (80mm)
+    // 8. طباعة الإيصال الحراري (80mm)
     function printCrateReceipt(data) {
       const printWindow = window.open('', '_blank', 'width=400,height=600');
       const htmlContent = `
@@ -339,7 +301,7 @@
       printWindow.document.close();
     }
 
-    // 8. إرسال البيانات للسيرفر وطباعة الإيصال
+    // 9. إرسال البيانات للسيرفر وطباعة الإيصال
     document.getElementById('customerCratesForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -371,7 +333,7 @@
         if (result.success) {
           alert('تم حفظ البيانات بنجاح!');
 
-          // طباعة الإيصال الحراري فوراً
+          // طباعة الإيصال الحراري
           printCrateReceipt({
             customerName: customerName,
             phone: customerPhone,
@@ -384,7 +346,7 @@
           // إعادة ضبط النموذج
           document.getElementById('customerCratesForm').reset();
           document.getElementById('google_maps_url').value = '';
-          document.getElementById('mapButtonLabel').innerHTML = `<i class="fa-solid fa-map-location-dot text-indigo-400 text-sm"></i> اضغط لتحديد موقع محل الزبون يدويًا`;
+          document.getElementById('locationStatus').classList.add('hidden');
           previousDebt = 0;
           calculateTotalGlow();
         } else {
