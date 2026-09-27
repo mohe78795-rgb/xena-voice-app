@@ -4,14 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إدارة الزبائن والمواقع - مكتب معجم لتسويق الدواجن</title>
+  
+  <!-- Manifest لميزة المشاركة من خرائط جوجل -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#059669">
+
+  <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet CSS الخريطة المدمجة -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   
   <style>
     .digital-glow {
       box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
       background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
     }
+    #interactiveMap { height: 260px; width: 100%; border-radius: 1rem; }
   </style>
 </head>
 <body class="bg-slate-900 font-sans min-h-screen text-slate-100 p-3 sm:p-6 flex items-center justify-center">
@@ -28,7 +38,7 @@
       </div>
 
       <!-- زر قائمة أسماء الزبائن -->
-      <button onclick="toggleCustomersMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow flex items-center gap-2">
+      <button type="button" onclick="toggleCustomersMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow flex items-center gap-2">
         <i class="fa-solid fa-users"></i> أسماء الزبائن
       </button>
     </div>
@@ -37,7 +47,7 @@
     <div id="customersListMenu" class="hidden bg-slate-800 border border-slate-700 rounded-2xl p-4 space-y-3 shadow-2xl">
       <div class="flex justify-between items-center pb-2 border-b border-slate-700">
         <span class="text-xs font-bold text-slate-300">قائمة الزبائن المسجلين</span>
-        <button onclick="toggleCustomersMenu()" class="text-slate-400 hover:text-slate-200 text-sm">&times;</button>
+        <button type="button" onclick="toggleCustomersMenu()" class="text-slate-400 hover:text-slate-200 text-sm">&times;</button>
       </div>
       <ul id="namesOnlyList" class="max-h-48 overflow-y-auto space-y-1.5 text-sm text-slate-200 divide-y divide-slate-700/50">
         <li class="py-1 text-slate-400 text-xs text-center">جاري تحميل الأسماء...</li>
@@ -67,26 +77,27 @@
         </div>
       </div>
 
-      <!-- الحقل 3: تحديد موقع المحل عبر Google Maps السريع -->
+      <!-- الحقل 3: تحديد موقع المحل والتفاعل المباشر -->
       <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1.5">موقع محل الزبون (Google Maps)</label>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">موقع محل الزبون</label>
         
         <div class="space-y-2">
+          <!-- الأزرار التفاعلية -->
           <div class="flex gap-2">
-            <!-- زر جلب الموقع الحالي GPS فوراً -->
-            <button type="button" onclick="getCurrentLocationGPS()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-emerald-600 transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-crosshairs text-emerald-300"></i> جلب موقعك الحالي
+            <!-- زر التحديد بالدبوس على الخريطة المدمجة -->
+            <button type="button" onclick="openEmbeddedMap()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-emerald-600 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-map-pin text-emerald-300"></i> تحديد بالدبوس
             </button>
 
-            <!-- زر فتح Google Maps للتحديد السريع -->
-            <button type="button" onclick="openGoogleMapsDirectly()" class="flex-1 bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-indigo-600 transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-map-marked-alt text-indigo-300"></i> فتح خرائط جوجل
+            <!-- زر جلب الموقع الحالي GPS -->
+            <button type="button" onclick="getCurrentLocationGPS()" class="flex-1 bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-indigo-600 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-crosshairs text-indigo-300"></i> موقعي الحالي (GPS)
             </button>
           </div>
 
-          <!-- حقل رابط الخريطة -->
+          <!-- حقل إدخال الرابط وقبول المشاركة التلقائية -->
           <div class="relative">
-            <input type="url" id="google_maps_url" placeholder="أو إلصق رابط Google Maps هنا..." class="w-full bg-slate-900 border border-slate-700 p-2.5 pr-8 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            <input type="url" id="google_maps_url" placeholder="رابط الخريطة سينزل هنا تلقائياً..." class="w-full bg-slate-900 border border-slate-700 p-2.5 pr-8 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 outline-none">
             <i class="fa-solid fa-link absolute right-3 top-3 text-slate-500 text-xs"></i>
           </div>
           <p id="locationStatus" class="text-[11px] text-slate-400 flex items-center gap-1 hidden"></p>
@@ -130,46 +141,133 @@
     </form>
   </div>
 
+  <!-- نافذة الخريطة المدمجة بالتأشير الدبابيسي المباشر -->
+  <div id="embeddedMapModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 rounded-3xl max-w-lg w-full p-4 border border-slate-700 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-700">
+        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+          <i class="fa-solid fa-map-pin text-emerald-400"></i> انقر في أي مكان لوضع الدبوس الأحمر
+        </span>
+        <button type="button" onclick="closeEmbeddedMap()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      
+      <div id="interactiveMap"></div>
+
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="confirmPinLocation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+          اعتماد هذا الموقع تلقائياً
+        </button>
+        <button type="button" onclick="closeEmbeddedMap()" class="bg-slate-700 text-slate-300 hover:bg-slate-600 px-4 py-2.5 rounded-xl text-xs">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
     const API_URL = '/api/zoe';
     let previousDebt = 0;
 
-    // 1. فتح تطبيق/موقع Google Maps مباشرة
-    function openGoogleMapsDirectly() {
-      window.open('https://www.google.com/maps', '_blank');
+    let embeddedMap = null;
+    let activeMarker = null;
+    let currentPinLat = 13.9800;
+    let currentPinLng = 45.5700;
+
+    // 1. استقبال ميزة "المشاركة" التلقائية عند الضغط على مشاركة من Google Maps
+    window.addEventListener('DOMContentLoaded', () => {
+      const parsedUrl = new URL(window.location.href);
+      const sharedUrl = parsedUrl.searchParams.get('url') || parsedUrl.searchParams.get('text');
+
+      if (sharedUrl) {
+        const mapMatch = sharedUrl.match(/(https?:\/\/[^\s]+)/g);
+        if (mapMatch && mapMatch[0]) {
+          document.getElementById('google_maps_url').value = mapMatch[0];
+          
+          const statusEl = document.getElementById('locationStatus');
+          statusEl.classList.remove('hidden');
+          statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم التقاط الموقع المشارك بنجاح!`;
+        }
+      }
+    });
+
+    // 2. إدارة الخريطة التفاعلية المدمجة بالدبوس الأحمر
+    function openEmbeddedMap() {
+      const modal = document.getElementById('embeddedMapModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      if (!embeddedMap) {
+        embeddedMap = L.map('interactiveMap').setView([currentPinLat, currentPinLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(embeddedMap);
+
+        embeddedMap.on('click', function(e) {
+          currentPinLat = e.latlng.lat;
+          currentPinLng = e.latlng.lng;
+
+          if (activeMarker) {
+            activeMarker.setLatLng(e.latlng);
+          } else {
+            activeMarker = L.marker(e.latlng).addTo(embeddedMap);
+          }
+        });
+      } else {
+        setTimeout(() => embeddedMap.invalidateSize(), 200);
+      }
     }
 
-    // 2. جلب الموقع الحالي فوراً عبر GPS وبناء رابط Google Maps
+    function closeEmbeddedMap() {
+      const modal = document.getElementById('embeddedMapModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmPinLocation() {
+      if (!activeMarker) {
+        alert('الرجاء النقر على الخريطة أولاً لتحديد موقع الدبوس.');
+        return;
+      }
+      const generatedUrl = `https://www.google.com/maps?q=${currentPinLat},${currentPinLng}`;
+      document.getElementById('google_maps_url').value = generatedUrl;
+      
+      const statusEl = document.getElementById('locationStatus');
+      statusEl.classList.remove('hidden');
+      statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
+      statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم اعتماد إحداثيات الدبوس بنجاح!`;
+
+      closeEmbeddedMap();
+    }
+
+    // 3. جلب الموقع الحالي فوراً عبر GPS
     function getCurrentLocationGPS() {
       const statusEl = document.getElementById('locationStatus');
       statusEl.classList.remove('hidden');
       statusEl.className = "text-[11px] text-indigo-400 flex items-center gap-1";
-      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري جلب الإحداثيات الدقيقة...`;
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري جلب الإحداثيات...`;
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-            
-            document.getElementById('google_maps_url').value = mapsUrl;
+            document.getElementById('google_maps_url').value = `https://www.google.com/maps?q=${lat},${lng}`;
             statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
-            statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تحديد الموقع بنجاح!`;
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تحديث الموقع بنجاح!`;
           },
-          (error) => {
+          () => {
             statusEl.className = "text-[11px] text-rose-400 flex items-center gap-1";
-            statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> متعذر تحديد الموقع. تأكد من تفعيل الـ GPS.`;
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> متعذر تحديد الموقع. تأكد من تفعيل GPS.`;
           },
           { enableHighAccuracy: true, timeout: 10000 }
         );
       } else {
         statusEl.className = "text-[11px] text-rose-400 flex items-center gap-1";
-        statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ميزة تحديد الموقع غير مدعومة بجهازك.`;
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> GPS غير مدعوم بجهازك.`;
       }
     }
 
-    // 3. إظهار/إخفاء قائمة الأسماء
+    // 4. إظهار/إخفاء قائمة الأسماء
     async function toggleCustomersMenu() {
       const menu = document.getElementById('customersListMenu');
       menu.classList.toggle('hidden');
@@ -179,7 +277,7 @@
       }
     }
 
-    // 4. جلب قائمة أسماء الزبائن
+    // 5. جلب قائمة أسماء الزبائن
     async function fetchNamesOnly() {
       const listContainer = document.getElementById('namesOnlyList');
       try {
@@ -202,7 +300,7 @@
       }
     }
 
-    // 5. اختيار زبون من القائمة
+    // 6. اختيار زبون من القائمة
     function selectCustomer(name, phone, mapUrl, currentDebt) {
       document.getElementById('customer_name').value = name;
       document.getElementById('customer_phone').value = phone;
@@ -214,7 +312,7 @@
       document.getElementById('customersListMenu').classList.add('hidden');
     }
 
-    // 6. استيراد جهات الاتصال
+    // 7. استيراد جهات الاتصال
     async function selectFromContacts() {
       if ('contacts' in navigator && 'ContactsManager' in window) {
         try {
@@ -238,7 +336,7 @@
       }
     }
 
-    // 7. حساب المجموع الكلي
+    // 8. حساب المجموع الكلي
     function calculateTotalGlow() {
       const newDelivered = Number(document.getElementById('delivered_crates').value) || 0;
       const newReturned = Number(document.getElementById('returned_crates').value) || 0;
@@ -246,7 +344,7 @@
       document.getElementById('remaining_display').innerText = totalRemaining;
     }
 
-    // 8. طباعة الإيصال الحراري (80mm)
+    // 9. طباعة الإيصال الحراري (80mm)
     function printCrateReceipt(data) {
       const printWindow = window.open('', '_blank', 'width=400,height=600');
       const htmlContent = `
@@ -301,7 +399,7 @@
       printWindow.document.close();
     }
 
-    // 9. إرسال البيانات للسيرفر وطباعة الإيصال
+    // 10. إرسال البيانات للسيرفر وطباعة الإيصال
     document.getElementById('customerCratesForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -333,7 +431,7 @@
         if (result.success) {
           alert('تم حفظ البيانات بنجاح!');
 
-          // طباعة الإيصال الحراري
+          // طباعة الإيصال
           printCrateReceipt({
             customerName: customerName,
             phone: customerPhone,
