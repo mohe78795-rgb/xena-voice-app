@@ -3,226 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام تتبع الشبوك - حسين حبشي</title>
-
-  <!-- Tailwind CSS عبر CDN -->
+  <title>إدارة زبناء الصناديق - ZOE</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Leaflet CSS للخرائط -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- خط Tajawal لتصميم عربي احترافي -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap">
-
-  <style>
-    * {
-      font-family: 'Tajawal', sans-serif;
-    }
-    /* جعل الخريطة ملء الشاشة بالكامل */
-    #map {
-      width: 100vw;
-      height: 100vh;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
-    /* خريطة بثيم داكن وألوان نيون متناسقة */
-    .leaflet-tile-pane {
-      filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
-    }
-    /* إخفاء عناصر التحكم الافتراضية للخرائط */
-    .leaflet-control-container .leaflet-routing-container-hide {
-      display: none;
-    }
-    /* تصميم مؤشر تخصيص الخريطة custom pulse marker */
-    .custom-marker {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .marker-pin {
-      width: 48px;
-      height: 48px;
-      border-radius: 50% 50% 50% 0;
-      background: #f59e0b;
-      position: absolute;
-      transform: rotate(-45deg);
-      left: 50%;
-      top: 50%;
-      margin: -24px 0 0 -24px;
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
-      animation: bounce 2s infinite ease-in-out;
-    }
-    .marker-pin::after {
-      content: '';
-      width: 36px;
-      height: 36px;
-      margin: 6px 0 0 6px;
-      background: #0f172a;
-      position: absolute;
-      border-radius: 50%;
-    }
-    .marker-img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      position: absolute;
-      z-index: 10;
-      object-fit: cover;
-      border: 2px solid #f59e0b;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0) rotate(-45deg); }
-      50% { transform: translateY(-10px) rotate(-45deg); }
-    }
-  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 overflow-hidden select-none">
+<body class="bg-gray-100 p-4 min-h-screen text-gray-800">
 
-  <!-- 1. الخريطة تغطي الشاشة بالكامل -->
-  <div id="map"></div>
+  <div class="max-w-4xl mx-auto space-y-6">
+    <h1 class="text-2xl font-bold text-center text-indigo-700">نظام إدارة الزبناء والصناديق (ZOE)</h1>
 
-  <!-- 2. شريط الأدوات العلوي للهوية (Glassmorphism Navbar) -->
-  <header class="absolute top-4 right-4 left-4 z-20 flex items-center justify-between pointer-events-none">
-    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-2xl px-5 py-3 shadow-2xl flex items-center gap-3 pointer-events-auto">
-      <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-xl shadow-lg">
-        📦
-      </div>
-      <div>
-        <h1 class="font-extrabold text-sm md:text-base text-white tracking-wide">نظام تتبع الشبوك والديون</h1>
-        <p class="text-[11px] text-amber-400 font-medium">الفرع: البيضاء - اليمن</p>
-      </div>
+    <!-- نموذج إضافة زبون جديد -->
+    <div class="bg-white p-6 rounded-xl shadow-md">
+      <h2 class="text-lg font-semibold mb-4 text-gray-700">إضافة زبون جديد</h2>
+      <form id="addCustomerForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm mb-1">اسم الزبون</label>
+          <input type="text" id="name" required class="w-full border p-2 rounded-lg border-gray-300">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">رقم الهاتف</label>
+          <input type="text" id="phone" required class="w-full border p-2 rounded-lg border-gray-300">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">رابط الموقع (Google Maps)</label>
+          <input type="url" id="google_maps_url" class="w-full border p-2 rounded-lg border-gray-300">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">الصناديق المسلمة (فارغة لدى الزبون)</label>
+          <input type="number" id="total_delivered" value="0" min="0" class="w-full border p-2 rounded-lg border-gray-300">
+        </div>
+        <div>
+          <label class="block text-sm mb-1">الصناديق المحصلة منه</label>
+          <input type="number" id="total_returned" value="0" min="0" class="w-full border p-2 rounded-lg border-gray-300">
+        </div>
+        <div class="md:col-span-2">
+          <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">حفظ البيانات</button>
+        </div>
+      </form>
     </div>
 
-    <!-- عداد إجمالي الحالات -->
-    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-2xl px-4 py-2.5 shadow-2xl flex items-center gap-2 pointer-events-auto">
-      <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
-      <span class="text-xs font-bold text-slate-200">1 عميل يمتلك شبوك فارغة</span>
+    <!-- قائمة عرض واستدعاء الزبناء -->
+    <div class="bg-white p-6 rounded-xl shadow-md">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-gray-700">قائمة الزبناء</h2>
+        <button onclick="fetchCustomers()" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm hover:bg-gray-300">تحديث البيانات</button>
+      </div>
+      <div id="customersList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- سيتم استدعاء وعرض البطاقات هنا تلقائياً -->
+      </div>
     </div>
-  </header>
+  </div>
 
-  <!-- 3. لوحة تفاصيل العميل الجانبية Floating Card -->
-  <aside class="absolute bottom-6 right-4 left-4 md:left-auto md:w-96 z-20 pointer-events-auto">
-    <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-5 shadow-2xl space-y-4 transition-all duration-300">
-      
-      <!-- صورة الشبوك الفارغة + Badge -->
-      <div class="relative h-44 rounded-2xl overflow-hidden border border-slate-700/50 group">
-        <img 
-          src="https://postimg.cc/YLWDNm8Z" 
-          alt="الشبوك الفارغة" 
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1584473457406-6df3a637210c?q=80&w=600&auto=format&fit=crop';"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-        <div class="absolute top-3 right-3 bg-amber-500/90 backdrop-blur-md text-slate-950 font-black text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
-          <span>📦</span>
-          <span>المتبقي: <strong id="cageNum" class="text-sm">6</strong> شبوك</span>
-        </div>
-      </div>
-
-      <!-- المواصفات واسم الزبون -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-black text-white">حسين حبشي</h2>
-          <span class="text-[11px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold px-2.5 py-0.5 rounded-md">عميل دائم</span>
-        </div>
-        <p class="text-xs text-slate-400 flex items-center gap-1">
-          <span>🏪</span>
-          <span class="font-bold text-slate-300">احمد الحبشي للدواجن</span>
-        </p>
-      </div>
-
-      <!-- الإحداثيات والموقع -->
-      <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs text-slate-400 font-mono">
-        <div class="flex items-center gap-1.5">
-          <span class="text-amber-400">📍</span>
-          <span>13.985184, 45.574288</span>
-        </div>
-        <button onclick="centerMap()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-2 py-1 rounded transition">
-          تركيز الخريطة
-        </button>
-      </div>
-
-      <!-- أزرار التفاعل والإجراءات -->
-      <div class="grid grid-cols-2 gap-2 pt-1">
-        <button onclick="decreaseCages()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black py-2.5 px-3 rounded-xl text-xs transition shadow-lg shadow-amber-500/10 flex items-center justify-center gap-1 active:scale-95">
-          <span>استلام شبك (-1)</span>
-        </button>
-        <a href="https://maps.app.goo.gl/PVDHxv8XXFVzw61v5" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 active:scale-95">
-          <span>توجيه الخريطة</span>
-          <span>🗺️</span>
-        </a>
-      </div>
-
-    </div>
-  </aside>
-
-  <!-- 4. JavaScript لتشغيل الخريطة والمؤشر -->
   <script>
-    const lat = 13.985184;
-    const lng = 45.574288;
-    let cagesCount = 6;
+    // 1. استدعاء البيانات عند تحميل الصفحة
+    async function fetchCustomers() {
+      const list = document.getElementById('customersList');
+      list.innerHTML = '<p class="text-gray-500">جاري تحميل البيانات...</p>';
+      
+      try {
+        const res = await fetch('/api/zoe');
+        const data = await res.json();
 
-    // تهيئة الخريطة على ملء الشاشة
-    const map = L.map('map', {
-      zoomControl: false
-    }).setView([lat, lng], 16);
-
-    // إضافة بلاطات الخريطة
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
-
-    // إنشاء المؤشر المخصص المميز المضيء (Neon Custom Marker)
-    const customIcon = L.divIcon({
-      className: 'custom-marker',
-      html: `
-        <div class="marker-pin"></div>
-        <img src="https://postimg.cc/YLWDNm8Z" class="marker-img" onerror="this.src='https://images.unsplash.com/photo-1584473457406-6df3a637210c?q=80&w=600&auto=format&fit=crop';" />
-      `,
-      iconSize: [48, 48],
-      iconAnchor: [24, 48]
-    });
-
-    // إضافة المؤشر ورسالة Popup التفاعلية
-    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-
-    const updatePopup = () => {
-      marker.bindPopup(`
-        <div style="direction: rtl; font-family: 'Tajawal', sans-serif; text-align: right; color: #0f172a;">
-          <h3 style="font-weight: 800; font-size: 14px; margin: 0 0 4px 0;">حسين حبشي</h3>
-          <p style="font-size: 11px; color: #64748b; margin: 0 0 6px 0;">احمد الحبشي للدواجن</p>
-          <span style="background: #f59e0b; color: #0f172a; font-weight: 800; font-size: 11px; padding: 2px 8px; border-radius: 12px; inline-block;">
-            📦 ${cagesCount} شبوك متبقية
-          </span>
-        </div>
-      `).openPopup();
-    };
-
-    updatePopup();
-
-    // دالة تقليل عدد الشبوك عند الاستلام
-    function decreaseCages() {
-      if (cagesCount > 0) {
-        cagesCount--;
-        document.getElementById('cageNum').innerText = cagesCount;
-        updatePopup();
-      } else {
-        alert('تم استلام جميع الشبوك للعميل بنجاح!');
+        if (data.success && data.data.length > 0) {
+          list.innerHTML = data.data.map(item => `
+            <div class="border rounded-lg p-4 bg-gray-50 space-y-2 shadow-sm">
+              <div class="flex justify-between items-center border-b pb-2">
+                <span class="font-bold text-indigo-900">${item.name}</span>
+                <span class="text-sm bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full">${item.phone}</span>
+              </div>
+              <div class="text-sm text-gray-600">
+                <p>صناديق لديه: <strong>${item.crates_balance?.total_delivered || 0}</strong></p>
+                <p>صناديق محصلة: <strong>${item.crates_balance?.total_returned || 0}</strong></p>
+                <p class="text-red-600 font-bold">باقي لديه (المتبقي): ${item.crates_balance?.remaining_debt || 0}</p>
+              </div>
+              ${item.location?.google_maps_url ? `
+                <a href="${item.location.google_maps_url}" target="_blank" class="inline-block text-xs text-blue-600 hover:underline">عرض الموقع على الخريطة 📍</a>
+              ` : ''}
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<p class="text-gray-500">لا يوجد زبناء مسجلين حالياً.</p>';
+        }
+      } catch (err) {
+        list.innerHTML = '<p class="text-red-500">حدث خطأ أثناء جلب البيانات.</p>';
       }
     }
 
-    // إعادة الخريطة إلى مركز الموقع
-    function centerMap() {
-      map.flyTo([lat, lng], 16, {
-        animate: true,
-        duration: 1.5
-      });
-    }
-  </script>
+    // 2. إرسال وإضافة البيانات
+    document.getElementById('addCustomerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        google_maps_url: document.getElementById('google_maps_url').value,
+        total_delivered: document.getElementById('total_delivered').value,
+        total_returned: document.getElementById('total_returned').value,
+      };
 
+      try {
+        const res = await fetch('/api/zoe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          alert('تم إضافة الزبون بنجاح!');
+          document.getElementById('addCustomerForm').reset();
+          fetchCustomers(); // إعادة استدعاء التحديث لتظهر الإضافة مباشرة
+        } else {
+          alert('خطأ: ' + result.message);
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء الإضافة!');
+      }
+    });
+
+    // استدعاء البيانات تلقائياً أول مرة
+    fetchCustomers();
+  </script>
 </body>
 </html>
 

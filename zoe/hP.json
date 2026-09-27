@@ -1,0 +1,18 @@
+[
+  {
+    "_id": { "$oid": "66f6f1a8e123456789abcdef" },
+    "name": "حسين حبشي",
+    "phone": "736152088",
+    "location": {
+      "google_maps_url": "https://postimg.cc/YLWDNm8Z",
+      "address": ""
+    },
+    "crates_balance": {
+      "total_delivered": 12,
+      "total_returned": 4,
+      "remaining_debt": 8
+    },
+    "createdAt": { "$date": "2026-09-27T12:00:00Z" },
+    "updatedAt": { "$date": "2026-09-27T12:00:00Z" }
+  }
+]

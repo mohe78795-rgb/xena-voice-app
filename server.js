@@ -1,56 +1,76 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const path = require('path');
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// اتصال ذكي بمونجو: يعيد المحاولة تلقائياً عند عودة النت
-mongoose.connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 5000 // لا يعلق لأكثر من 5 ثواني إذا انقطع النت
-})
-.then(() => console.log('✅ متصل بسحابة MongoDB Atlas'))
-.catch(err => console.log('⚠️ لا يوجد إنترنت حالياً: السيرفر يعمل محلياً وسيتصل بمونجو تلقائياً فور عودة الشبكة'));
+// الاتصال بقاعدة البيانات
+const mongoURI = process.env.MONGO_URI;
+if (!mongoURI) {
+  console.error('❌ لم يتم العثور على MONGO_URI في ملف .env');
+  process.exit(1);
+}
 
-const Invoice = mongoose.model('Invoice', new mongoose.Schema({ _id: String }, { strict: false }));
-const Expense = mongoose.model('Expense', new mongoose.Schema({ _id: String }, { strict: false }));
-const DailyStock = mongoose.model('DailyStock', new mongoose.Schema({ _id: String }, { strict: false }));
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ تم الاتصال بقاعدة البيانات بنجاح.'))
+  .catch(err => console.error('❌ خطأ في الاتصال بقاعدة البيانات:', err.message));
 
-app.post('/api/sync', async (req, res) => {
-    // إذا لم يكن هناك اتصال بسحابة مونجو حالياً
-    if (mongoose.connection.readyState !== 1) {
-        return res.status(503).json({ success: false, message: "لا يوجد اتصال بالإنترنت، البيانات ستبقى محفوظة بالهاتف" });
-    }
+// تعريف مخطط كولكشن zoe
+const ZoeSchema = new mongoose.Schema({
+  name: String,
+  phone: String,
+  location: {
+    google_maps_url: String,
+    address: String
+  },
+  crates_balance: {
+    total_delivered: Number,
+    total_returned: Number,
+    remaining_debt: Number
+  }
+}, { timestamps: true });
 
-    try {
-        const { invoices, expenses, stock } = req.body;
+const ZoeModel = mongoose.model('Zoe', ZoeSchema, 'zoe');
 
-        if (invoices && invoices.length > 0) {
-            const invOps = invoices.map(inv => ({
-                updateOne: { filter: { _id: inv.id || inv._id }, update: { $set: { ...inv, _id: inv.id || inv._id } }, upsert: true }
-            }));
-            await Invoice.bulkWrite(invOps);
-        }
-
-        if (expenses && expenses.length > 0) {
-            const expOps = expenses.map(exp => ({
-                updateOne: { filter: { _id: exp.id || exp._id }, update: { $set: { ...exp, _id: exp.id || exp._id } }, upsert: true }
-            }));
-            await Expense.bulkWrite(expOps);
-        }
-
-        if (stock) {
-            await DailyStock.updateOne({ _id: `stock_${stock.date}` }, { $set: stock }, { upsert: true });
-        }
-
-        res.json({ success: true, message: "تم الترحيل للسحابة بنجاح" });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
+// API جلب بيانات الزبناء
+app.get('/api/zoe', async (req, res) => {
+  try {
+    const customers = await ZoeModel.find().sort({ createdAt: -1 });
+    res.json({ success: true, data: customers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 النظام يعمل على: http://localhost:${PORT}`));
+// API إضافة زبون جديد
+app.post('/api/zoe', async (req, res) => {
+  try {
+    const { name, phone, google_maps_url, total_delivered, total_returned } = req.body;
+    const remaining_debt = Number(total_delivered || 0) - Number(total_returned || 0);
+
+    const newCustomer = new ZoeModel({
+      name,
+      phone,
+      location: { google_maps_url: google_maps_url || '', address: '' },
+      crates_balance: {
+        total_delivered: Number(total_delivered || 0),
+        total_returned: Number(total_returned || 0),
+        remaining_debt
+      }
+    });
+
+    await newCustomer.save();
+    res.json({ success: true, message: 'تم حفظ البيانات بنجاح!', data: newCustomer });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 السيرفر يعمل على: http://localhost:${PORT}`);
+});
