@@ -3,296 +3,421 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>محصل الشبوك - معجم لتسويق الدواجن</title>
+  <title>إدارة الزبائن والمواقع - مكتب معجم لتسويق الدواجن</title>
+  
+  <!-- Manifest لميزة المشاركة من خرائط جوجل -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#059669">
 
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+  
+  <!-- Leaflet CSS الخريطة المدمجة -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
   <style>
-    body { background-color: #f8fafc; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .digital-glow {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+      background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+    }
+    #interactiveMap { height: 260px; width: 100%; border-radius: 1rem; }
   </style>
 </head>
-<body class="font-sans min-h-screen text-slate-800 flex flex-col justify-between pb-24 select-none">
+<body class="bg-slate-900 font-sans min-h-screen text-slate-100 p-3 sm:p-6 flex items-center justify-center">
 
-  <!-- ==================== 1. الهيدر العلوي ==================== -->
-  <header class="sticky top-0 z-40 bg-slate-900 text-white border-b-2 border-emerald-500 px-4 py-3.5 shadow-md">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xl shadow">
-          <i class="fa-solid fa-boxes-packing"></i>
-        </div>
-        <div>
-          <h1 class="text-base font-black text-white tracking-wide leading-tight">
-            معجم لتسويق الدواجن
-          </h1>
-          <p class="text-[11px] text-emerald-400 font-bold">نظام محصل الشبوك الفارغة</p>
-        </div>
+  <div class="w-full max-w-md bg-slate-800 p-5 sm:p-6 rounded-3xl border border-slate-700 shadow-2xl space-y-5">
+
+    <!-- الهيدر والوصول السريع -->
+    <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+      <div>
+        <h1 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-boxes-packing text-emerald-400"></i> معجم لتسويق الدواجن
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">تسجيل حركة الصناديق الفارغة والمواقع</p>
       </div>
 
-      <div class="flex items-center gap-2">
-        <span id="serverStatus" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-emerald-400 border border-emerald-500/30 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          مربوط
-        </span>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- ==================== 2. محتوى الصفحة الرئيسية ==================== -->
-  <main class="max-w-md mx-auto w-full px-4 py-4 space-y-4 flex-1">
-
-    <!-- شريط البحث السريع -->
-    <div class="relative">
-      <input type="text" id="searchInput" oninput="filterCustomers()" placeholder="ابحث باسم الزبون أو رقم الهاتف..." 
-             class="w-full bg-white border border-slate-300 pl-4 pr-11 py-3 rounded-2xl text-xs font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-800 focus:ring-2 focus:ring-slate-200 shadow-sm">
-      <i class="fa-solid fa-magnifying-glass absolute right-4 top-3.5 text-slate-400 text-sm"></i>
-    </div>
-
-    <!-- قائمة الزبائن -->
-    <div id="customersContainer" class="space-y-4">
-      <div class="text-center py-12 text-slate-600 font-bold">
-        <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-slate-800"></i>
-        <p class="text-xs">جاري الاتصال بقاعدة البيانات...</p>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ==================== 3. الشريط السفلي ==================== -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900 text-white border-t border-slate-800 py-2.5 px-6 shadow-2xl">
-    <div class="max-w-md mx-auto flex justify-between items-center">
-
-      <button onclick="switchTab('home')" id="tab-home" class="flex flex-col items-center gap-1 transition group">
-        <div class="w-11 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black group-hover:scale-105 transition shadow">
-          <i class="fa-solid fa-house text-sm"></i>
-        </div>
-        <span class="text-xs text-emerald-400 font-bold">الرئيسية</span>
+      <!-- زر قائمة أسماء الزبائن -->
+      <button type="button" onclick="toggleCustomersMenu()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-xl transition shadow flex items-center gap-2">
+        <i class="fa-solid fa-users"></i> أسماء الزبائن
       </button>
-
-      <button onclick="switchTab('messages')" id="tab-messages" class="flex flex-col items-center gap-1 transition group">
-        <div class="relative w-11 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition">
-          <i class="fa-solid fa-comments text-sm"></i>
-          <span class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 text-slate-950 text-[10px] font-black rounded-full flex items-center justify-center border border-slate-900">3</span>
-        </div>
-        <span class="text-xs text-slate-300 font-medium">الرسائل</span>
-      </button>
-
-      <button onclick="switchTab('notifications')" id="tab-notifications" class="flex flex-col items-center gap-1 transition group">
-        <div class="relative w-11 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition">
-          <i class="fa-solid fa-bell text-sm"></i>
-          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border border-slate-900 animate-pulse"></span>
-        </div>
-        <span class="text-xs text-slate-300 font-medium">التنبيهات</span>
-      </button>
-
     </div>
-  </nav>
 
-  <!-- ==================== 4. النافذة المنبثقة التفاعلية (Modal) ==================== -->
-  <div id="statusModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center px-4 transition-all">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-100 text-center space-y-4 animate-in fade-in zoom-in duration-200">
-      
-      <!-- أيقونة الحالة -->
-      <div id="modalIconContainer" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl shadow-inner bg-emerald-100 text-emerald-600">
-        <i id="modalIcon" class="fa-solid fa-circle-check"></i>
+    <!-- قائمة منسدلة سريعة لأسماء الزبائن -->
+    <div id="customersListMenu" class="hidden bg-slate-800 border border-slate-700 rounded-2xl p-4 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-700">
+        <span class="text-xs font-bold text-slate-300">قائمة الزبائن المسجلين</span>
+        <button type="button" onclick="toggleCustomersMenu()" class="text-slate-400 hover:text-slate-200 text-sm">&times;</button>
+      </div>
+      <ul id="namesOnlyList" class="max-h-48 overflow-y-auto space-y-1.5 text-sm text-slate-200 divide-y divide-slate-700/50">
+        <li class="py-1 text-slate-400 text-xs text-center">جاري تحميل الأسماء...</li>
+      </ul>
+    </div>
+
+    <!-- النموذج -->
+    <form id="customerCratesForm" class="space-y-4">
+
+      <!-- الحقل 1: اسم الزبون -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">اسم الزبون</label>
+        <div class="relative flex gap-2">
+          <input type="text" id="customer_name" required placeholder="أدخل اسم الزبون..." class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <button type="button" onclick="selectFromContacts()" title="اختر من جهات الاتصال" class="bg-slate-700 hover:bg-slate-600 text-emerald-400 px-3.5 rounded-xl text-base transition flex items-center justify-center border border-slate-600 shrink-0">
+            <i class="fa-solid fa-address-book"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- العنوان والرسالة -->
-      <div class="space-y-1">
-        <h3 id="modalTitle" class="text-lg font-black text-slate-900">تمت العملية بنجاح!</h3>
-        <p id="modalMessage" class="text-xs text-slate-600 font-medium leading-relaxed"></p>
+      <!-- الحقل 2: رقم الهاتف -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">رقم هاتف الزبون</label>
+        <div class="relative">
+          <input type="tel" id="customer_phone" required placeholder="مثال: 770000000" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none dir-ltr text-right">
+          <i class="fa-solid fa-phone absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+        </div>
       </div>
 
-      <!-- ملخص تفاصيل الخصم والرصيد الدقيق -->
-      <div id="modalDetails" class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5 text-right font-medium text-slate-700">
-      </div>
-
-      <!-- أزرار التحكم بالنافذة المنبثقة -->
-      <div class="flex gap-2 pt-2">
-        <!-- زر فتح الواتساب بالرسالة المجهزة -->
-        <a id="modalWaBtn" href="#" target="_blank" onclick="closeModal()" 
-           class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2">
-          <i class="fa-brands fa-whatsapp text-sm"></i> إرسال واتساب
-        </a>
+      <!-- الحقل 3: تحديد موقع المحل والتفاعل المباشر -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">موقع محل الزبون</label>
         
-        <!-- زر إغلاق عادي -->
-        <button onclick="closeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-4 py-3 rounded-xl text-xs transition">
-          إغلاق
-        </button>
+        <div class="space-y-2">
+          <!-- الأزرار التفاعلية -->
+          <div class="flex gap-2">
+            <!-- زر التحديد بالدبوس على الخريطة المدمجة -->
+            <button type="button" onclick="openEmbeddedMap()" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-emerald-600 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-map-pin text-emerald-300"></i> تحديد بالدبوس
+            </button>
+
+            <!-- زر جلب الموقع الحالي GPS -->
+            <button type="button" onclick="getCurrentLocationGPS()" class="flex-1 bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-semibold p-2.5 rounded-xl border border-indigo-600 transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-crosshairs text-indigo-300"></i> موقعي الحالي (GPS)
+            </button>
+          </div>
+
+          <!-- حقل إدخال الرابط وقبول المشاركة التلقائية -->
+          <div class="relative">
+            <input type="url" id="google_maps_url" placeholder="رابط الخريطة سينزل هنا تلقائياً..." class="w-full bg-slate-900 border border-slate-700 p-2.5 pr-8 rounded-xl text-xs text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            <i class="fa-solid fa-link absolute right-3 top-3 text-slate-500 text-xs"></i>
+          </div>
+          <p id="locationStatus" class="text-[11px] text-slate-400 flex items-center gap-1 hidden"></p>
+        </div>
       </div>
 
+      <!-- الحقل 4: تسليم صناديق فارغة جديدة -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">تسليم صناديق فارغة اليوم (+)</label>
+        <div class="relative">
+          <input type="number" id="delivered_crates" value="0" min="0" oninput="calculateTotalGlow()" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <i class="fa-solid fa-box-archive absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+        </div>
+      </div>
+
+      <!-- الحقل 5: إرجاع صناديق فارغة -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5">إرجاع صناديق فارغة من الزبون (-)</label>
+        <div class="relative">
+          <input type="number" id="returned_crates" value="0" min="0" oninput="calculateTotalGlow()" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <i class="fa-solid fa-rotate-left absolute left-3.5 top-3.5 text-slate-500 text-xs"></i>
+        </div>
+      </div>
+
+      <!-- المربع الضوئي الرقمي لإجمالي المتبقي -->
+      <div class="pt-1">
+        <label class="block text-xs font-semibold text-slate-400 mb-2 text-center">إجمالي الصناديق المتبقية ذمة على الزبون</label>
+        <div class="digital-glow rounded-2xl p-4 border border-emerald-500/40 text-center space-y-1">
+          <div id="remaining_display" class="text-4xl font-black text-emerald-400 tracking-wider font-mono drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]">
+            0
+          </div>
+          <span class="text-[10px] text-emerald-300 uppercase tracking-widest font-semibold">صندوق فارغ</span>
+        </div>
+      </div>
+
+      <!-- زر الحفظ والطباعة -->
+      <button type="submit" id="submitBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition text-sm shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-cloud-arrow-up"></i> حفظ البيانات وطباعة الإيصال
+      </button>
+
+    </form>
+  </div>
+
+  <!-- نافذة الخريطة المدمجة بالتأشير الدبابيسي المباشر -->
+  <div id="embeddedMapModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-800 rounded-3xl max-w-lg w-full p-4 border border-slate-700 space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-700">
+        <span class="text-xs font-bold text-white flex items-center gap-1.5">
+          <i class="fa-solid fa-map-pin text-emerald-400"></i> انقر في أي مكان لوضع الدبوس الأحمر
+        </span>
+        <button type="button" onclick="closeEmbeddedMap()" class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      
+      <div id="interactiveMap"></div>
+
+      <div class="flex gap-2 pt-1">
+        <button type="button" onclick="confirmPinLocation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+          اعتماد هذا الموقع تلقائياً
+        </button>
+        <button type="button" onclick="closeEmbeddedMap()" class="bg-slate-700 text-slate-300 hover:bg-slate-600 px-4 py-2.5 rounded-xl text-xs">إلغاء</button>
+      </div>
     </div>
   </div>
 
-  <!-- ==================== البرمجة والربط بالسيرفر ==================== -->
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
     const API_URL = '/api/zoe';
-    let allCustomers = [];
+    let previousDebt = 0;
 
-    // 1. جلب البيانات من السيرفر
-    async function fetchCustomersFromDB() {
-      const container = document.getElementById('customersContainer');
+    let embeddedMap = null;
+    let activeMarker = null;
+    let currentPinLat = 13.9800;
+    let currentPinLng = 45.5700;
+
+    // 1. استقبال ميزة "المشاركة" التلقائية عند الضغط على مشاركة من Google Maps
+    window.addEventListener('DOMContentLoaded', () => {
+      const parsedUrl = new URL(window.location.href);
+      const sharedUrl = parsedUrl.searchParams.get('url') || parsedUrl.searchParams.get('text');
+
+      if (sharedUrl) {
+        const mapMatch = sharedUrl.match(/(https?:\/\/[^\s]+)/g);
+        if (mapMatch && mapMatch[0]) {
+          document.getElementById('google_maps_url').value = mapMatch[0];
+          
+          const statusEl = document.getElementById('locationStatus');
+          statusEl.classList.remove('hidden');
+          statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم التقاط الموقع المشارك بنجاح!`;
+        }
+      }
+    });
+
+    // 2. إدارة الخريطة التفاعلية المدمجة بالدبوس الأحمر
+    function openEmbeddedMap() {
+      const modal = document.getElementById('embeddedMapModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      if (!embeddedMap) {
+        embeddedMap = L.map('interactiveMap').setView([currentPinLat, currentPinLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(embeddedMap);
+
+        embeddedMap.on('click', function(e) {
+          currentPinLat = e.latlng.lat;
+          currentPinLng = e.latlng.lng;
+
+          if (activeMarker) {
+            activeMarker.setLatLng(e.latlng);
+          } else {
+            activeMarker = L.marker(e.latlng).addTo(embeddedMap);
+          }
+        });
+      } else {
+        setTimeout(() => embeddedMap.invalidateSize(), 200);
+      }
+    }
+
+    function closeEmbeddedMap() {
+      const modal = document.getElementById('embeddedMapModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmPinLocation() {
+      if (!activeMarker) {
+        alert('الرجاء النقر على الخريطة أولاً لتحديد موقع الدبوس.');
+        return;
+      }
+      const generatedUrl = `https://www.google.com/maps?q=${currentPinLat},${currentPinLng}`;
+      document.getElementById('google_maps_url').value = generatedUrl;
+      
+      const statusEl = document.getElementById('locationStatus');
+      statusEl.classList.remove('hidden');
+      statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
+      statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم اعتماد إحداثيات الدبوس بنجاح!`;
+
+      closeEmbeddedMap();
+    }
+
+    // 3. جلب الموقع الحالي فوراً عبر GPS
+    function getCurrentLocationGPS() {
+      const statusEl = document.getElementById('locationStatus');
+      statusEl.classList.remove('hidden');
+      statusEl.className = "text-[11px] text-indigo-400 flex items-center gap-1";
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري جلب الإحداثيات...`;
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            document.getElementById('google_maps_url').value = `https://www.google.com/maps?q=${lat},${lng}`;
+            statusEl.className = "text-[11px] text-emerald-400 flex items-center gap-1";
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> تم تحديث الموقع بنجاح!`;
+          },
+          () => {
+            statusEl.className = "text-[11px] text-rose-400 flex items-center gap-1";
+            statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> متعذر تحديد الموقع. تأكد من تفعيل GPS.`;
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      } else {
+        statusEl.className = "text-[11px] text-rose-400 flex items-center gap-1";
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> GPS غير مدعوم بجهازك.`;
+      }
+    }
+
+    // 4. إظهار/إخفاء قائمة الأسماء
+    async function toggleCustomersMenu() {
+      const menu = document.getElementById('customersListMenu');
+      menu.classList.toggle('hidden');
+
+      if (!menu.classList.contains('hidden')) {
+        fetchNamesOnly();
+      }
+    }
+
+    // 5. جلب قائمة أسماء الزبائن
+    async function fetchNamesOnly() {
+      const listContainer = document.getElementById('namesOnlyList');
       try {
         const res = await fetch(API_URL);
         const result = await res.json();
 
-        if (result.success) {
-          allCustomers = result.data || [];
-          renderCustomers(allCustomers);
+        if (result.success && result.data.length > 0) {
+          listContainer.innerHTML = result.data.map(c => `
+            <li class="py-2 px-1 flex justify-between items-center hover:text-emerald-400 cursor-pointer rounded-lg hover:bg-slate-750 transition" 
+                onclick="selectCustomer('${c.name}', '${c.phone}', '${c.location?.google_maps_url || ''}', ${c.crates_balance?.remaining_debt || 0})">
+              <span><i class="fa-solid fa-user text-xs text-indigo-400 ml-2"></i>${c.name}</span>
+              <span class="text-[11px] text-emerald-400 font-mono font-bold">${c.crates_balance?.remaining_debt || 0} صندوق</span>
+            </li>
+          `).join('');
         } else {
-          container.innerHTML = `
-            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center text-rose-700 font-bold">
-              <i class="fa-solid fa-triangle-exclamation text-3xl mb-2 text-rose-600"></i>
-              <p class="text-xs">خطأ في استجابة السيرفر: ${result.message}</p>
-            </div>
-          `;
+          listContainer.innerHTML = '<li class="py-2 text-slate-400 text-xs text-center">لا يوجد زبائن مسجلين.</li>';
         }
       } catch (err) {
-        container.innerHTML = `
-          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center text-amber-800 font-bold">
-            <i class="fa-solid fa-wifi text-3xl mb-2 text-amber-600"></i>
-            <p class="text-xs">فشل الاتصال بالسيرفر. تأكد من تشغيل الخادم.</p>
-          </div>
-        `;
+        listContainer.innerHTML = '<li class="py-2 text-rose-400 text-xs text-center">خطأ في الاتصال بالسيرفر!</li>';
       }
     }
 
-    // 2. تجميع رابط رسالة الواتساب بالصيغة المطلوبة
-    function generateWhatsAppLink(rawPhone, name, returned, remaining) {
-      let cleanPhone = rawPhone.replace(/\D/g, '');
-      if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
-      if (!cleanPhone.startsWith('967')) cleanPhone = '967' + cleanPhone;
+    // 6. اختيار زبون من القائمة
+    function selectCustomer(name, phone, mapUrl, currentDebt) {
+      document.getElementById('customer_name').value = name;
+      document.getElementById('customer_phone').value = phone;
+      document.getElementById('google_maps_url').value = mapUrl;
 
-      const text = `عميلنا العزيز (${name})
-معجم لتسويق الدواجن
-محصل الشبوك الفاضية
+      previousDebt = Number(currentDebt) || 0;
+      calculateTotalGlow();
 
-تم استلام لكم: (${returned}) شبوك فاضية.
-المتبقي عليكم: (${remaining}) شبوك.
-
-الرجاء توضيح وابلاغنا عن موقع باقي شبوكنا، مالم سيتم إدراجهم على حسابكم الخاص وتتحملون كافة المسؤولية عند إتلاف الصناديق أو ضياعها.`;
-
-      return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+      document.getElementById('customersListMenu').classList.add('hidden');
     }
 
-    // 3. عرض كروت الزبائن مع حساب دقيق للشبوك
-    function renderCustomers(list) {
-      const container = document.getElementById('customersContainer');
-      
-      if (!list || list.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-600 font-bold">
-            <i class="fa-solid fa-box-open text-4xl mb-3 text-slate-400"></i>
-            <p class="text-xs">لا يوجد زبائن مسجلين في قاعدة البيانات</p>
-          </div>
-        `;
-        return;
+    // 7. استيراد جهات الاتصال
+    async function selectFromContacts() {
+      if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+          const props = ['name', 'tel'];
+          const contacts = await navigator.contacts.select(props, { multiple: false });
+          
+          if (contacts.length > 0) {
+            const contact = contacts[0];
+            if (contact.name && contact.name[0]) {
+              document.getElementById('customer_name').value = contact.name[0];
+            }
+            if (contact.tel && contact.tel[0]) {
+              document.getElementById('customer_phone').value = contact.tel[0].replace(/\s+/g, '');
+            }
+          }
+        } catch (ex) {
+          alert('تعذر الوصول لجهات الاتصال.');
+        }
+      } else {
+        alert('ميزة استيراد جهات الاتصال غير مدعومة في متصفحك.');
       }
-
-      container.innerHTML = list.map(c => {
-        // حساب الرصيد الدقيق
-        const previousCrates = Number(c.crates_balance?.previous_debt || 0);
-        const todayDelivered = Number(c.crates_balance?.today_delivered || 0);
-        const totalReturned = Number(c.crates_balance?.total_returned || 0);
-        
-        // إجمالي المتبقي الحقيقي الدقيق
-        const calculatedRemaining = (previousCrates + todayDelivered) - totalReturned;
-        const totalRemaining = calculatedRemaining > 0 ? calculatedRemaining : 0;
-        
-        const mapsUrl = c.location?.google_maps_url || `https://maps.google.com/?q=13.9800,45.5700`;
-
-        return `
-          <div class="bg-white border border-slate-200/80 rounded-3xl p-4 shadow-sm space-y-3.5 relative hover:shadow-md transition">
-            
-            <!-- الهيدر والاسم والاتصال -->
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div class="space-y-1">
-                <h2 class="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <span class="w-7 h-7 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center shrink-0 border border-slate-200">
-                    <i class="fa-solid fa-store text-xs"></i>
-                  </span>
-                  ${c.name}
-                </h2>
-                <div class="flex items-center gap-2 text-xs text-slate-500 font-bold font-mono pr-1">
-                  <span>${c.phone}</span>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-1.5">
-                <a href="tel:${c.phone}" 
-                   class="w-9 h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center text-xs transition shadow-sm"
-                   title="اتصال تلفوني">
-                  <i class="fa-solid fa-phone"></i>
-                </a>
-
-                <a href="${mapsUrl}" target="_blank" 
-                   class="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 flex items-center justify-center text-xs transition shadow-sm" 
-                   title="فتح الموقع بالخريطة">
-                  <i class="fa-solid fa-location-dot"></i>
-                </a>
-              </div>
-            </div>
-
-            <!-- شبكة تفاصيل أعداد الشبوك بالكامل -->
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="bg-slate-50 p-2.5 rounded-2xl border border-slate-200/60">
-                <span class="block text-[10px] font-bold text-slate-500 mb-0.5">شبوك سابقة</span>
-                <span class="text-xs font-black text-slate-800 font-mono">${previousCrates}</span>
-              </div>
-
-              <div class="bg-amber-50 p-2.5 rounded-2xl border border-amber-200/60">
-                <span class="block text-[10px] font-bold text-amber-700 mb-0.5">مستلم اليوم</span>
-                <span class="text-xs font-black text-amber-600 font-mono">+${todayDelivered}</span>
-              </div>
-
-              <div class="bg-slate-900 text-white p-2.5 rounded-2xl shadow-sm border border-slate-800">
-                <span class="block text-[10px] font-bold text-slate-300 mb-0.5">إجمالي المتبقي</span>
-                <span class="text-sm font-black font-mono text-emerald-400 tracking-wider">${totalRemaining}</span>
-              </div>
-            </div>
-
-            <!-- نموذج استلام الشبوك -->
-            <form onsubmit="handleReceiveCrates(event, '${c.name}', '${c.phone}', '${mapsUrl}', ${totalRemaining})" class="pt-1 flex gap-2">
-              <div class="relative flex-1">
-                <input type="number" id="input_crates_${c.phone}" min="1" max="${totalRemaining > 0 ? totalRemaining : 999}" placeholder="عدد الشبوك المستلمة..." required
-                       class="w-full bg-slate-50 border border-slate-300 p-2.5 pr-8 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-slate-800 font-mono placeholder-slate-400">
-                <i class="fa-solid fa-box-archive absolute right-3 top-3 text-slate-400 text-xs"></i>
-              </div>
-
-              <button type="submit" id="btn_submit_${c.phone}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 rounded-xl text-xs transition shadow flex items-center gap-1.5 shrink-0">
-                <i class="fa-solid fa-check"></i> استلام
-              </button>
-            </form>
-
-          </div>
-        `;
-      }).join('');
     }
 
-    // 4. معالجة العملية وعرض النافذة المنبثقة التفاعلية
-    async function handleReceiveCrates(event, customerName, customerPhone, mapUrl, currentRemaining) {
-      event.preventDefault();
+    // 8. حساب المجموع الكلي
+    function calculateTotalGlow() {
+      const newDelivered = Number(document.getElementById('delivered_crates').value) || 0;
+      const newReturned = Number(document.getElementById('returned_crates').value) || 0;
+      const totalRemaining = previousDebt + newDelivered - newReturned;
+      document.getElementById('remaining_display').innerText = totalRemaining;
+    }
 
-      const inputEl = document.getElementById(`input_crates_${customerPhone}`);
-      const btnEl = document.getElementById(`btn_submit_${customerPhone}`);
-      const amount = Number(inputEl.value);
+    // 9. طباعة الإيصال الحراري (80mm)
+    function printCrateReceipt(data) {
+      const printWindow = window.open('', '_blank', 'width=400,height=600');
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="ar" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <title>إيصال حركة صناديق - ${data.customerName}</title>
+          <style>
+            @media print { @page { size: 80mm auto; margin: 0; } body { padding: 8px; } }
+            body { font-family: sans-serif; width: 78mm; margin: 0 auto; padding: 8px; font-size: 12px; }
+            .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 6px; margin-bottom: 8px; }
+            .header h2 { margin: 0; font-size: 15px; }
+            .info-table, .crates-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            .crates-table th, .crates-table td { border: 1px solid #000; padding: 5px; text-align: center; }
+            .total-box { border: 2px solid #000; padding: 6px; text-align: center; font-weight: bold; font-size: 13px; margin-top: 8px; }
+            .footer { text-align: center; margin-top: 10px; font-size: 10px; border-top: 1px dashed #000; padding-top: 5px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>مكتب معجم لتسويق الدواجن</h2>
+            <p style="margin:3px 0;">إيصال حركة صناديق فارغة</p>
+            <p style="margin:0; font-size:10px;">التاريخ: ${new Date().toLocaleString('ar-YE')}</p>
+          </div>
+          <table class="info-table">
+            <tr><td><strong>اسم الزبون:</strong> ${data.customerName}</td></tr>
+            <tr><td><strong>رقم الهاتف:</strong> ${data.phone}</td></tr>
+          </table>
+          <table class="crates-table">
+            <thead>
+              <tr><th>البيان</th><th>العدد</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>صناديق سابقة</td><td>${data.previousBalance}</td></tr>
+              <tr><td>مسلمة اليوم (+)</td><td>${data.delivered}</td></tr>
+              <tr><td>مرجعة اليوم (-)</td><td>${data.returned}</td></tr>
+            </tbody>
+          </table>
+          <div class="total-box">
+            إجمالي المتبقي ذمة: ${data.totalRemaining} صندوق
+          </div>
+          <div class="footer">شكراً لتعاملكم معنا</div>
+          <script>
+            window.onload = function() { window.print(); setTimeout(() => { window.close(); }, 500); };
+          <\/script>
+        </body>
+        </html>
+      `;
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
 
-      if (!amount || amount <= 0) return;
+    // 10. إرسال البيانات للسيرفر وطباعة الإيصال
+    document.getElementById('customerCratesForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      btnEl.disabled = true;
-      btnEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> حفظ...`;
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ والطباعة...`;
+
+      const customerName = document.getElementById('customer_name').value;
+      const customerPhone = document.getElementById('customer_phone').value;
+      const deliveredVal = Number(document.getElementById('delivered_crates').value) || 0;
+      const returnedVal = Number(document.getElementById('returned_crates').value) || 0;
 
       const payload = {
         name: customerName,
         phone: customerPhone,
-        google_maps_url: mapUrl,
-        total_delivered: 0,
-        total_returned: amount
+        google_maps_url: document.getElementById('google_maps_url').value,
+        total_delivered: deliveredVal,
+        total_returned: returnedVal
       };
 
       try {
@@ -304,86 +429,34 @@
         const result = await res.json();
 
         if (result.success) {
-          const newRemaining = Math.max(0, currentRemaining - amount);
-          const waUrl = generateWhatsAppLink(customerPhone, customerName, amount, newRemaining);
+          alert('تم حفظ البيانات بنجاح!');
 
-          // عرض النافذة المنبثقة
-          showModal({
-            title: 'تم تسجيل الاستلام بنجاح!',
-            message: `تم خصم وتسجيل استلام الشبوك بنجاح للزبون (${customerName}).`,
-            waUrl: waUrl,
-            details: `
-              <div class="flex justify-between border-b border-slate-200 pb-1"><span>اسم الزبون:</span> <strong class="text-slate-900">${customerName}</strong></div>
-              <div class="flex justify-between border-b border-slate-200 pb-1"><span>الشبوك المستلمة:</span> <strong class="text-emerald-600">${amount} صندوق</strong></div>
-              <div class="flex justify-between"><span>المتبقي عليه الآن:</span> <strong class="text-rose-600">${newRemaining} صندوق</strong></div>
-            `
+          // طباعة الإيصال
+          printCrateReceipt({
+            customerName: customerName,
+            phone: customerPhone,
+            previousBalance: result.meta?.previousBalance || previousDebt,
+            delivered: deliveredVal,
+            returned: returnedVal,
+            totalRemaining: result.data.crates_balance.remaining_debt
           });
 
-          inputEl.value = '';
-          fetchCustomersFromDB();
+          // إعادة ضبط النموذج
+          document.getElementById('customerCratesForm').reset();
+          document.getElementById('google_maps_url').value = '';
+          document.getElementById('locationStatus').classList.add('hidden');
+          previousDebt = 0;
+          calculateTotalGlow();
         } else {
-          alert('خطأ في العملية: ' + result.message);
+          alert('خطأ من السيرفر: ' + result.message);
         }
       } catch (err) {
-        alert('تعذر الاتصال بالسيرفر لحفظ الحركة!');
+        alert('حدث خطأ أثناء الاتصال بالسيرفر!');
       } finally {
-        btnEl.disabled = false;
-        btnEl.innerHTML = `<i class="fa-solid fa-check"></i> استلام`;
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> حفظ البيانات وطباعة الإيصال`;
       }
-    }
-
-    // 5. إظهار وإغلاق النافذة المنبثقة
-    function showModal({ title, message, details, waUrl }) {
-      const modal = document.getElementById('statusModal');
-      document.getElementById('modalTitle').innerText = title;
-      document.getElementById('modalMessage').innerText = message;
-      document.getElementById('modalDetails').innerHTML = details;
-      
-      const waBtn = document.getElementById('modalWaBtn');
-      waBtn.href = waUrl;
-
-      modal.classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('statusModal').classList.add('hidden');
-    }
-
-    // 6. فلترة الزبائن
-    function filterCustomers() {
-      const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      const filtered = allCustomers.filter(c => 
-        (c.name && c.name.toLowerCase().includes(query)) || 
-        (c.phone && c.phone.includes(query))
-      );
-      renderCustomers(filtered);
-    }
-
-    // 7. التنقل بين الصفحات السفلية
-    function switchTab(tabName) {
-      const tabs = ['home', 'messages', 'notifications'];
-      tabs.forEach(t => {
-        const el = document.getElementById(`tab-${t}`);
-        const iconDiv = el.querySelector('div');
-        const textSpan = el.querySelector('span');
-
-        if (t === tabName) {
-          iconDiv.className = "w-11 h-8 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black group-hover:scale-105 transition shadow";
-          textSpan.className = "text-xs text-emerald-400 font-bold";
-        } else {
-          iconDiv.className = "relative w-11 h-8 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center group-hover:scale-105 transition";
-          textSpan.className = "text-xs text-slate-300 font-medium";
-        }
-      });
-
-      if (tabName !== 'home') {
-        alert(`قسم ${tabName === 'messages' ? 'الرسائل' : 'التنبيهات'} قيد التحديث.`);
-      }
-    }
-
-    window.onload = () => {
-      fetchCustomersFromDB();
-    };
+    });
   </script>
 </body>
 </html>
