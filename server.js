@@ -4,6 +4,21 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const path = require('path');
 
+// قراءة ملف .env الموجود بجانب server.js عند التشغيل محليًا أو على Termux.
+// في Render يمكن استخدام Environment Variables مباشرة، وستكون لها الأولوية.
+const envFile = path.join(__dirname, '.env');
+if (require('fs').existsSync(envFile)) {
+  for (const raw of require('fs').readFileSync(envFile, 'utf8').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const match = line.match(/^([A-Z][A-Z0-9_]*)\s*=\s*(.*)$/);
+    if (!match || process.env[match[1]] !== undefined) continue;
+    let value = match[2].trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
+    process.env[match[1]] = value;
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 10000;
 const MONGO_URI = process.env.MONGO_URI;
