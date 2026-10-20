@@ -61,13 +61,19 @@ function amounts(line) {
 }
 function parseRows(text) {
   const out=[]; const seen=new Set();
-  const idRe=/\s(\d{1,4})\s*$/; const nameRe=/([\u0600-\u06ff][\u0600-\u06ff\s_\-ـ.,()]*?)\s*$/u;
-  for (const raw of text.split(/\r?\n/)) {
-    const line=clean(raw).trimEnd(), id=line.match(idRe); if(!id) continue;
-    const customer_id=Number(id[1]); if(customer_id<=0 || seen.has(customer_id)) continue;
-    const left=line.slice(0,id.index).trimEnd(), nm=left.match(nameRe); if(!nm) continue;
-    const customer_name=nm[1].replace(/\s+/g,' ').replace(/^[_\-.,()\s]+|[_\-.,()\s]+$/g,''); if(customer_name.length<2) continue;
-    seen.add(customer_id); const a=amounts(left.slice(0,nm.index));
+  const idRe=/(?<![\d.,])\d{1,4}(?![\d.,])/g;
+  const nameRe=/[\u0600-\u06ff][\u0600-\u06ff\s_\-ـ.,()]{1,160}/u;
+  for (const raw of String(text).replace(/\f/g,'\n').split(/\r?\n/)) {
+    const line=clean(raw).trim(); if(!line) continue;
+    const ids=[...line.matchAll(idRe)]; if(!ids.length) continue;
+    const nm=line.match(nameRe); if(!nm) continue;
+    // pdf-parse قد يعكس ترتيب الأعمدة؛ الرقم قد يكون أول الصف أو آخره.
+    const startsWithId=line.match(/^\s*(\d{1,4})(?![\d.,])\s+/);
+    const idMatch=startsWithId ? { 0: startsWithId[1] } : ids[ids.length-1];
+    const customer_id=Number(idMatch[0]); if(customer_id<=0 || customer_id>=10000 || seen.has(customer_id)) continue;
+    const customer_name=nm[0].replace(/\s+/g,' ').replace(/^[_\-.,()\s]+|[_\-.,()\s]+$/g,'');
+    if(customer_name.length<2 || !/[\u0600-\u06ff]{2}/u.test(customer_name)) continue;
+    seen.add(customer_id); const a=amounts(line).filter(value=>Number(value)!==customer_id);
     out.push({ customer_id, customer_name, balance: a.length ? a[a.length-1] : null, currency:'YER' });
   }
   return out;
