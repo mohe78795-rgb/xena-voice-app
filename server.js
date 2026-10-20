@@ -59,12 +59,26 @@ function amounts(line) {
     const n=Number(v); return Number.isFinite(n) ? n : null;
   }).filter(v => v !== null);
 }
+async function renderPdfPage(pageData) {
+  const content = await pageData.getTextContent({ normalizeWhitespace: false, disableCombineTextItems: false });
+  const rows = [];
+  for (const item of content.items) {
+    if (!String(item.str || '').trim()) continue;
+    const x = item.transform[4], y = item.transform[5];
+    let row = rows.find(entry => Math.abs(entry.y - y) < 2);
+    if (!row) { row = { y, items: [] }; rows.push(row); }
+    row.items.push({ x, text: item.str });
+  }
+  return rows.sort((a, b) => b.y - a.y)
+    .map(row => row.items.sort((a, b) => a.x - b.x).map(item => item.text).join(' ').replace(/\s+/g, ' ').trim())
+    .join('\n') + '\n';
+}
 function parseRows(text) {
   const out=[]; const seen=new Set();
   const idRe=/(?<![\d.,])\d{1,4}(?![\d.,])/g;
   const nameRe=/[\u0600-\u06ff][\u0600-\u06ff\s_\-ـ.,()]{1,160}/u;
   for (const raw of String(text).replace(/\f/g,'\n').split(/\r?\n/)) {
-    const line=clean(raw).trim(); if(!line) continue;
+    const line=clean(raw).trim(); if(!line || !/\bYER\b/.test(line)) continue;
     const ids=[...line.matchAll(idRe)]; if(!ids.length) continue;
     const nm=line.match(nameRe); if(!nm) continue;
     // pdf-parse قد يعكس ترتيب الأعمدة؛ الرقم قد يكون أول الصف أو آخره.
@@ -73,6 +87,7 @@ function parseRows(text) {
     const customer_id=Number(idMatch[0]); if(customer_id<=0 || customer_id>=10000 || seen.has(customer_id)) continue;
     const customer_name=nm[0].replace(/\s+/g,' ').replace(/^[_\-.,()\s]+|[_\-.,()\s]+$/g,'');
     if(customer_name.length<2 || !/[\u0600-\u06ff]{2}/u.test(customer_name)) continue;
+    if (/الاجمالي|الإجمالي|اجمالي|إجمالي/.test(customer_name)) continue;
     seen.add(customer_id); const a=amounts(line).filter(value=>Number(value)!==customer_id);
     out.push({ customer_id, customer_name, balance: a.length ? a[a.length-1] : null, currency:'YER' });
   }
@@ -83,8 +98,8 @@ function dto(c) { const x=c.toObject ? c.toObject() : c; return { ...x, current_
 app.get('/api/health', (_req,res) => res.json({ ok:true, mongo: mongoose.connection.readyState === 1 }));
 app.get('/api/customers', async (req,res) => { try { const q=String(req.query.q||''); const rows=await Customer.find(q ? { $or:[{customer_name:new RegExp(q,'i')},{customer_id:Number(q)||-1}] } : {}).sort({customer_id:1}).limit(500); res.json({customers:rows.map(dto)}); } catch(e){res.status(500).json({error:e.message});} });
 app.post('/api/customers', async (req,res) => { try { const b=req.body||{}, id=Number(b.customer_id), name=String(b.customer_name||'').trim(); if(!id||!name) return res.status(400).json({error:'رقم العميل والاسم مطلوبان.'}); const c=await Customer.create({customer_id:id,customer_name:name,phone:String(b.phone||''),credit_limit:b.credit_limit===''||b.credit_limit==null?null:Number(b.credit_limit),suspended:Boolean(b.suspended),statement_balance:0}); res.status(201).json({customer:dto(c)}); } catch(e){res.status(e.code===11000?409:400).json({error:e.code===11000?'رقم العميل موجود مسبقًا.':e.message});} });
-app.patch('/api/customers/:id', async (req,res) => { try { const b=req.body||{}, patch={updated_at:new Date()}; for(const k of ['customer_name','phone','suspended']) if(b[k]!==undefined) patch[k]=k==='customer_name'?String(b[k]).trim():b[k]; if(b.credit_limit!==undefined) patch.credit_limit=b.credit_limit===''||b.credit_limit==null?null:Number(b.credit_limit); const c=await Customer.findOneAndUpdate({customer_id:Number(req.params.id)},{$set:patch},{new:true}); if(!c)return res.status(404).json({error:'العميل غير موجود.'}); res.json({customer:dto(c)}); } catch(e){res.status(400).json({error:e.message});} });
-app.post('/api/pdf/preview', upload.single('pdf'), async (req,res) => { try { if(!req.file)return res.status(400).json({error:'اختر ملف PDF.'}); const data=await pdfParse(req.file.buffer); const records=parseRows(data.text); if(!records.length)return res.status(422).json({error:'لم أجد صفوف عملاء قابلة للقراءة في PDF.'}); const ids=records.map(x=>x.customer_id); const old=await Customer.find({customer_id:{$in:ids}}); const map=new Map(old.map(x=>[x.customer_id,x])); const items=records.map(r=>({ ...r, old_balance:map.get(r.customer_id)?.statement_balance ?? null, status:!map.has(r.customer_id)?'added':map.get(r.customer_id).statement_balance!==r.balance?'changed':'unchanged' })); res.json({file:req.file.originalname,records:items,summary:{incoming:items.length,added:items.filter(x=>x.status==='added').length,changed:items.filter(x=>x.status==='changed').length,unchanged:items.filter(x=>x.status==='unchanged').length}}); } catch(e){res.status(422).json({error:e.message});} });
+app.patch('/api/customers/:id', async (req,res) => { try { const b=req.body||{}, patch={updated_at:new Date()}; for(const k of ['customer_name','phone','suspended']) if(b[k]!==undefined) patch[k]=k==='customer_name'?String(b[k]).trim():b[k]; if(b.credit_limit!==undefined) patch.credit_limit=b.credit_limit===''||b.credit_limit==null?null:Number(b.credit_limit); const c=await Customer.findOneAndUpdate({customer_id:Number(req.params.id)},{$set:patch},{returnDocument:'after'}); if(!c)return res.status(404).json({error:'العميل غير موجود.'}); res.json({customer:dto(c)}); } catch(e){res.status(400).json({error:e.message});} });
+app.post('/api/pdf/preview', upload.single('pdf'), async (req,res) => { try { if(!req.file)return res.status(400).json({error:'اختر ملف PDF.'}); const data=await pdfParse(req.file.buffer,{pagerender:renderPdfPage}); const records=parseRows(data.text); if(!records.length)return res.status(422).json({error:'لم أجد صفوف عملاء قابلة للقراءة في PDF.'}); const ids=records.map(x=>x.customer_id); const old=await Customer.find({customer_id:{$in:ids}}); const map=new Map(old.map(x=>[x.customer_id,x])); const items=records.map(r=>({ ...r, old_balance:map.get(r.customer_id)?.statement_balance ?? null, status:!map.has(r.customer_id)?'added':map.get(r.customer_id).statement_balance!==r.balance?'changed':'unchanged' })); res.json({file:req.file.originalname,records:items,summary:{incoming:items.length,added:items.filter(x=>x.status==='added').length,changed:items.filter(x=>x.status==='changed').length,unchanged:items.filter(x=>x.status==='unchanged').length}}); } catch(e){res.status(422).json({error:e.message});} });
 app.post('/api/pdf/commit', async (req,res) => { try { const {file,records}=req.body||{}; if(!Array.isArray(records)||!records.length)return res.status(400).json({error:'لا توجد معاينة للاعتماد.'}); let changed=0; for(const r of records){ await Customer.findOneAndUpdate({customer_id:Number(r.customer_id)},{$set:{customer_name:r.customer_name,statement_balance:r.balance,updated_at:new Date()},$setOnInsert:{currency:'YER',balance_adjustment:0,credit_limit:null,phone:'',suspended:false}},{upsert:true,returnDocument:'after'}); changed++; } await Statement.findOneAndUpdate({_id:'current'},{$set:{_id:'current',source_file:file,records,records_extracted:records.length,imported_at:new Date()}},{upsert:true,returnDocument:'after'}); res.json({ok:true,updated:changed}); } catch(e){res.status(500).json({error:e.message});} });
 app.get('/', (_req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
 app.use((_req,res)=>res.status(404).json({error:'الرابط غير موجود.'}));
