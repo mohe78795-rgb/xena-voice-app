@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const path = require('path');
+const cors = require('cors');
 
 // قراءة ملف .env الموجود بجانب server.js عند التشغيل محليًا أو على Termux.
 // في Render يمكن استخدام Environment Variables مباشرة، وستكون لها الأولوية.
@@ -21,6 +22,14 @@ if (require('fs').existsSync(envFile)) {
 
 const app = express();
 const PORT = process.env.PORT || 10000;
+
+// السماح لواجهة الفواتير بقراءة العملاء والأرصدة من هذا الخادم.
+app.use(cors({
+  origin: true,
+  methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-account-id'],
+  optionsSuccessStatus: 204
+}));
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) console.warn('MONGO_URI غير مضبوط. أضفه في Render Environment Variables.');
 
